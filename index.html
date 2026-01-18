@@ -126,7 +126,7 @@
         </div>
       </div>
       <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
-        <div class="small muted">v1.1</div>
+        <div class="small muted">v1.2</div>
       </div>
     </header>
 
@@ -139,7 +139,7 @@
               <strong>Test reakcji — wideo</strong>
               <div class="small muted">Wczytaj wideo, ustaw zdarzenie (E) i mierz reakcje (Space)</div>
             </div>
-            <div class="small muted">Sprawdź swoją reakcję</div>
+            <div class="small muted">Team colors</div>
           </div>
 
           <div class="video-wrap" id="videoWrap">
@@ -465,7 +465,37 @@ function distanceBetweenTouches(a,b){
 /* --- Test logic (robust mapping) --- */
 startTestBtn.addEventListener('click', startTest);
 stopTestBtn.addEventListener('click', stopTest);
-reactBtn.addEventListener('click', reactNow);
+
+// ---- Low-latency react handler ----
+let _lastReactTs = 0;
+const REACT_DEBOUNCE_MS = 250; // zabezpiecza przed podwojeniem
+
+function lowLatencyReactHandler(ev) {
+  // uniemożliwiamy dwukrotne wywołanie: pointerdown -> click
+  const now = performance.now();
+  if (now - _lastReactTs < REACT_DEBOUNCE_MS) {
+    // zapobiegaj podwójnemu triggerowi
+    ev.preventDefault?.();
+    return;
+  }
+  _lastReactTs = now;
+
+  // jeśli event touch/pointer - zapobiegamy dalej propagacji, aby nie wywołać click później
+  if (ev) {
+    try { ev.preventDefault(); } catch(e){}
+    try { ev.stopPropagation(); } catch(e){}
+  }
+
+  // wywołaj Twoją istniejącą funkcję reactNow()
+  reactNow();
+}
+
+// Podłączamy niskolatency listener (pointerdown obsługuje touch i mouse)
+// Zakładając, że masz referencję: const reactBtn = document.getElementById('reactBtn');
+
+reactBtn.addEventListener('pointerdown', lowLatencyReactHandler, {passive:false});
+// dodatkowo na starszych przeglądarkach/tabletach możemy dodać touchstart aby mieć pewność:
+reactBtn.addEventListener('touchstart', lowLatencyReactHandler, {passive:false});
 
 function startTest(){
   if (!video.src) { alert('Wczytaj wideo najpierw'); return; }
