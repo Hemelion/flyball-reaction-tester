@@ -70,7 +70,8 @@
   .btn-ghost{background:transparent;border:1px solid #e6e9ef;color:var(--dark)}
 
   .react-row{display:flex;gap:12px;margin-top:12px;align-items:center;flex-wrap:wrap}
-  .react-big{flex:1;background:linear-gradient(90deg,var(--accent),#00b8f5);color:white;padding:14px;border-radius:12px;font-size:18px;box-shadow:0 8px 22px rgba(0,170,235,0.12);border:none}
+  .react-big{flex:1;background:linear-gradient(90deg,var(--accent),#00b8f5);color:white;padding:14px;border-radius:12px;font-size:18px;box-shadow:0 8px 22px rgba(0,170,235,0.12);border:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation;-webkit-user-select:none;}
+
 
   aside .card{padding:12px}
   .stat{font-size:13px;color:var(--mid)}
@@ -126,7 +127,7 @@
         </div>
       </div>
       <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
-        <div class="small muted">v1.2</div>
+        <div class="small muted">v1.3</div>
       </div>
     </header>
 
@@ -139,7 +140,7 @@
               <strong>Test reakcji — wideo</strong>
               <div class="small muted">Wczytaj wideo, ustaw zdarzenie (E) i mierz reakcje (Space)</div>
             </div>
-            <div class="small muted">Team colors</div>
+            <div class="small muted">Sprawdź swoją reakcję</div>
           </div>
 
           <div class="video-wrap" id="videoWrap">
@@ -465,37 +466,7 @@ function distanceBetweenTouches(a,b){
 /* --- Test logic (robust mapping) --- */
 startTestBtn.addEventListener('click', startTest);
 stopTestBtn.addEventListener('click', stopTest);
-
-// ---- Low-latency react handler ----
-let _lastReactTs = 0;
-const REACT_DEBOUNCE_MS = 250; // zabezpiecza przed podwojeniem
-
-function lowLatencyReactHandler(ev) {
-  // uniemożliwiamy dwukrotne wywołanie: pointerdown -> click
-  const now = performance.now();
-  if (now - _lastReactTs < REACT_DEBOUNCE_MS) {
-    // zapobiegaj podwójnemu triggerowi
-    ev.preventDefault?.();
-    return;
-  }
-  _lastReactTs = now;
-
-  // jeśli event touch/pointer - zapobiegamy dalej propagacji, aby nie wywołać click później
-  if (ev) {
-    try { ev.preventDefault(); } catch(e){}
-    try { ev.stopPropagation(); } catch(e){}
-  }
-
-  // wywołaj Twoją istniejącą funkcję reactNow()
-  reactNow();
-}
-
-// Podłączamy niskolatency listener (pointerdown obsługuje touch i mouse)
-// Zakładając, że masz referencję: const reactBtn = document.getElementById('reactBtn');
-
-reactBtn.addEventListener('pointerdown', lowLatencyReactHandler, {passive:false});
-// dodatkowo na starszych przeglądarkach/tabletach możemy dodać touchstart aby mieć pewność:
-reactBtn.addEventListener('touchstart', lowLatencyReactHandler, {passive:false});
+reactBtn.addEventListener('click', reactNow);
 
 function startTest(){
   if (!video.src) { alert('Wczytaj wideo najpierw'); return; }
@@ -559,6 +530,7 @@ function pollVideo(){
   }
   ongoingTest.raf = requestAnimationFrame(pollVideo);
 }
+
 
 function reactNow(){
   if (!ongoingTest || !ongoingTest.running){
