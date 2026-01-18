@@ -127,7 +127,7 @@
         </div>
       </div>
       <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
-        <div class="small muted">v1.4</div>
+        <div class="small muted">v1.5</div>
       </div>
     </header>
 
@@ -300,7 +300,6 @@ fileInput.addEventListener('change', (e)=>{
   setVideoIdentityFromFile(f);
   eventTime = null; updateEventUI();
   loadSavedList();
-  // reset transform to default or keep user zoom? keep last used scale but center
   tx = 0; ty = 0; updateTransform();
 });
 
@@ -338,7 +337,6 @@ function updateEventUI(){
 
 /* SAVE EVENT */
 document.getElementById('setEventBtn').addEventListener('dblclick', ()=>{
-  // dblclick to quickly save
   saveEvent();
 });
 document.getElementById('setEventBtn').addEventListener('contextmenu', (e)=>{ e.preventDefault(); saveEvent(); });
@@ -397,12 +395,10 @@ function updateTransform(){
   transformer.style.setProperty('--scale', `${scale}`);
   zoomLabel.textContent = `${Math.round(scale*100)}%`;
   zoomSlider.value = scale;
-  // save global preference
   localStorage.setItem('fly_zoom', String(scale));
 }
 zoomSlider.addEventListener('input', (e)=>{
   scale = parseFloat(e.target.value);
-  // optional: clamp translate so content not move outside view - but keep simple
   updateTransform();
 });
 
@@ -416,7 +412,6 @@ largeBtn.addEventListener('click', ()=>{ scale = 1.6; tx = 0; ty = 0; updateTran
 let pointerActive = false;
 let lastPointer = {x:0,y:0};
 videoWrap.addEventListener('pointerdown', (e)=>{
-  // only start pan if scale != 1
   if (scale === 1) return;
   pointerActive = true;
   lastPointer.x = e.clientX; lastPointer.y = e.clientY;
@@ -443,12 +438,11 @@ videoWrap.addEventListener('touchstart', (e)=>{
 }, {passive:false});
 videoWrap.addEventListener('touchmove', (e)=>{
   if (e.touches && e.touches.length === 2){
-    e.preventDefault(); // prevent page scroll while pinch
+    e.preventDefault();
     const dist = distanceBetweenTouches(e.touches[0], e.touches[1]);
     if (lastPinchDist){
       const delta = dist - lastPinchDist;
-      // change scale proportional
-      let factor = 1 + delta / 300; // sensitivity
+      let factor = 1 + delta / 300;
       scale = Math.max(0.5, Math.min(2.5, scale * factor));
       updateTransform();
     }
@@ -467,7 +461,7 @@ function distanceBetweenTouches(a,b){
 startTestBtn.addEventListener('click', startTest);
 stopTestBtn.addEventListener('click', stopTest);
 
-// ZMIANA: zamiast click używamy pointerdown, żeby pozbyć się opóźnienia tap na mobile
+/* Natychmiastowa reakcja na dotyk/klik (bez opóźnienia click na mobile) */
 reactBtn.addEventListener('pointerdown', (e)=>{
   e.preventDefault();
   reactNow();
@@ -489,6 +483,7 @@ function startTest(){
     preRoll,
     expectedEventPerfTime: null,
     startPerfOffset: null,
+    eventPerfTime: null,
     raf: null
   };
   runNextTrial();
@@ -512,6 +507,7 @@ function runNextTrial(){
     ongoingTest.startPerfOffset = performance.now() - (video.currentTime * 1000) / (video.playbackRate || 1);
     ongoingTest.expectedEventPerfTime = ongoingTest.startPerfOffset + (eventTime * 1000) / (video.playbackRate || 1);
     ongoingTest.eventTriggered = false;
+    ongoingTest.eventPerfTime = null;
     ongoingTest.trialStartWall = new Date().toISOString();
     video.play().then(()=>{
       trialInfo.textContent = `Próba ${trialIndex} / ${ongoingTest.trialsTotal} — gra. Naciśnij Space lub "Reaguj".`;
@@ -531,20 +527,29 @@ function pollVideo(){
     const eventPerf = performance.now() - Math.max(0, overshootMs);
     ongoingTest.eventTriggered = true;
     ongoingTest.eventPerfTime = eventPerf;
-    // we do NOT provide extra visual cue (user must react)
   }
   ongoingTest.raf = requestAnimationFrame(pollVideo);
 }
 
-
 function reactNow(){
   if (!ongoingTest || !ongoingTest.running){
-    alert('Brak trwającego testu.'); return;
+    alert('Brak trwającego testu.');
+    return;
   }
+
   const pressPerf = performance.now();
-  const expected = ongoingTest.expectedEventPerfTime;
-  const reactionMs = pressPerf - expected;
-  const reactionRounded = Math.round(reactionMs*10)/10;
+  let reactionMs;
+
+  if (ongoingTest.eventPerfTime != null) {
+    // zdarzenie z wideo już zaszło – używamy rzeczywistego timestampu
+    reactionMs = pressPerf - ongoingTest.eventPerfTime;
+  } else {
+    // naciśnięcie PRZED zdarzeniem (przewidywanie) – fallback na teoretyczny czas
+    const expected = ongoingTest.expectedEventPerfTime ?? pressPerf;
+    reactionMs = pressPerf - expected;
+  }
+
+  const reactionRounded = Math.round(reactionMs * 10) / 10;
 
   try { video.pause(); } catch(e){}
   if (ongoingTest.raf) cancelAnimationFrame(ongoingTest.raf);
@@ -553,7 +558,6 @@ function reactNow(){
   const classification = classifyReaction(reactionMs);
   const note = classification.valid ? 'OK' : 'Przewidziałeś';
 
-  // zapisz wynik z dodatkowymi polami
   results.push({
     trial: ongoingTest.currentTrial,
     ms: reactionRounded,
@@ -567,8 +571,9 @@ function reactNow(){
   updateResultsUI();
 
   setTimeout(()=>{
-    if (ongoingTest.currentTrial < ongoingTest.trialsTotal) runNextTrial();
-    else {
+    if (ongoingTest.currentTrial < ongoingTest.trialsTotal) {
+      runNextTrial();
+    } else {
       ongoingTest.running = false;
       trialInfo.textContent = `Test zakończony. ${results.length} wyników.`;
     }
@@ -584,7 +589,6 @@ function stopTest(){
 }
 
 function classifyReaction(ms){
-  // ms może być ujemne => przewidziane
   if (ms < 120) {
     return { label: 'Przewidziałeś', valid: false, color: 'danger' };
   }
@@ -623,7 +627,6 @@ function updateResultsUI(){
     resultsBody.appendChild(tr);
   });
 
-  // Statystyki – tylko valid === true
   const validResults = results.filter(r => r.valid === true);
   const predictedCount = results.length - validResults.length;
 
@@ -639,14 +642,12 @@ function updateResultsUI(){
   const min = Math.min(...nums);
   const max = Math.max(...nums);
 
-  // 👉 ODCHYLENIE STANDARDOWE (powtarzalność)
   const mean = nums.reduce((a,b)=>a+b,0) / nums.length;
   const variance = nums.reduce((sum, v)=>{
     return sum + Math.pow(v - mean, 2);
   }, 0) / nums.length;
   const stdDev = Math.sqrt(variance);
 
-  // Klasyfikacja powtarzalności
   let consistencyLabel = '';
   let consistencyColor = '';
 
@@ -694,35 +695,26 @@ exportCsvBtn.addEventListener('click', ()=>{
   URL.revokeObjectURL(url);
 });
 
-/* Persist zoom per user (global) - already saved in updateTransform */
-/* Optionally: remember last tx/ty? we keep centered after presets */
-
 /* INITIALIZE saved list on load */
 window.addEventListener('load', ()=>{
-  // restore zoom from storage
   const stored = parseFloat(localStorage.getItem('fly_zoom') || '1');
   if (!isNaN(stored)){ scale = stored; updateTransform(); }
   loadSavedList();
   updateResultsUI();
 });
 
-/* Extra: reset transform on double-tap/click on transformer */
+/* reset transform on double-tap/click on transformer */
 transformer.addEventListener('dblclick', ()=>{
   scale = 1; tx = 0; ty = 0; updateTransform();
 });
 
 /* Small UX: when video loads metadata adjust transform constraints */
 video.addEventListener('loadedmetadata', ()=>{
-  // if on mobile, slightly increase default zoom so event is clearer
   if (window.innerWidth < 600 && scale === 1) { scale = 1.15; updateTransform(); }
 });
 
 /* Prevent accidental drag of video element */
 video.addEventListener('dragstart', (e)=> e.preventDefault());
-
-/* Optional: quick save event button via long press on setEventBtn — implemented with dblclick/contextmenu above */
-
-/* End of script */
 </script>
 </body>
 </html>
