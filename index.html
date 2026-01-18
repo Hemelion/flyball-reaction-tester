@@ -45,7 +45,6 @@
     max-height: 60vh; /* gwarantuje UI widoczne */
     touch-action: none;
   }
-  /* element transformowany przez CSS vars (tx,ty,scale) */
   .video-inner {
     transform-origin: center center;
     transform: translate(var(--tx), var(--ty)) scale(var(--scale));
@@ -72,7 +71,6 @@
   .react-row{display:flex;gap:12px;margin-top:12px;align-items:center;flex-wrap:wrap}
   .react-big{flex:1;background:linear-gradient(90deg,var(--accent),#00b8f5);color:white;padding:14px;border-radius:12px;font-size:18px;box-shadow:0 8px 22px rgba(0,170,235,0.12);border:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation;-webkit-user-select:none;}
 
-
   aside .card{padding:12px}
   .stat{font-size:13px;color:var(--mid)}
   .results{margin-top:10px;max-height:260px;overflow:auto}
@@ -87,7 +85,6 @@
   .zoom-panel{display:flex;gap:8px;align-items:center;margin-top:10px}
   .zoom-panel input[type="range"]{flex:1}
 
-  /* mobile tweaks */
   @media (max-width:700px){
     .logo{width:48px;height:48px}
     .brand h1{font-size:16px}
@@ -96,7 +93,6 @@
     video{max-height:42vh}
   }
 
-  /* helper for overlayed event marker (optional) */
   .event-marker {
     position:absolute;
     top:8px;
@@ -127,7 +123,7 @@
         </div>
       </div>
       <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
-        <div class="small muted">v1.5</div>
+        <div class="small muted">v1.7</div>
       </div>
     </header>
 
@@ -214,12 +210,20 @@
           </div>
         </div>
 
+        <!-- NOWA KARTA: wykres Gaussa -->
         <div class="card" style="margin-top:12px">
           <div style="display:flex;justify-content:space-between;align-items:center">
-            <div><strong>Zdarzenia (zapisane)</strong><div class="small muted">localStorage</div></div>
-            <div><button class="btn btn-ghost" id="loadSavedBtn">Pokaż</button></div>
+            <div>
+              <strong>Krzywa powtarzalności</strong>
+              <div class="small muted">Rozkład Twoich czasów reakcji</div>
+            </div>
           </div>
-          <div id="savedList" style="margin-top:10px;max-height:220px;overflow:auto"></div>
+          <div style="margin-top:10px">
+            <canvas id="gaussCanvas" width="320" height="200" style="width:100%;height:auto;"></canvas>
+            <div id="gaussInfo" class="small muted" style="margin-top:6px">
+              Wykres pojawi się po zakończeniu testu (min. 3 ważne próby).
+            </div>
+          </div>
         </div>
 
         <div class="card" style="margin-top:12px">
@@ -227,7 +231,7 @@
           <ul class="small muted">
             <li>Użyj suwaka Zoom lub gestu pinch, aby powiększyć fragment wideo.</li>
             <li>Przeciągnij (drag/pan) aby przesunąć widok przy zoomie.</li>
-            <li>Zapisy zdarzeń są przypisane do pliku (name|size|lastModified) lub URL.</li>
+            <li>Celem jest jak najwęższa krzywa (idealnie powtarzalne czasy reakcji).</li>
           </ul>
         </div>
       </aside>
@@ -235,8 +239,8 @@
   </div>
 
 <script>
-/* Pełna funkcjonalność: zoom, pan, pinch, test reakcji, zapisy, export */
-/* BEZPIECZNE założenia: działa lokalnie w przeglądarce - bez backendu */
+/* Pełna funkcjonalność: zoom, pan, pinch, test reakcji, statystyki, wykres Gaussa */
+/* Uwaga: pomiary czasów warto dodatkowo weryfikować w realnej przeglądarce/urządzeniu. */
 
 const video = document.getElementById('video');
 const transformer = document.getElementById('transformer');
@@ -265,8 +269,10 @@ const resultsBody = document.getElementById('resultsBody');
 const statsDiv = document.getElementById('stats');
 const exportCsvBtn = document.getElementById('exportCsvBtn');
 
-const loadSavedBtn = document.getElementById('loadSavedBtn');
-const savedList = document.getElementById('savedList');
+/* Wykres Gaussa */
+const gaussCanvas = document.getElementById('gaussCanvas');
+const gaussInfo = document.getElementById('gaussInfo');
+const gaussCtx = gaussCanvas.getContext('2d');
 
 let currentVideoKey = null;
 let currentFileObject = null;
@@ -280,7 +286,7 @@ let scale = parseFloat(localStorage.getItem('fly_zoom') || '1');
 let tx = 0, ty = 0; // pixels
 updateTransform();
 
-/* Helpers */
+/* Helpers: identyfikacja wideo (zostawione, gdybyś chciał wrócić do zapisu zdarzeń) */
 function setVideoIdentityFromFile(f){
   currentFileObject = f;
   currentVideoKey = `file:${f.name}|${f.size}|${f.lastModified}`;
@@ -299,7 +305,6 @@ fileInput.addEventListener('change', (e)=>{
   video.load();
   setVideoIdentityFromFile(f);
   eventTime = null; updateEventUI();
-  loadSavedList();
   tx = 0; ty = 0; updateTransform();
 });
 
@@ -311,7 +316,6 @@ loadUrlBtn.addEventListener('click', ()=>{
   video.load();
   setVideoIdentityFromUrl(url);
   eventTime = null; updateEventUI();
-  loadSavedList();
   tx = 0; ty = 0; updateTransform();
 });
 
@@ -319,7 +323,7 @@ loadUrlBtn.addEventListener('click', ()=>{
 setEventBtn.addEventListener('click', setEventAtCurrent);
 document.addEventListener('keydown', (e)=>{
   if (e.code === 'KeyE') { e.preventDefault(); setEventAtCurrent(); }
-  if (e.code === 'Space') { if (ongoingTest && ongoingTest.running) { e.preventDefault(); reactNow(); } else { /* optionally allow manual react */ } }
+  if (e.code === 'Space') { if (ongoingTest && ongoingTest.running) { e.preventDefault(); reactNow(); } }
   if (e.code === 'KeyS') { e.preventDefault(); startTestBtn.click(); }
 });
 
@@ -333,59 +337,6 @@ function setEventAtCurrent(){
 function updateEventUI(){
   if (eventTime == null){ eventMarker.style.display = 'none'; eventTimeText.textContent = '—'; }
   else { eventMarker.style.display = 'block'; eventTimeText.textContent = eventTime.toFixed(3) + 's'; }
-}
-
-/* SAVE EVENT */
-document.getElementById('setEventBtn').addEventListener('dblclick', ()=>{
-  saveEvent();
-});
-document.getElementById('setEventBtn').addEventListener('contextmenu', (e)=>{ e.preventDefault(); saveEvent(); });
-
-function saveEvent(){
-  if (!currentVideoKey) { alert('Wczytaj wideo najpierw.'); return; }
-  if (eventTime == null) { alert('Ustaw punkt zdarzenia (E) przed zapisaniem.'); return; }
-  const label = lastEventLabel || `event @ ${eventTime.toFixed(3)}s`;
-  const obj = {time:eventTime, label, savedAt:new Date().toISOString()};
-  localStorage.setItem('videoEvent:' + currentVideoKey, JSON.stringify(obj));
-  loadSavedList();
-  alert('Zapisano zdarzenie w localStorage.');
-}
-
-/* Saved list */
-loadSavedBtn.addEventListener('click', loadSavedList);
-function loadSavedList(){
-  savedList.innerHTML = '';
-  const prefix = 'videoEvent:';
-  const keys = Object.keys(localStorage).filter(k=>k.startsWith(prefix));
-  if (keys.length === 0){ savedList.textContent = '(brak zapisanych zdarzeń)'; return; }
-  keys.forEach(k=>{
-    try {
-      const v = JSON.parse(localStorage.getItem(k));
-      const shortKey = k.slice(prefix.length);
-      const row = document.createElement('div');
-      row.style.display='flex'; row.style.justifyContent='space-between'; row.style.alignItems='center'; row.style.marginBottom='8px';
-      const left = document.createElement('div');
-      left.innerHTML = `<div style="font-weight:700">${v.label}</div><div class="small muted">${v.time.toFixed(3)}s • ${shortKey}</div>`;
-      const right = document.createElement('div');
-      const loadBtn = document.createElement('button'); loadBtn.className='btn btn-ghost'; loadBtn.textContent='Wczytaj';
-      loadBtn.addEventListener('click', ()=>{
-        if (!video.src) { if (!confirm('Brak wczytanego wideo — chcesz wczytać zapisane zdarzenie i ustawić je dla aktualnego wideo?')) return; }
-        if (currentVideoKey !== shortKey) {
-          if (!confirm('Zapisane zdarzenie odpowiada innemu wideo (inna tożsamość). Nadal ustawić je?')) return;
-        }
-        eventTime = v.time; lastEventLabel = v.label; eventTimeText.textContent = eventTime.toFixed(3)+'s'; updateEventUI();
-        alert('Ustawiono zdarzenie z zapisu.');
-      });
-      const delBtn = document.createElement('button'); delBtn.className='btn btn-ghost'; delBtn.textContent='Usuń';
-      delBtn.addEventListener('click', ()=>{
-        if (!confirm('Usunąć zapis?')) return;
-        localStorage.removeItem(k); loadSavedList();
-      });
-      right.appendChild(loadBtn); right.appendChild(delBtn);
-      row.appendChild(left); row.appendChild(right);
-      savedList.appendChild(row);
-    } catch(e){}
-  });
 }
 
 /* --- ZOOM & PAN --- */
@@ -457,7 +408,7 @@ function distanceBetweenTouches(a,b){
   return Math.sqrt(dx*dx + dy*dy);
 }
 
-/* --- Test logic (robust mapping) --- */
+/* --- Test logic --- */
 startTestBtn.addEventListener('click', startTest);
 stopTestBtn.addEventListener('click', stopTest);
 
@@ -541,21 +492,20 @@ function reactNow(){
   let reactionMs;
 
   if (ongoingTest.eventPerfTime != null) {
-    // zdarzenie z wideo już zaszło – używamy rzeczywistego timestampu
     reactionMs = pressPerf - ongoingTest.eventPerfTime;
   } else {
-    // naciśnięcie PRZED zdarzeniem (przewidywanie) – fallback na teoretyczny czas
     const expected = ongoingTest.expectedEventPerfTime ?? pressPerf;
     reactionMs = pressPerf - expected;
   }
 
-  const reactionRounded = Math.round(reactionMs * 10) / 10;
+  // Zostawiono 30ms dla parametryzacji offsetu
+  const reactionRounded = 30 + (Math.round(reactionMs * 10) / 10);
 
   try { video.pause(); } catch(e){}
   if (ongoingTest.raf) cancelAnimationFrame(ongoingTest.raf);
 
   ongoingTest.currentTrial += 1;
-  const classification = classifyReaction(reactionMs);
+  const classification = classifyReaction(reactionRounded);
   const note = classification.valid ? 'OK' : 'Przewidziałeś';
 
   results.push({
@@ -576,6 +526,7 @@ function reactNow(){
     } else {
       ongoingTest.running = false;
       trialInfo.textContent = `Test zakończony. ${results.length} wyników.`;
+      // po zakończeniu testu wykres jest już odświeżony przez updateResultsUI()
     }
   }, 700);
 }
@@ -589,17 +540,15 @@ function stopTest(){
 }
 
 function classifyReaction(ms){
-  if (ms < 120) {
-    return { label: 'Przewidziałeś', valid: false, color: 'danger' };
-  }
   const m = Math.round(ms);
-  if (m <= 140) return { label: 'Rewelacja', valid: true, color: 'gold' };
-  if (m <= 180) return { label: 'Bardzo dobrze', valid: true, color: 'green' };
-  if (m <= 250) return { label: 'Dobrze', valid: true, color: 'orange' };
+  if (m < 140) return { label: 'Przewidziałeś', valid: false, color: 'danger' };
+  if (m <= 180) return { label: 'Rewelacja', valid: true, color: 'gold' };
+  if (m <= 240) return { label: 'Bardzo dobrze', valid: true, color: 'green' };
+  if (m <= 270) return { label: 'Dobrze', valid: true, color: 'orange' };
   return { label: 'Do poprawy', valid: true, color: 'muted' };
 }
 
-/* RESULTS UI */
+/* RESULTS UI + STATYSTYKI + WYKRES GAUSSA */
 function updateResultsUI(){
   resultsBody.innerHTML = '';
   results.forEach((r, idx)=>{
@@ -635,6 +584,7 @@ function updateResultsUI(){
       Za mało prób do oceny powtarzalności.
       <span style="color:#b00020"> Przewidzianych: ${predictedCount}</span>
     `;
+    drawEmptyGauss('Za mało danych do krzywej (min. 3 ważne próby).');
     return;
   }
 
@@ -666,11 +616,11 @@ function updateResultsUI(){
   }
 
   statsDiv.innerHTML = `
-    Powtarzalność (SD): 
-    <b style="color:${consistencyColor}">±${stdDev.toFixed(1)} ms</b>
-    • ${consistencyLabel}
-    • Min: <b>${min.toFixed(1)} ms</b>
-    • Max: <b>${max.toFixed(1)} ms</b>
+    Powtarzalność (SD):<br/>
+    <b style="color:${consistencyColor}">±${stdDev.toFixed(1)} ms</b><br/>
+    • <b style="color:${consistencyColor}">${consistencyLabel}</b><br/>
+    • Min: <b>${min.toFixed(1)} ms</b><br/>
+    • Max: <b>${max.toFixed(1)} ms</b><br/>
     • Próby: ${validResults.length}
   `;
 
@@ -681,6 +631,201 @@ function updateResultsUI(){
       </span>
     `;
   }
+
+  // Aktualizacja wykresu Gaussa
+  drawGaussCurve(nums, mean, stdDev);
+}
+
+/* Rysowanie wykresu Gaussa */
+function drawEmptyGauss(msg){
+  if (!gaussCtx) return;
+  const ctx = gaussCtx;
+  const W = gaussCanvas.width;
+  const H = gaussCanvas.height;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle = '#f5f7fb';
+  ctx.fillRect(0,0,W,H);
+  ctx.fillStyle = '#888';
+  ctx.font = '12px system-ui, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('Brak danych', W/2, H/2 - 8);
+  if (msg){
+    ctx.fillText(msg, W/2, H/2 + 10);
+  }
+  gaussInfo.textContent = msg || 'Wykres pojawi się po zakończeniu testu (min. 3 ważne próby).';
+}
+
+function drawGaussCurve(samples, mean, stdDev){
+  if (!gaussCtx) return;
+  const ctx = gaussCtx;
+  const W = gaussCanvas.width;
+  const H = gaussCanvas.height;
+
+  ctx.clearRect(0,0,W,H);
+
+  const paddingLeft = 35;
+  const paddingRight = 10;
+  const paddingTop = 10;
+  const paddingBottom = 22;
+
+  const plotW = W - paddingLeft - paddingRight;
+  const plotH = H - paddingTop - paddingBottom;
+  const baseY = H - paddingBottom;
+
+  // Jedno miejsce – praktycznie idealna powtarzalność
+  if (stdDev < 1e-3) {
+    ctx.fillStyle = '#f5f7fb';
+    ctx.fillRect(0,0,W,H);
+
+    // oś X
+    ctx.strokeStyle = '#ccd2e5';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(paddingLeft, baseY);
+    ctx.lineTo(W - paddingRight, baseY);
+    ctx.stroke();
+
+    const x = paddingLeft + plotW/2;
+    ctx.strokeStyle = '#00AEEB';
+    ctx.setLineDash([4,3]);
+    ctx.beginPath();
+    ctx.moveTo(x, baseY);
+    ctx.lineTo(x, paddingTop);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    ctx.fillStyle = '#00AEEB';
+    ctx.font = '11px system-ui, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'bottom';
+    ctx.fillText(`${mean.toFixed(1)} ms (idealnie powtarzalnie)`, x, paddingTop + 14);
+
+    gaussInfo.textContent = `Średnia: ${mean.toFixed(1)} ms • SD ≈ 0 ms — prawie idealna powtarzalność.`;
+    return;
+  }
+
+  const minSample = Math.min(...samples);
+  const maxSample = Math.max(...samples);
+
+  const left = Math.min(minSample, mean - 3*stdDev);
+  const right = Math.max(maxSample, mean + 3*stdDev);
+  const range = right - left || 1;
+
+  function xToCanvas(val){
+    return paddingLeft + ((val - left) / range) * plotW;
+  }
+
+  function normalPDF(x, mu, sigma){
+    const z = (x - mu) / sigma;
+    return Math.exp(-0.5 * z * z) / (sigma * Math.sqrt(2*Math.PI));
+  }
+
+  const steps = 120;
+  const xs = [];
+  const ys = [];
+  let maxPdf = 0;
+  for (let i=0;i<=steps;i++){
+    const x = left + (range * i / steps);
+    const pdf = normalPDF(x, mean, stdDev);
+    xs.push(x);
+    ys.push(pdf);
+    if (pdf > maxPdf) maxPdf = pdf;
+  }
+
+  ctx.fillStyle = '#f5f7fb';
+  ctx.fillRect(0,0,W,H);
+
+  // oś X
+  ctx.strokeStyle = '#ccd2e5';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(paddingLeft, baseY);
+  ctx.lineTo(W - paddingRight, baseY);
+  ctx.stroke();
+
+  // Siatka pomocnicza i opis osi X (co 20 ms)
+  const approxStep = 20;
+  const startTick = Math.ceil(left / approxStep) * approxStep;
+  const endTick = Math.floor(right / approxStep) * approxStep;
+  ctx.fillStyle = '#99a1bd';
+  ctx.font = '10px system-ui, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+
+  for (let t = startTick; t <= endTick; t += approxStep){
+    const cx = xToCanvas(t);
+    ctx.strokeStyle = '#eef1f8';
+    ctx.beginPath();
+    ctx.moveTo(cx, baseY);
+    ctx.lineTo(cx, paddingTop);
+    ctx.stroke();
+
+    ctx.fillStyle = '#99a1bd';
+    ctx.fillText(t.toFixed(0), cx, baseY + 3);
+  }
+
+  // Krzywa Gaussa
+  ctx.strokeStyle = '#00AEEB';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ys.forEach((pdf, i)=>{
+    const xVal = xs[i];
+    const cx = xToCanvas(xVal);
+    const norm = pdf / maxPdf;
+    const cy = baseY - norm * plotH;
+    if (i===0) ctx.moveTo(cx, cy);
+    else ctx.lineTo(cx, cy);
+  });
+  ctx.stroke();
+
+  // Średnia (μ)
+  const meanX = xToCanvas(mean);
+  ctx.strokeStyle = '#f9db2e';
+  ctx.setLineDash([5,3]);
+  ctx.beginPath();
+  ctx.moveTo(meanX, baseY);
+  ctx.lineTo(meanX, paddingTop);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  ctx.fillStyle = '#f9db2e';
+  ctx.font = '11px system-ui, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'bottom';
+  ctx.fillText(`μ = ${mean.toFixed(1)} ms`, meanX, paddingTop + 14);
+
+  // ±1σ
+  const sigma1Left = xToCanvas(mean - stdDev);
+  const sigma1Right = xToCanvas(mean + stdDev);
+  ctx.strokeStyle = 'rgba(0,174,235,0.35)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(sigma1Left, baseY);
+  ctx.lineTo(sigma1Left, paddingTop+5);
+  ctx.moveTo(sigma1Right, baseY);
+  ctx.lineTo(sigma1Right, paddingTop+5);
+  ctx.stroke();
+
+  ctx.fillStyle = '#00AEEB';
+  ctx.font = '10px system-ui, sans-serif';
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'top';
+  ctx.fillText('-1σ', sigma1Left - 2, paddingTop + 6);
+  ctx.textAlign = 'left';
+  ctx.fillText('+1σ', sigma1Right + 2, paddingTop + 6);
+
+  // Pojedyncze próby jako kropki
+  ctx.fillStyle = '#d06b00';
+  samples.forEach(v=>{
+    const cx = xToCanvas(v);
+    const cy = baseY - 3;
+    ctx.beginPath();
+    ctx.arc(cx, cy, 3, 0, Math.PI*2);
+    ctx.fill();
+  });
+
+  gaussInfo.textContent = `Średnia: ${mean.toFixed(1)} ms • SD: ±${stdDev.toFixed(1)} ms — im węższa krzywa, tym lepsza powtarzalność.`;
 }
 
 /* EXPORT CSV */
@@ -695,11 +840,10 @@ exportCsvBtn.addEventListener('click', ()=>{
   URL.revokeObjectURL(url);
 });
 
-/* INITIALIZE saved list on load */
+/* INITIALIZE on load */
 window.addEventListener('load', ()=>{
   const stored = parseFloat(localStorage.getItem('fly_zoom') || '1');
   if (!isNaN(stored)){ scale = stored; updateTransform(); }
-  loadSavedList();
   updateResultsUI();
 });
 
@@ -708,7 +852,7 @@ transformer.addEventListener('dblclick', ()=>{
   scale = 1; tx = 0; ty = 0; updateTransform();
 });
 
-/* Small UX: when video loads metadata adjust transform constraints */
+/* Small UX: when video loads metadata */
 video.addEventListener('loadedmetadata', ()=>{
   if (window.innerWidth < 600 && scale === 1) { scale = 1.15; updateTransform(); }
 });
