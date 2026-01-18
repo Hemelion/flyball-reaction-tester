@@ -123,7 +123,7 @@
         </div>
       </div>
       <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
-        <div class="small muted">v1.8</div>
+        <div class="small muted">v1.9</div>
       </div>
     </header>
 
@@ -231,7 +231,7 @@
           <ul class="small muted">
             <li>Użyj suwaka Zoom lub gestu pinch, aby powiększyć fragment wideo.</li>
             <li>Przeciągnij (drag/pan) aby przesunąć widok przy zoomie.</li>
-            <li>Celem jest jak najwęższa krzywa (idealnie powtarzalne czasy reakcji).</li>
+            <li>Celem jest jak najwęższa krzywa (idealnie powtarzalne czasy reakcji) i brak przewidywania.</li>
           </ul>
         </div>
       </aside>
@@ -480,9 +480,8 @@ function reactNow(){
     return;
   }
 
-  // KLUCZ: liczymy wyłącznie na podstawie czasu wideo
   const pressVideoTime = video.currentTime; // s
-  const reactionMs = (pressVideoTime - eventTime) * 1000; // może być ujemne = za wcześnie
+  const reactionMs = (pressVideoTime - eventTime) * 1000; // może być ujemne (za wcześnie)
   const reactionRounded = Math.round(reactionMs * 10) / 10;
 
   try { video.pause(); } catch(_){}
@@ -522,7 +521,7 @@ function stopTest(){
 
 function classifyReaction(ms){
   const m = Math.round(ms);
-  // m < 0 → PRZED zdarzeniem
+  // m < 0 → PRZED zdarzeniem = przewidywanie
   if (m < 0) return { label: 'Przewidziałeś', valid: false, color: 'danger' };
   if (m < 140) return { label: 'Przewidziałeś', valid: false, color: 'danger' };
   if (m <= 180) return { label: 'Rewelacja', valid: true, color: 'gold' };
@@ -531,7 +530,7 @@ function classifyReaction(ms){
   return { label: 'Do poprawy', valid: true, color: 'muted' };
 }
 
-/* RESULTS UI + STATYSTYKI + WYKRES GAUSSA */
+/* RESULTS UI + STATYSTYKI + WYNIK KOŃCOWY + WYKRES GAUSSA */
 function updateResultsUI(){
   resultsBody.innerHTML = '';
   results.forEach((r, idx)=>{
@@ -561,11 +560,12 @@ function updateResultsUI(){
 
   const validResults = results.filter(r => r.valid === true);
   const predictedCount = results.length - validResults.length;
+  const totalTrials = results.length;
 
   if (validResults.length < 3) {
     statsDiv.innerHTML = `
-      Za mało prób do oceny powtarzalności.
-      <span style="color:#b00020"> Przewidzianych: ${predictedCount}</span>
+      Ostateczny wynik: za mało ważnych prób (min. 3).<br/>
+      Prób ogółem: ${totalTrials} • przewidzianych: ${predictedCount}
     `;
     drawEmptyGauss('Za mało danych do krzywej (min. 3 ważne próby).');
     return;
@@ -598,19 +598,59 @@ function updateResultsUI(){
     consistencyColor = '#b00020';
   }
 
+  /* OSTATECZNY WYNIK 0–100, uwzględnia:
+     - średni czas (mean),
+     - powtarzalność (stdDev),
+     - przewidywanie (predictedCount/totalTrials).
+  */
+  const predictedRatio = totalTrials > 0 ? (predictedCount / totalTrials) : 0;
+
+  // 1) punktacja za szybkość: 140ms ≈ 100 pkt, im wolniej tym mniej
+  const speedScoreRaw = 100 - Math.max(0, (mean - 140) * 0.4);
+
+  // 2) kara za słabą powtarzalność: SD powyżej 10ms obniża wynik
+  const consistencyPenalty = Math.max(0, (stdDev - 10) * 1.5);
+
+  // 3) bardzo mocna kara za przewidywanie: 10% przewidzianych = -20 pkt
+  const predictionPenalty = predictedRatio * 200;
+
+  let finalScore = Math.round(speedScoreRaw - consistencyPenalty - predictionPenalty);
+  finalScore = Math.max(0, Math.min(100, finalScore));
+
+  let finalLabel = '';
+  let finalColor = '';
+
+  if (finalScore >= 90) {
+    finalLabel = 'MISTRZ REAKCJI (bez przewidywania)';
+    finalColor = '#0b8a3e';
+  } else if (finalScore >= 75) {
+    finalLabel = 'Bardzo dobry wynik';
+    finalColor = '#2e7d32';
+  } else if (finalScore >= 60) {
+    finalLabel = 'Dobry wynik';
+    finalColor = '#d06b00';
+  } else {
+    finalLabel = 'Do poprawy (przestań przewidywać)';
+    finalColor = '#b00020';
+  }
+
   statsDiv.innerHTML = `
-    Powtarzalność (SD):<br/>
-    <b style="color:${consistencyColor}">±${stdDev.toFixed(1)} ms</b><br/>
+    <b>Ostateczny wynik (0–100): 
+      <span style="color:${finalColor}">${finalScore} pkt</span>
+    </b><br/>
+    <span style="color:${finalColor}">${finalLabel}</span><br/><br/>
+    Średni czas (tylko ważne próby): <b>${mean.toFixed(1)} ms</b><br/>
+    Powtarzalność (SD): <b style="color:${consistencyColor}">±${stdDev.toFixed(1)} ms</b>
     • <b style="color:${consistencyColor}">${consistencyLabel}</b><br/>
-    • Min: <b>${min.toFixed(1)} ms</b><br/>
-    • Max: <b>${max.toFixed(1)} ms</b><br/>
-    • Próby: ${validResults.length}
+    Min: <b>${min.toFixed(1)} ms</b> • Max: <b>${max.toFixed(1)} ms</b><br/>
+    Próby ważne: ${validResults.length} / ${totalTrials} łącznie
   `;
 
   if (predictedCount > 0) {
     statsDiv.innerHTML += `
-      • <span style="color:#b00020">
-        Przewidzianych (nie wliczane): ${predictedCount}
+      <br/><span style="color:#b00020">
+        Przewidzianych (za wcześnie): ${predictedCount} 
+        (${Math.round(predictedRatio*100)}% prób) — mocno obniża wynik końcowy.
       </span>
     `;
   }
