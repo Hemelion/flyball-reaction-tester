@@ -73,13 +73,66 @@
 
   aside .card{padding:12px}
   .stat{font-size:13px;color:var(--mid)}
-  .results{margin-top:10px;max-height:260px;overflow:auto}
-  table{width:100%;border-collapse:collapse}
-  td,th{padding:8px;border-bottom:1px solid #f1f4f8;font-size:13px}
-  th{color:var(--mid);text-align:left;font-weight:700}
+
+  /* Tabela wyników */
+  .results{margin-top:10px;max-height:260px;overflow:auto;border-radius:12px;border:1px solid #e4e7f0;background:#f9fafc;}
+  .results table{width:100%;border-collapse:separate;border-spacing:0;}
+  .results thead th{
+    position:sticky;
+    top:0;
+    z-index:1;
+    background:#f3f5fb;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+    padding:10px 10px;
+    border-bottom:1px solid #e0e4f0;
+  }
+  .results tbody td{
+    padding:8px 10px;
+    font-size:13px;
+    border-bottom:1px solid #edf0f7;
+    background:#ffffff;
+  }
+  .results tbody tr:nth-child(even) td{
+    background:#fdfdff;
+  }
+  .results tbody tr:hover td{
+    background:#eef3ff;
+  }
+  .results td:nth-child(1){
+    width:32px;
+    text-align:center;
+    color:#9ba3bd;
+    font-weight:600;
+  }
+  .results td:nth-child(2){
+    font-size:11px;
+    color:#9ba3bd;
+  }
+  .results td:nth-child(3){
+    text-align:right;
+    font-variant-numeric:tabular-nums;
+  }
+  .results td:nth-child(4){
+    width:140px;
+  }
+
+  .badge{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    padding:3px 8px;
+    border-radius:999px;
+    font-size:11px;
+    font-weight:600;
+    background:#eef1fb;
+    color:#555;
+    white-space:nowrap;
+  }
 
   .small{font-size:13px;color:var(--mid)}
-  input,select{padding:8px;border-radius:8px;border:1px solid #e6e9ef;width:100%}
+  input,select{padding:8px;border-radius:8px;border:1px solid #e6e9ef;width:100%;font-size:13px}
   .row{display:flex;gap:8px}
 
   .zoom-panel{display:flex;gap:8px;align-items:center;margin-top:10px}
@@ -108,6 +161,92 @@
 
   .fit-buttons{display:flex;gap:8px}
   .muted{color:var(--mid)}
+
+  /* NOWY WYGLĄD STATYSTYK */
+  .stats-shell{
+    margin-top:6px;
+    padding:10px 12px;
+    border-radius:12px;
+    background:#f5f7fc;
+    border:1px solid #e1e5f4;
+  }
+  .stats-score{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:8px;
+  }
+  .stats-score-main{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+  }
+  .stats-score-label{
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    color:var(--mid);
+  }
+  .stats-score-value{
+    font-size:26px;
+    font-weight:800;
+    font-variant-numeric:tabular-nums;
+  }
+  .stats-score-desc{
+    font-size:12px;
+    font-weight:600;
+  }
+  .stats-score-meta{
+    font-size:11px;
+    color:#9ba3bd;
+    text-align:right;
+  }
+
+  .stats-grid{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:8px;
+    margin-top:4px;
+  }
+  .stat-tile{
+    background:#ffffff;
+    border-radius:10px;
+    padding:7px 9px;
+    box-shadow:0 4px 10px rgba(15,23,42,0.04);
+  }
+  .stat-tile-label{
+    font-size:11px;
+    color:var(--mid);
+    margin-bottom:2px;
+  }
+  .stat-tile-value{
+    font-size:13px;
+    font-weight:600;
+    font-variant-numeric:tabular-nums;
+  }
+
+  .stats-footer{
+    margin-top:8px;
+    font-size:11px;
+    color:#9ba3bd;
+  }
+
+  .stats-panel{
+    margin-top:6px;
+    border-radius:10px;
+    padding:8px 10px;
+    font-size:12px;
+  }
+  .stats-panel-title{
+    font-weight:600;
+    margin-bottom:4px;
+  }
+  .stats-panel-warning{
+    background:#fff7f5;
+    border:1px dashed #f5c2c2;
+    color:#b00020;
+  }
 </style>
 </head>
 <body>
@@ -123,7 +262,7 @@
         </div>
       </div>
       <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
-        <div class="small muted">v1.9</div>
+        <div class="small muted">v2.1</div>
       </div>
     </header>
 
@@ -175,10 +314,12 @@
               <div class="small muted">Ustawienia testu</div>
               <div style="display:flex;gap:8px;margin-top:8px">
                 <input id="trialsCount" type="number" value="5" min="1" />
-                <input id="startOffset" type="number" value="0" min="0" step="0.1" />
-                <input id="preRoll" type="number" value="1.5" min="0" step="0.1" />
+                <input id="randomFrom" type="number" value="1.5" min="0" step="0.1" />
+                <input id="randomTo" type="number" value="2.5" min="0" step="0.1" />
               </div>
-              <div class="small muted" style="margin-top:6px">Powtórzeń • Start od (s) • Przewinięcie przed (s)</div>
+              <div class="small muted" style="margin-top:6px">
+                Powtórzeń • Losowo od (s) • do (s) przed zdarzeniem
+              </div>
               <div style="margin-top:8px;display:flex;gap:8px">
                 <button class="btn btn-accent" id="startTestBtn">Start (S)</button>
                 <button class="btn btn-ghost" id="stopTestBtn">Stop</button>
@@ -199,7 +340,14 @@
 
           <div class="results" style="margin-top:10px">
             <table>
-              <thead><tr><th>#</th><th>Data</th><th>Reakcja (ms)</th><th>Uwagi</th></tr></thead>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Data</th>
+                  <th>Reakcja (ms)</th>
+                  <th>Ocena</th>
+                </tr>
+              </thead>
               <tbody id="resultsBody"></tbody>
             </table>
           </div>
@@ -260,8 +408,8 @@ const reactBtn = document.getElementById('reactBtn');
 const startTestBtn = document.getElementById('startTestBtn');
 const stopTestBtn = document.getElementById('stopTestBtn');
 const trialsCountInput = document.getElementById('trialsCount');
-const startOffsetInput = document.getElementById('startOffset');
-const preRollInput = document.getElementById('preRoll');
+const randomFromInput = document.getElementById('randomFrom');
+const randomToInput = document.getElementById('randomTo');
 const trialInfo = document.getElementById('trialInfo');
 
 const resultsBody = document.getElementById('resultsBody');
@@ -420,7 +568,7 @@ function distanceBetweenTouches(a,b){
   return Math.sqrt(dx*dx + dy*dy);
 }
 
-/* --- Test logic: bazujemy WYŁĄCZNIE na video.currentTime --- */
+/* --- Test logic: losowy start przed zdarzeniem, bazujemy na video.currentTime --- */
 startTestBtn.addEventListener('click', startTest);
 stopTestBtn.addEventListener('click', stopTest);
 
@@ -434,16 +582,23 @@ function startTest(){
   if (!video.src) { alert('Wczytaj wideo najpierw'); return; }
   if (eventTime == null) { alert('Ustaw punkt zdarzenia (E) przed testem'); return; }
   const trials = Math.max(1, parseInt(trialsCountInput.value)||1);
-  const startOffset = parseFloat(startOffsetInput.value) || 0;
-  const preRoll = parseFloat(preRollInput.value) || 0;
+
+  let from = parseFloat(randomFromInput.value);
+  let to = parseFloat(randomToInput.value);
+  if (isNaN(from)) from = 1.5;
+  if (isNaN(to)) to = 2.5;
+  if (from < 0) from = 0;
+  if (to < 0) to = 0;
+  if (to < from) { const tmp = from; from = to; to = tmp; }
+
   results = [];
   updateResultsUI();
   ongoingTest = {
     running:true,
     trialsTotal:trials,
     currentTrial:0,
-    startOffset,
-    preRoll
+    offsetMin:from,
+    offsetMax:to
   };
   runNextTrial();
 }
@@ -457,12 +612,22 @@ function runNextTrial(){
     return;
   }
   const trialIndex = ongoingTest.currentTrial + 1;
-  trialInfo.textContent = `Próba ${trialIndex} / ${ongoingTest.trialsTotal} — przygotowanie...`;
 
-  const startPos = Math.max(0, Math.min(video.duration || Infinity, ongoingTest.startOffset));
-  const preferStart = Math.max(0, Math.min(video.duration || Infinity, eventTime - ongoingTest.preRoll));
-  video.currentTime = (startPos > 0) ? startPos : preferStart;
+  const minOffset = Math.max(0, ongoingTest.offsetMin || 0);
+  const maxOffset = Math.max(minOffset, ongoingTest.offsetMax || minOffset);
+  const range = maxOffset - minOffset;
+  const randomBefore = range > 0 ? (minOffset + Math.random() * range) : minOffset;
+
+  let startTime = eventTime - randomBefore;
+  if (!isFinite(startTime) || startTime < 0) startTime = 0;
+  if (video.duration && startTime > video.duration) {
+    startTime = Math.max(0, video.duration - 0.1);
+  }
+
+  video.currentTime = startTime;
   video.pause();
+
+  trialInfo.textContent = `Próba ${trialIndex} / ${ongoingTest.trialsTotal} — losowo ~${randomBefore.toFixed(2)}s przed zdarzeniem...`;
 
   setTimeout(()=>{
     video.play().then(()=>{
@@ -537,19 +702,41 @@ function updateResultsUI(){
     const tr = document.createElement('tr');
 
     const td1 = document.createElement('td'); td1.textContent = (idx+1);
-    const td2 = document.createElement('td'); td2.textContent = r.iso;
-    const td3 = document.createElement('td'); td3.textContent = `${r.ms} ms`; td3.style.fontWeight='700';
+
+    const td2 = document.createElement('td');
+    td2.textContent = r.iso.replace('T',' ').slice(0,19);
+
+    const td3 = document.createElement('td');
+    td3.textContent = `${r.ms} ms`;
+    td3.style.fontWeight='700';
 
     const td4 = document.createElement('td');
-    td4.textContent = r.rating || (r.note || '');
+    const badge = document.createElement('span');
+    badge.className = 'badge';
+    badge.textContent = r.rating || (r.note || '');
+
     if (r.valid === false) {
-      td4.style.color = '#b00020';
-      td4.style.fontWeight = '700';
+      badge.style.background = 'rgba(176,0,32,0.08)';
+      badge.style.color = '#b00020';
+      badge.style.border = '1px solid rgba(176,0,32,0.25)';
     } else {
-      if (r.color === 'gold') td4.style.color = '#b8860b';
-      if (r.color === 'green') td4.style.color = '#0b8a3e';
-      if (r.color === 'orange') td4.style.color = '#d06b00';
+      if (r.color === 'gold') {
+        badge.style.background = 'rgba(249,219,46,0.12)';
+        badge.style.color = '#b8860b';
+        badge.style.border = '1px solid rgba(249,219,46,0.35)';
+      }
+      if (r.color === 'green') {
+        badge.style.background = 'rgba(11,138,62,0.08)';
+        badge.style.color = '#0b8a3e';
+        badge.style.border = '1px solid rgba(11,138,62,0.25)';
+      }
+      if (r.color === 'orange') {
+        badge.style.background = 'rgba(208,107,0,0.08)';
+        badge.style.color = '#d06b00';
+        badge.style.border = '1px solid rgba(208,107,0,0.25)';
+      }
     }
+    td4.appendChild(badge);
 
     tr.appendChild(td1); 
     tr.appendChild(td2); 
@@ -564,8 +751,13 @@ function updateResultsUI(){
 
   if (validResults.length < 3) {
     statsDiv.innerHTML = `
-      Ostateczny wynik: za mało ważnych prób (min. 3).<br/>
-      Prób ogółem: ${totalTrials} • przewidzianych: ${predictedCount}
+      <div class="stats-panel stats-panel-warning">
+        <div class="stats-panel-title">Za mało prób do oceny wyniku</div>
+        <div>
+          Prób ogółem: <b>${totalTrials}</b><br/>
+          Przewidzianych (za wcześnie): <b>${predictedCount}</b>
+        </div>
+      </div>
     `;
     drawEmptyGauss('Za mało danych do krzywej (min. 3 ważne próby).');
     return;
@@ -576,9 +768,7 @@ function updateResultsUI(){
   const max = Math.max(...nums);
 
   const mean = nums.reduce((a,b)=>a+b,0) / nums.length;
-  const variance = nums.reduce((sum, v)=>{
-    return sum + Math.pow(v - mean, 2);
-  }, 0) / nums.length;
+  const variance = nums.reduce((sum, v)=> sum + Math.pow(v - mean, 2), 0) / nums.length;
   const stdDev = Math.sqrt(variance);
 
   let consistencyLabel = '';
@@ -598,20 +788,10 @@ function updateResultsUI(){
     consistencyColor = '#b00020';
   }
 
-  /* OSTATECZNY WYNIK 0–100, uwzględnia:
-     - średni czas (mean),
-     - powtarzalność (stdDev),
-     - przewidywanie (predictedCount/totalTrials).
-  */
   const predictedRatio = totalTrials > 0 ? (predictedCount / totalTrials) : 0;
 
-  // 1) punktacja za szybkość: 140ms ≈ 100 pkt, im wolniej tym mniej
-  const speedScoreRaw = 100 - Math.max(0, (mean - 140) * 0.4);
-
-  // 2) kara za słabą powtarzalność: SD powyżej 10ms obniża wynik
+  const speedScoreRaw = 100 - Math.max(0, (mean - 180) * 0.15);
   const consistencyPenalty = Math.max(0, (stdDev - 10) * 1.5);
-
-  // 3) bardzo mocna kara za przewidywanie: 10% przewidzianych = -20 pkt
   const predictionPenalty = predictedRatio * 200;
 
   let finalScore = Math.round(speedScoreRaw - consistencyPenalty - predictionPenalty);
@@ -627,33 +807,51 @@ function updateResultsUI(){
     finalLabel = 'Bardzo dobry wynik';
     finalColor = '#2e7d32';
   } else if (finalScore >= 60) {
-    finalLabel = 'Dobry wynik';
+    finalLabel = 'Nie najgorzej';
     finalColor = '#d06b00';
   } else {
-    finalLabel = 'Do poprawy (przestań przewidywać)';
+    finalLabel = 'Słabo Ci to idzie';
     finalColor = '#b00020';
   }
 
   statsDiv.innerHTML = `
-    <b>Ostateczny wynik (0–100): 
-      <span style="color:${finalColor}">${finalScore} pkt</span>
-    </b><br/>
-    <span style="color:${finalColor}">${finalLabel}</span><br/><br/>
-    Średni czas (tylko ważne próby): <b>${mean.toFixed(1)} ms</b><br/>
-    Powtarzalność (SD): <b style="color:${consistencyColor}">±${stdDev.toFixed(1)} ms</b>
-    • <b style="color:${consistencyColor}">${consistencyLabel}</b><br/>
-    Min: <b>${min.toFixed(1)} ms</b> • Max: <b>${max.toFixed(1)} ms</b><br/>
-    Próby ważne: ${validResults.length} / ${totalTrials} łącznie
-  `;
+    <div class="stats-shell">
+      <div class="stats-score">
+        <div class="stats-score-main">
+          <div class="stats-score-label">Ostateczny wynik</div>
+          <div class="stats-score-value" style="color:${finalColor}">${finalScore}</div>
+          <div class="stats-score-desc" style="color:${finalColor}">${finalLabel}</div>
+        </div>
+        <div class="stats-score-meta">
+          Próby ważne: <b>${validResults.length}</b> / ${totalTrials}<br/>
+          Przewidzianych: <b>${predictedCount}</b> (${Math.round(predictedRatio*100)}%)
+        </div>
+      </div>
 
-  if (predictedCount > 0) {
-    statsDiv.innerHTML += `
-      <br/><span style="color:#b00020">
-        Przewidzianych (za wcześnie): ${predictedCount} 
-        (${Math.round(predictedRatio*100)}% prób) — mocno obniża wynik końcowy.
-      </span>
-    `;
-  }
+      <div class="stats-grid">
+        <div class="stat-tile">
+          <div class="stat-tile-label">Średni czas</div>
+          <div class="stat-tile-value">${mean.toFixed(1)} ms</div>
+        </div>
+        <div class="stat-tile">
+          <div class="stat-tile-label">Powtarzalność (SD)</div>
+          <div class="stat-tile-value" style="color:${consistencyColor}">±${stdDev.toFixed(1)} ms</div>
+        </div>
+        <div class="stat-tile">
+          <div class="stat-tile-label">Min</div>
+          <div class="stat-tile-value">${min.toFixed(1)} ms</div>
+        </div>
+        <div class="stat-tile">
+          <div class="stat-tile-label">Max</div>
+          <div class="stat-tile-value">${max.toFixed(1)} ms</div>
+        </div>
+      </div>
+
+      <div class="stats-footer">
+        Im wyższy wynik i niższe SD przy zerowym przewidywaniu, tym lepsza kontrola reakcji.
+      </div>
+    </div>
+  `;
 
   drawGaussCurve(nums, mean, stdDev);
 }
