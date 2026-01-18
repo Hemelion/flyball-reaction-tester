@@ -538,15 +538,33 @@ function reactNow(){
   const expected = ongoingTest.expectedEventPerfTime;
   const reactionMs = pressPerf - expected;
   const reactionRounded = Math.round(reactionMs*10)/10;
+
   try { video.pause(); } catch(e){}
   if (ongoingTest.raf) cancelAnimationFrame(ongoingTest.raf);
+
   ongoingTest.currentTrial += 1;
-  const note = reactionMs < 0 ? 'Za wcześnie' : 'OK';
-  results.push({trial: ongoingTest.currentTrial, ms: reactionRounded, iso: new Date().toISOString(), note});
+  const classification = classifyReaction(reactionMs);
+  const note = classification.valid ? 'OK' : 'Przewidziałeś';
+
+  // zapisz wynik z dodatkowymi polami
+  results.push({
+    trial: ongoingTest.currentTrial,
+    ms: reactionRounded,
+    iso: new Date().toISOString(),
+    note,
+    rating: classification.label,
+    valid: classification.valid,
+    color: classification.color
+  });
+
   updateResultsUI();
+
   setTimeout(()=>{
     if (ongoingTest.currentTrial < ongoingTest.trialsTotal) runNextTrial();
-    else { ongoingTest.running = false; trialInfo.textContent = `Test zakończony. ${results.length} wyników.`; }
+    else {
+      ongoingTest.running = false;
+      trialInfo.textContent = `Test zakończony. ${results.length} wyników.`;
+    }
   }, 700);
 }
 
@@ -558,23 +576,103 @@ function stopTest(){
   trialInfo.textContent = 'Test zatrzymany.';
 }
 
+function classifyReaction(ms){
+  // ms może być ujemne => przewidziane
+  if (ms < 120) {
+    return { label: 'Przewidziałeś', valid: false, color: 'danger' };
+  }
+  const m = Math.round(ms);
+  if (m <= 140) return { label: 'Rewelacja', valid: true, color: 'gold' };
+  if (m <= 180) return { label: 'Bardzo dobrze', valid: true, color: 'green' };
+  if (m <= 250) return { label: 'Dobrze', valid: true, color: 'orange' };
+  return { label: 'Do poprawy', valid: true, color: 'muted' };
+}
+
 /* RESULTS UI */
 function updateResultsUI(){
   resultsBody.innerHTML = '';
   results.forEach((r, idx)=>{
     const tr = document.createElement('tr');
+
     const td1 = document.createElement('td'); td1.textContent = (idx+1);
     const td2 = document.createElement('td'); td2.textContent = r.iso;
     const td3 = document.createElement('td'); td3.textContent = `${r.ms} ms`; td3.style.fontWeight='700';
-    const td4 = document.createElement('td'); td4.textContent = r.note || '';
-    tr.appendChild(td1); tr.appendChild(td2); tr.appendChild(td3); tr.appendChild(td4);
+
+    const td4 = document.createElement('td');
+    td4.textContent = r.rating || (r.note || '');
+    if (r.valid === false) {
+      td4.style.color = '#b00020';
+      td4.style.fontWeight = '700';
+    } else {
+      if (r.color === 'gold') td4.style.color = '#b8860b';
+      if (r.color === 'green') td4.style.color = '#0b8a3e';
+      if (r.color === 'orange') td4.style.color = '#d06b00';
+    }
+
+    tr.appendChild(td1); 
+    tr.appendChild(td2); 
+    tr.appendChild(td3); 
+    tr.appendChild(td4);
     resultsBody.appendChild(tr);
   });
-  if (results.length === 0){ statsDiv.textContent = 'Brak wyników.'; return; }
-  const nums = results.map(r=>r.ms);
-  const avg = (nums.reduce((a,b)=>a+b,0)/nums.length);
-  const min = Math.min(...nums), max = Math.max(...nums);
-  statsDiv.innerHTML = `Średnia: <b>${avg.toFixed(1)} ms</b> • Min: <b>${min.toFixed(1)} ms</b> • Max: <b>${max.toFixed(1)} ms</b> • Próby: ${nums.length}`;
+
+  // Statystyki – tylko valid === true
+  const validResults = results.filter(r => r.valid === true);
+  const predictedCount = results.length - validResults.length;
+
+  if (validResults.length < 3) {
+    statsDiv.innerHTML = `
+      Za mało prób do oceny powtarzalności.
+      <span style="color:#b00020"> Przewidzianych: ${predictedCount}</span>
+    `;
+    return;
+  }
+
+  const nums = validResults.map(r => r.ms);
+  const min = Math.min(...nums);
+  const max = Math.max(...nums);
+
+  // 👉 ODCHYLENIE STANDARDOWE (powtarzalność)
+  const mean = nums.reduce((a,b)=>a+b,0) / nums.length;
+  const variance = nums.reduce((sum, v)=>{
+    return sum + Math.pow(v - mean, 2);
+  }, 0) / nums.length;
+  const stdDev = Math.sqrt(variance);
+
+  // Klasyfikacja powtarzalności
+  let consistencyLabel = '';
+  let consistencyColor = '';
+
+  if (stdDev < 15) {
+    consistencyLabel = 'ELITARNA POWTARZALNOŚĆ';
+    consistencyColor = '#0b8a3e';
+  } else if (stdDev < 30) {
+    consistencyLabel = 'BARDZO DOBRA POWTARZALNOŚĆ';
+    consistencyColor = '#2e7d32';
+  } else if (stdDev < 50) {
+    consistencyLabel = 'PRZECIĘTNA POWTARZALNOŚĆ';
+    consistencyColor = '#d06b00';
+  } else {
+    consistencyLabel = 'NISKA POWTARZALNOŚĆ (antycypacja?)';
+    consistencyColor = '#b00020';
+  }
+
+  statsDiv.innerHTML = `
+    Powtarzalność (SD): 
+    <b style="color:${consistencyColor}">±${stdDev.toFixed(1)} ms</b>
+    • ${consistencyLabel}
+    • Min: <b>${min.toFixed(1)} ms</b>
+    • Max: <b>${max.toFixed(1)} ms</b>
+    • Próby: ${validResults.length}
+  `;
+
+  if (predictedCount > 0) {
+    statsDiv.innerHTML += `
+      • <span style="color:#b00020">
+        Przewidzianych (nie wliczane): ${predictedCount}
+      </span>
+    `;
+  }
 }
 
 /* EXPORT CSV */
