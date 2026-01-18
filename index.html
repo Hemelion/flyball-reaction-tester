@@ -8,8 +8,8 @@
   :root{
     --bg: #F6F8FB;
     --card: #FFFFFF;
-    --primary: #f9db2e;   /* yellow from hoodie */
-    --accent: #00AEEB;    /* cyan accent */
+    --primary: #f9db2e;
+    --accent: #00AEEB;
     --dark: #222;
     --mid: #7b7b7b;
     --radius: 12px;
@@ -42,14 +42,14 @@
     display:flex;
     align-items:center;
     justify-content:center;
-    max-height: 60vh; /* gwarantuje UI widoczne */
-    touch-action: none;
+    max-height:60vh;
+    touch-action:none;
   }
   .video-inner {
-    transform-origin: center center;
-    transform: translate(var(--tx), var(--ty)) scale(var(--scale));
-    transition: transform 0.12s linear;
-    will-change: transform;
+    transform-origin:center center;
+    transform:translate(var(--tx), var(--ty)) scale(var(--scale));
+    transition:transform 0.12s linear;
+    will-change:transform;
     display:block;
   }
   video {
@@ -57,9 +57,9 @@
     width:100%;
     height:auto;
     object-fit:contain;
-    max-height: 60vh;
+    max-height:60vh;
     user-select:none;
-    -webkit-user-drag: none;
+    -webkit-user-drag:none;
   }
 
   .controls{display:flex;gap:10px;align-items:center;margin-top:12px;flex-wrap:wrap}
@@ -123,7 +123,7 @@
         </div>
       </div>
       <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
-        <div class="small muted">v1.7</div>
+        <div class="small muted">v1.8</div>
       </div>
     </header>
 
@@ -210,7 +210,7 @@
           </div>
         </div>
 
-        <!-- NOWA KARTA: wykres Gaussa -->
+        <!-- KARTA: wykres Gaussa -->
         <div class="card" style="margin-top:12px">
           <div style="display:flex;justify-content:space-between;align-items:center">
             <div>
@@ -239,8 +239,7 @@
   </div>
 
 <script>
-/* Pełna funkcjonalność: zoom, pan, pinch, test reakcji, statystyki, wykres Gaussa */
-/* Uwaga: pomiary czasów warto dodatkowo weryfikować w realnej przeglądarce/urządzeniu. */
+/* Uwaga: pomiary warto sprawdzić na realnym sprzęcie; przeglądarki różnie obsługują wideo. */
 
 const video = document.getElementById('video');
 const transformer = document.getElementById('transformer');
@@ -283,10 +282,10 @@ let results = [];
 
 /* Transform state */
 let scale = parseFloat(localStorage.getItem('fly_zoom') || '1');
-let tx = 0, ty = 0; // pixels
+let tx = 0, ty = 0;
 updateTransform();
 
-/* Helpers: identyfikacja wideo (zostawione, gdybyś chciał wrócić do zapisu zdarzeń) */
+/* Helpers: identyfikacja wideo (na przyszłość) */
 function setVideoIdentityFromFile(f){
   currentFileObject = f;
   currentVideoKey = `file:${f.name}|${f.size}|${f.lastModified}`;
@@ -304,7 +303,8 @@ fileInput.addEventListener('change', (e)=>{
   video.src = url;
   video.load();
   setVideoIdentityFromFile(f);
-  eventTime = null; updateEventUI();
+  eventTime = null;
+  updateEventUI();
   tx = 0; ty = 0; updateTransform();
 });
 
@@ -315,7 +315,8 @@ loadUrlBtn.addEventListener('click', ()=>{
   video.crossOrigin = 'anonymous';
   video.load();
   setVideoIdentityFromUrl(url);
-  eventTime = null; updateEventUI();
+  eventTime = null;
+  updateEventUI();
   tx = 0; ty = 0; updateTransform();
 });
 
@@ -335,8 +336,13 @@ function setEventAtCurrent(){
   alert(`Ustawiono zdarzenie: ${eventTime.toFixed(3)} s ${lastEventLabel? '— ' + lastEventLabel : ''}`);
 }
 function updateEventUI(){
-  if (eventTime == null){ eventMarker.style.display = 'none'; eventTimeText.textContent = '—'; }
-  else { eventMarker.style.display = 'block'; eventTimeText.textContent = eventTime.toFixed(3) + 's'; }
+  if (eventTime == null){
+    eventMarker.style.display = 'none';
+    eventTimeText.textContent = '—';
+  } else {
+    eventMarker.style.display = 'block';
+    eventTimeText.textContent = eventTime.toFixed(3) + 's';
+  }
 }
 
 /* --- ZOOM & PAN --- */
@@ -359,7 +365,7 @@ smallBtn.addEventListener('click', ()=>{ scale = 0.8; tx = 0; ty = 0; updateTran
 medBtn.addEventListener('click', ()=>{ scale = 1.2; tx = 0; ty = 0; updateTransform(); });
 largeBtn.addEventListener('click', ()=>{ scale = 1.6; tx = 0; ty = 0; updateTransform(); });
 
-/* PAN with pointer events (mouse & single-touch) */
+/* PAN with pointer events */
 let pointerActive = false;
 let lastPointer = {x:0,y:0};
 videoWrap.addEventListener('pointerdown', (e)=>{
@@ -377,7 +383,11 @@ videoWrap.addEventListener('pointermove', (e)=>{
   ty += dy;
   updateTransform();
 });
-videoWrap.addEventListener('pointerup', (e)=>{ if (!pointerActive) return; pointerActive=false; try{ videoWrap.releasePointerCapture(e.pointerId); }catch(e){} });
+videoWrap.addEventListener('pointerup', (e)=>{
+  if (!pointerActive) return;
+  pointerActive = false;
+  try{ videoWrap.releasePointerCapture(e.pointerId); }catch(_){}
+});
 videoWrap.addEventListener('pointercancel', ()=>{ pointerActive=false; });
 
 /* TOUCH: pinch-to-zoom for two fingers */
@@ -400,7 +410,9 @@ videoWrap.addEventListener('touchmove', (e)=>{
     lastPinchDist = dist;
   }
 }, {passive:false});
-videoWrap.addEventListener('touchend', (e)=>{ if (!e.touches || e.touches.length < 2) lastPinchDist = null; });
+videoWrap.addEventListener('touchend', (e)=>{
+  if (!e.touches || e.touches.length < 2) lastPinchDist = null;
+});
 
 function distanceBetweenTouches(a,b){
   const dx = a.clientX - b.clientX;
@@ -408,11 +420,11 @@ function distanceBetweenTouches(a,b){
   return Math.sqrt(dx*dx + dy*dy);
 }
 
-/* --- Test logic --- */
+/* --- Test logic: bazujemy WYŁĄCZNIE na video.currentTime --- */
 startTestBtn.addEventListener('click', startTest);
 stopTestBtn.addEventListener('click', stopTest);
 
-/* Natychmiastowa reakcja na dotyk/klik (bez opóźnienia click na mobile) */
+/* Reakcja na dotyk/klik bez opóźnienia click na mobile */
 reactBtn.addEventListener('pointerdown', (e)=>{
   e.preventDefault();
   reactNow();
@@ -431,11 +443,7 @@ function startTest(){
     trialsTotal:trials,
     currentTrial:0,
     startOffset,
-    preRoll,
-    expectedEventPerfTime: null,
-    startPerfOffset: null,
-    eventPerfTime: null,
-    raf: null
+    preRoll
   };
   runNextTrial();
 }
@@ -450,36 +458,20 @@ function runNextTrial(){
   }
   const trialIndex = ongoingTest.currentTrial + 1;
   trialInfo.textContent = `Próba ${trialIndex} / ${ongoingTest.trialsTotal} — przygotowanie...`;
+
   const startPos = Math.max(0, Math.min(video.duration || Infinity, ongoingTest.startOffset));
   const preferStart = Math.max(0, Math.min(video.duration || Infinity, eventTime - ongoingTest.preRoll));
   video.currentTime = (startPos > 0) ? startPos : preferStart;
   video.pause();
+
   setTimeout(()=>{
-    ongoingTest.startPerfOffset = performance.now() - (video.currentTime * 1000) / (video.playbackRate || 1);
-    ongoingTest.expectedEventPerfTime = ongoingTest.startPerfOffset + (eventTime * 1000) / (video.playbackRate || 1);
-    ongoingTest.eventTriggered = false;
-    ongoingTest.eventPerfTime = null;
-    ongoingTest.trialStartWall = new Date().toISOString();
     video.play().then(()=>{
-      trialInfo.textContent = `Próba ${trialIndex} / ${ongoingTest.trialsTotal} — gra. Naciśnij Space lub "Reaguj".`;
-      ongoingTest.raf = requestAnimationFrame(pollVideo);
+      trialInfo.textContent = `Próba ${trialIndex} / ${ongoingTest.trialsTotal} — gra. Reaguj na zdarzenie.`;
     }).catch(err=>{
       console.warn('Play rejected:', err);
       alert('Autoodtwarzanie zablokowane. Dotknij wideo, a potem kliknij Start ponownie.');
     });
   }, 140);
-}
-
-function pollVideo(){
-  if (!ongoingTest || !ongoingTest.running) return;
-  const vt = video.currentTime;
-  if (!ongoingTest.eventTriggered && vt >= eventTime){
-    const overshootMs = ((vt - eventTime) / (video.playbackRate || 1)) * 1000;
-    const eventPerf = performance.now() - Math.max(0, overshootMs);
-    ongoingTest.eventTriggered = true;
-    ongoingTest.eventPerfTime = eventPerf;
-  }
-  ongoingTest.raf = requestAnimationFrame(pollVideo);
 }
 
 function reactNow(){
@@ -488,24 +480,15 @@ function reactNow(){
     return;
   }
 
-  const pressPerf = performance.now();
-  let reactionMs;
+  // KLUCZ: liczymy wyłącznie na podstawie czasu wideo
+  const pressVideoTime = video.currentTime; // s
+  const reactionMs = (pressVideoTime - eventTime) * 1000; // może być ujemne = za wcześnie
+  const reactionRounded = Math.round(reactionMs * 10) / 10;
 
-  if (ongoingTest.eventPerfTime != null) {
-    reactionMs = pressPerf - ongoingTest.eventPerfTime;
-  } else {
-    const expected = ongoingTest.expectedEventPerfTime ?? pressPerf;
-    reactionMs = pressPerf - expected;
-  }
-
-  // Zostawiono 30ms dla parametryzacji offsetu
-  const reactionRounded = 30 + (Math.round(reactionMs * 10) / 10);
-
-  try { video.pause(); } catch(e){}
-  if (ongoingTest.raf) cancelAnimationFrame(ongoingTest.raf);
+  try { video.pause(); } catch(_){}
 
   ongoingTest.currentTrial += 1;
-  const classification = classifyReaction(reactionRounded);
+  const classification = classifyReaction(reactionMs);
   const note = classification.valid ? 'OK' : 'Przewidziałeś';
 
   results.push({
@@ -526,7 +509,6 @@ function reactNow(){
     } else {
       ongoingTest.running = false;
       trialInfo.textContent = `Test zakończony. ${results.length} wyników.`;
-      // po zakończeniu testu wykres jest już odświeżony przez updateResultsUI()
     }
   }, 700);
 }
@@ -534,13 +516,14 @@ function reactNow(){
 function stopTest(){
   if (!ongoingTest) return;
   ongoingTest.running = false;
-  if (ongoingTest.raf) cancelAnimationFrame(ongoingTest.raf);
-  try { video.pause(); } catch(e){}
+  try { video.pause(); } catch(_){}
   trialInfo.textContent = 'Test zatrzymany.';
 }
 
 function classifyReaction(ms){
   const m = Math.round(ms);
+  // m < 0 → PRZED zdarzeniem
+  if (m < 0) return { label: 'Przewidziałeś', valid: false, color: 'danger' };
   if (m < 140) return { label: 'Przewidziałeś', valid: false, color: 'danger' };
   if (m <= 180) return { label: 'Rewelacja', valid: true, color: 'gold' };
   if (m <= 240) return { label: 'Bardzo dobrze', valid: true, color: 'green' };
@@ -632,7 +615,6 @@ function updateResultsUI(){
     `;
   }
 
-  // Aktualizacja wykresu Gaussa
   drawGaussCurve(nums, mean, stdDev);
 }
 
@@ -673,12 +655,9 @@ function drawGaussCurve(samples, mean, stdDev){
   const plotH = H - paddingTop - paddingBottom;
   const baseY = H - paddingBottom;
 
-  // Jedno miejsce – praktycznie idealna powtarzalność
   if (stdDev < 1e-3) {
     ctx.fillStyle = '#f5f7fb';
     ctx.fillRect(0,0,W,H);
-
-    // oś X
     ctx.strokeStyle = '#ccd2e5';
     ctx.lineWidth = 1;
     ctx.beginPath();
@@ -736,7 +715,6 @@ function drawGaussCurve(samples, mean, stdDev){
   ctx.fillStyle = '#f5f7fb';
   ctx.fillRect(0,0,W,H);
 
-  // oś X
   ctx.strokeStyle = '#ccd2e5';
   ctx.lineWidth = 1;
   ctx.beginPath();
@@ -744,7 +722,6 @@ function drawGaussCurve(samples, mean, stdDev){
   ctx.lineTo(W - paddingRight, baseY);
   ctx.stroke();
 
-  // Siatka pomocnicza i opis osi X (co 20 ms)
   const approxStep = 20;
   const startTick = Math.ceil(left / approxStep) * approxStep;
   const endTick = Math.floor(right / approxStep) * approxStep;
@@ -760,12 +737,10 @@ function drawGaussCurve(samples, mean, stdDev){
     ctx.moveTo(cx, baseY);
     ctx.lineTo(cx, paddingTop);
     ctx.stroke();
-
     ctx.fillStyle = '#99a1bd';
     ctx.fillText(t.toFixed(0), cx, baseY + 3);
   }
 
-  // Krzywa Gaussa
   ctx.strokeStyle = '#00AEEB';
   ctx.lineWidth = 2;
   ctx.beginPath();
@@ -779,7 +754,6 @@ function drawGaussCurve(samples, mean, stdDev){
   });
   ctx.stroke();
 
-  // Średnia (μ)
   const meanX = xToCanvas(mean);
   ctx.strokeStyle = '#f9db2e';
   ctx.setLineDash([5,3]);
@@ -795,7 +769,6 @@ function drawGaussCurve(samples, mean, stdDev){
   ctx.textBaseline = 'bottom';
   ctx.fillText(`μ = ${mean.toFixed(1)} ms`, meanX, paddingTop + 14);
 
-  // ±1σ
   const sigma1Left = xToCanvas(mean - stdDev);
   const sigma1Right = xToCanvas(mean + stdDev);
   ctx.strokeStyle = 'rgba(0,174,235,0.35)';
@@ -815,7 +788,6 @@ function drawGaussCurve(samples, mean, stdDev){
   ctx.textAlign = 'left';
   ctx.fillText('+1σ', sigma1Right + 2, paddingTop + 6);
 
-  // Pojedyncze próby jako kropki
   ctx.fillStyle = '#d06b00';
   samples.forEach(v=>{
     const cx = xToCanvas(v);
@@ -847,17 +819,15 @@ window.addEventListener('load', ()=>{
   updateResultsUI();
 });
 
-/* reset transform on double-tap/click on transformer */
+/* reset transform on double-tap/click */
 transformer.addEventListener('dblclick', ()=>{
   scale = 1; tx = 0; ty = 0; updateTransform();
 });
 
-/* Small UX: when video loads metadata */
 video.addEventListener('loadedmetadata', ()=>{
   if (window.innerWidth < 600 && scale === 1) { scale = 1.15; updateTransform(); }
 });
 
-/* Prevent accidental drag of video element */
 video.addEventListener('dragstart', (e)=> e.preventDefault());
 </script>
 </body>
