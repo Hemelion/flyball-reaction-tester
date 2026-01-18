@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-<title>Unleashed FLyball Team - Flyball Reaction</title>
+<title>Unleashed Flyball Team - Flyball Reaction</title>
 <style>
   :root{
     --bg: #F6F8FB;
@@ -127,7 +127,7 @@
         </div>
       </div>
       <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
-        <div class="small muted">v1.3</div>
+        <div class="small muted">v1.4</div>
       </div>
     </header>
 
@@ -140,7 +140,7 @@
               <strong>Test reakcji — wideo</strong>
               <div class="small muted">Wczytaj wideo, ustaw zdarzenie (E) i mierz reakcje (Space)</div>
             </div>
-            <div class="small muted">Sprawdź swoją reakcję</div>
+            <div class="small muted">Sprawdź swoją reakcję</div>
           </div>
 
           <div class="video-wrap" id="videoWrap">
@@ -466,7 +466,12 @@ function distanceBetweenTouches(a,b){
 /* --- Test logic (robust mapping) --- */
 startTestBtn.addEventListener('click', startTest);
 stopTestBtn.addEventListener('click', stopTest);
-reactBtn.addEventListener('click', reactNow);
+
+// ZMIANA: zamiast click używamy pointerdown, żeby pozbyć się opóźnienia tap na mobile
+reactBtn.addEventListener('pointerdown', (e)=>{
+  e.preventDefault();
+  reactNow();
+});
 
 function startTest(){
   if (!video.src) { alert('Wczytaj wideo najpierw'); return; }
@@ -655,7 +660,7 @@ function updateResultsUI(){
     consistencyLabel = 'PRZECIĘTNA POWTARZALNOŚĆ';
     consistencyColor = '#d06b00';
   } else {
-    consistencyLabel = 'NISKA POWTARZALNOŚĆ (antycypacja?)';
+    consistencyLabel = 'NISKA POWTARZALNOŚĆ';
     consistencyColor = '#b00020';
   }
 
