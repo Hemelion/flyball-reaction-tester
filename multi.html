@@ -1,0 +1,1191 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>Unleashed Flyball Team - Flyball Reaction</title>
+<style>
+  :root{
+    --bg: #F6F8FB;
+    --card: #FFFFFF;
+    --primary: #f9db2e;
+    --accent: #00AEEB;
+    --dark: #222;
+    --mid: #7b7b7b;
+    --radius: 12px;
+    --gap: 12px;
+    --shadow: 0 10px 30px rgba(11,20,40,0.06);
+    --max-width: 1080px;
+    --tx: 0px;
+    --ty: 0px;
+    --scale: 1;
+  }
+
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg),#eef3f9);font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;color:var(--dark)}
+  .wrap{max-width:var(--max-width);margin:16px auto;padding:16px}
+  header{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+  .brand{display:flex;align-items:center;gap:12px}
+  .logo img{width:56px;height:56px;border-radius:12px;display:block;align-items:center;object-fit:contain;}
+  .brand h1{font-size:18px;margin:0}
+  .subtitle{color:var(--mid);font-size:13px;margin-top:4px}
+
+  .grid{display:grid;grid-template-columns:1fr 360px;gap:18px}
+  @media (max-width:920px){ .grid{grid-template-columns:1fr} }
+
+  .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px}
+  .video-wrap{
+    position:relative;
+    overflow:hidden;
+    border-radius:10px;
+    background:#000;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    max-height:60vh;
+    touch-action:none;
+  }
+  .video-inner {
+    transform-origin:center center;
+    transform:translate(var(--tx), var(--ty)) scale(var(--scale));
+    transition:transform 0.12s linear;
+    will-change:transform;
+    display:block;
+  }
+  video {
+    display:block;
+    width:100%;
+    height:auto;
+    object-fit:contain;
+    max-height:60vh;
+    user-select:none;
+    -webkit-user-drag:none;
+  }
+
+  .controls{display:flex;gap:10px;align-items:center;margin-top:12px;flex-wrap:wrap}
+  .btn{padding:10px 14px;border-radius:10px;border:none;cursor:pointer;font-weight:600}
+  .btn-primary{background:linear-gradient(90deg,var(--primary),#c9a900);color:#111}
+  .btn-accent{background:var(--accent);color:white}
+  .btn-ghost{background:transparent;border:1px solid #e6e9ef;color:var(--dark)}
+
+  .react-row{display:flex;gap:12px;margin-top:12px;align-items:center;flex-wrap:wrap}
+  .react-big{flex:1;background:linear-gradient(90deg,var(--accent),#00b8f5);color:white;padding:14px;border-radius:12px;font-size:18px;box-shadow:0 8px 22px rgba(0,170,235,0.12);border:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation;-webkit-user-select:none;}
+
+  aside .card{padding:12px}
+  .stat{font-size:13px;color:var(--mid)}
+
+  /* Tabela wyników */
+  .results{margin-top:10px;max-height:260px;overflow:auto;border-radius:12px;border:1px solid #e4e7f0;background:#f9fafc;}
+  .results table{width:100%;border-collapse:separate;border-spacing:0;}
+  .results thead th{
+    position:sticky;
+    top:0;
+    z-index:1;
+    background:#f3f5fb;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+    padding:10px 10px;
+    border-bottom:1px solid #e0e4f0;
+  }
+  .results tbody td{
+    padding:8px 10px;
+    font-size:13px;
+    border-bottom:1px solid #edf0f7;
+    background:#ffffff;
+  }
+  .results tbody tr:nth-child(even) td{
+    background:#fdfdff;
+  }
+  .results tbody tr:hover td{
+    background:#eef3ff;
+  }
+  .results td:nth-child(1){
+    width:32px;
+    text-align:center;
+    color:#9ba3bd;
+    font-weight:600;
+  }
+  .results td:nth-child(2){
+    font-size:11px;
+    color:#9ba3bd;
+  }
+  .results td:nth-child(3){
+    text-align:right;
+    font-variant-numeric:tabular-nums;
+  }
+  .results td:nth-child(4){
+    width:140px;
+  }
+
+  .badge{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    padding:3px 8px;
+    border-radius:999px;
+    font-size:11px;
+    font-weight:600;
+    background:#eef1fb;
+    color:#555;
+    white-space:nowrap;
+  }
+
+  .small{font-size:13px;color:var(--mid)}
+  input,select{padding:8px;border-radius:8px;border:1px solid #e6e9ef;font-size:13px}
+  input[type="number"]{width:100%}
+  .row{display:flex;gap:8px}
+
+  .zoom-panel{display:flex;gap:8px;align-items:center;margin-top:10px}
+  .zoom-panel input[type="range"]{flex:1}
+
+  @media (max-width:700px){
+    .logo{width:48px;height:48px}
+    .brand h1{font-size:16px}
+    .react-big{font-size:18px;padding:16px}
+    .video-wrap{max-height:42vh}
+    video{max-height:42vh}
+  }
+
+  .event-marker {
+    position:absolute;
+    top:8px;
+    right:10px;
+    background:rgba(255,255,255,0.9);
+    color:var(--dark);
+    padding:6px 8px;
+    border-radius:8px;
+    font-weight:600;
+    font-size:13px;
+    box-shadow:0 6px 18px rgba(11,20,40,0.06);
+  }
+
+  .fit-buttons{display:flex;gap:8px}
+  .muted{color:var(--mid)}
+
+  /* NOWY WYGLĄD STATYSTYK */
+  .stats-shell{
+    margin-top:6px;
+    padding:10px 12px;
+    border-radius:12px;
+    background:#f5f7fc;
+    border:1px solid #e1e5f4;
+  }
+  .stats-score{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:8px;
+  }
+  .stats-score-main{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+  }
+  .stats-score-label{
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    color:var(--mid);
+  }
+  .stats-score-value{
+    font-size:26px;
+    font-weight:800;
+    font-variant-numeric:tabular-nums;
+  }
+  .stats-score-desc{
+    font-size:12px;
+    font-weight:600;
+  }
+  .stats-score-meta{
+    font-size:11px;
+    color:#9ba3bd;
+    text-align:right;
+  }
+
+  .stats-grid{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:8px;
+    margin-top:4px;
+  }
+  .stat-tile{
+    background:#ffffff;
+    border-radius:10px;
+    padding:7px 9px;
+    box-shadow:0 4px 10px rgba(15,23,42,0.04);
+  }
+  .stat-tile-label{
+    font-size:11px;
+    color:var(--mid);
+    margin-bottom:2px;
+  }
+  .stat-tile-value{
+    font-size:13px;
+    font-weight:600;
+    font-variant-numeric:tabular-nums;
+  }
+
+  .stats-footer{
+    margin-top:8px;
+    font-size:11px;
+    color:#9ba3bd;
+  }
+
+  .stats-panel{
+    margin-top:6px;
+    border-radius:10px;
+    padding:8px 10px;
+    font-size:12px;
+  }
+  .stats-panel-title{
+    font-weight:600;
+    margin-bottom:4px;
+  }
+  .stats-panel-warning{
+    background:#fff7f5;
+    border:1px dashed #f5c2c2;
+    color:#b00020;
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden="true">
+          <img src="https://scontent-waw2-2.xx.fbcdn.net/v/t39.30808-6/529307358_1197038148893518_7517647576720036195_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=4Nn3zZ6vxcMQ7kNvwE9UG1n&_nc_oc=AdmFPyQxfQDPtGE9zbUZlW2QRw6ddeEo-8-TqnYUffmH36fAQEu5DaRTzvNboIA0tor1fheKaD1iIzfogDezUbFK&_nc_zt=23&_nc_ht=scontent-waw2-2.xx&_nc_gid=RvD7VEsdGz09--2-mtRVfQ&oh=00_AfoRLC7AWMpg1r_Trxt1U75brvbGJmWgU90bHeIS9SVEZw&oe=697287A9" alt="Unleashed Flyball Team" />
+        </div>
+        <div>
+          <h1>Unleashed Flyball Team - Flyball Reaction</h1>
+          <div class="subtitle">Tester czasu reakcji</div>
+        </div>
+      </div>
+      <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
+        <div class="small muted">v3.0</div>
+      </div>
+    </header>
+
+    <div class="grid">
+      <!-- MAIN -->
+      <main>
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <strong>Test reakcji — wideo</strong>
+              <div class="small muted">Wczytaj wideo, ustaw zdarzenie (E) i mierz reakcje (Space)</div>
+            </div>
+            <div class="small muted">Sprawdź swoją reakcję</div>
+          </div>
+
+          <div class="video-wrap" id="videoWrap">
+            <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center">
+              <div id="transformer" class="video-inner" style="--tx:0px; --ty:0px; --scale:1;">
+                <video id="video" playsinline webkit-playsinline controls crossorigin="anonymous"></video>
+              </div>
+            </div>
+            <div class="event-marker" id="eventMarker" style="display:none">Zdarzenie: <span id="eventTimeText">—</span></div>
+          </div>
+
+          <div class="controls" style="margin-top:12px">
+            <input id="fileInput" type="file" accept="video/*" multiple style="flex:1" />
+            <select id="videoList" class="small" style="min-width:180px">
+              <option value="">Brak wideo</option>
+            </select>
+            <button class="btn btn-ghost" id="loadUrlBtn">Wczytaj URL</button>
+            <button class="btn btn-primary" id="setEventBtn">Ustaw zdarzenie (E)</button>
+            <div class="fit-buttons">
+              <button class="btn btn-ghost" id="fitBtn">Fit</button>
+              <button class="btn btn-ghost" id="smallBtn">Small</button>
+              <button class="btn btn-ghost" id="medBtn">Medium</button>
+              <button class="btn btn-ghost" id="largeBtn">Large</button>
+            </div>
+          </div>
+
+          <div class="zoom-panel">
+            <label class="small muted" for="zoomSlider">Zoom</label>
+            <input id="zoomSlider" type="range" min="0.5" max="2.5" step="0.01" value="1" />
+            <div class="small muted" id="zoomLabel">100%</div>
+            <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
+              <label class="small muted">Pinch & drag — działa na telefonie</label>
+            </div>
+          </div>
+
+          <div class="react-row">
+            <button id="reactBtn" class="react-big">Reaguj (Space)</button>
+            <div style="min-width:220px">
+              <div class="small muted">Ustawienia testu</div>
+              <div style="display:flex;gap:8px;margin-top:8px">
+                <input id="trialsCount" type="number" value="5" min="1" />
+                <input id="randomFrom" type="number" value="1.5" min="0" step="0.1" />
+                <input id="randomTo" type="number" value="2.5" min="0" step="0.1" />
+              </div>
+              <div class="small muted" style="margin-top:6px">
+                Powtórzeń • Losowo od (s) • do (s) przed zdarzeniem
+              </div>
+              <div style="margin-top:8px;display:flex;gap:8px">
+                <button class="btn btn-accent" id="startTestBtn">Start (S)</button>
+                <button class="btn btn-ghost" id="stopTestBtn">Stop</button>
+              </div>
+              <div id="trialInfo" class="small muted" style="margin-top:8px">Brak testu.</div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- RIGHT COLUMN -->
+      <aside>
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div><strong>Wyniki</strong><div class="small muted">Twoje pomiary</div></div>
+            <div><button class="btn btn-ghost" id="exportCsvBtn">Eksport CSV</button></div>
+          </div>
+
+          <div class="results" style="margin-top:10px">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Data</th>
+                  <th>Reakcja (ms)</th>
+                  <th>Ocena</th>
+                </tr>
+              </thead>
+              <tbody id="resultsBody"></tbody>
+            </table>
+          </div>
+
+          <div style="margin-top:10px">
+            <div class="small muted">Statystyki</div>
+            <div id="stats" class="stat">Brak wyników.</div>
+          </div>
+        </div>
+
+        <!-- KARTA: wykres Gaussa -->
+        <div class="card" style="margin-top:12px">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <strong>Krzywa powtarzalności</strong>
+              <div class="small muted">Rozkład Twoich czasów reakcji</div>
+            </div>
+          </div>
+          <div style="margin-top:10px">
+            <canvas id="gaussCanvas" width="320" height="200" style="width:100%;height:auto;"></canvas>
+            <div id="gaussInfo" class="small muted" style="margin-top:6px">
+              Wykres pojawi się po zakończeniu testu (min. 3 ważne próby).
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:12px">
+          <div class="small muted">Uwagi</div>
+          <ul class="small muted">
+            <li>Użyj suwaka Zoom lub gestu pinch, aby powiększyć fragment wideo.</li>
+            <li>Przeciągnij (drag/pan) aby przesunąć widok przy zoomie.</li>
+            <li>Celem jest jak najwęższa krzywa (idealnie powtarzalne czasy reakcji) i brak przewidywania.</li>
+          </ul>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+<script>
+/* Uwaga: pomiary warto sprawdzić na realnym sprzęcie; przeglądarki różnie obsługują wideo. */
+
+const video = document.getElementById('video');
+const transformer = document.getElementById('transformer');
+const videoWrap = document.getElementById('videoWrap');
+const fileInput = document.getElementById('fileInput');
+const videoList = document.getElementById('videoList');
+const loadUrlBtn = document.getElementById('loadUrlBtn');
+const setEventBtn = document.getElementById('setEventBtn');
+const eventMarker = document.getElementById('eventMarker');
+const eventTimeText = document.getElementById('eventTimeText');
+const zoomSlider = document.getElementById('zoomSlider');
+const zoomLabel = document.getElementById('zoomLabel');
+const fitBtn = document.getElementById('fitBtn');
+const smallBtn = document.getElementById('smallBtn');
+const medBtn = document.getElementById('medBtn');
+const largeBtn = document.getElementById('largeBtn');
+
+const reactBtn = document.getElementById('reactBtn');
+const startTestBtn = document.getElementById('startTestBtn');
+const stopTestBtn = document.getElementById('stopTestBtn');
+const trialsCountInput = document.getElementById('trialsCount');
+const randomFromInput = document.getElementById('randomFrom');
+const randomToInput = document.getElementById('randomTo');
+const trialInfo = document.getElementById('trialInfo');
+
+const resultsBody = document.getElementById('resultsBody');
+const statsDiv = document.getElementById('stats');
+const exportCsvBtn = document.getElementById('exportCsvBtn');
+
+/* Wykres Gaussa */
+const gaussCanvas = document.getElementById('gaussCanvas');
+const gaussInfo = document.getElementById('gaussInfo');
+const gaussCtx = gaussCanvas.getContext('2d');
+
+let eventTime = null;
+let lastEventLabel = '';
+let ongoingTest = null;
+let results = [];
+
+/* Wiele wideo */
+let videoEntries = []; // { name, src, isLocal, eventTime, eventLabel }
+let currentVideoIndex = -1;
+
+/* Transform state */
+let scale = parseFloat(localStorage.getItem('fly_zoom') || '1');
+let tx = 0, ty = 0;
+updateTransform();
+
+/* --- WIELE WIDEO: pomocnicze funkcje --- */
+function refreshVideoList(){
+  videoList.innerHTML = '';
+  if (!videoEntries.length){
+    const opt = document.createElement('option');
+    opt.value = '';
+    opt.textContent = 'Brak wideo';
+    videoList.appendChild(opt);
+    return;
+  }
+  videoEntries.forEach((v, i)=>{
+    const opt = document.createElement('option');
+    opt.value = String(i);
+    let label = `${i+1}. ${v.name}`;
+    if (v.eventTime != null) label += ` (E: ${v.eventTime.toFixed(2)}s)`;
+    opt.textContent = label;
+    if (i === currentVideoIndex) opt.selected = true;
+    videoList.appendChild(opt);
+  });
+}
+
+function loadVideoByIndex(index, onReady){
+  const entry = videoEntries[index];
+  if (!entry) return;
+  currentVideoIndex = index;
+
+  try { video.pause(); } catch(_){}
+  video.removeAttribute('src');
+  video.load();
+
+  if (entry.isLocal) {
+    video.removeAttribute('crossorigin');
+  } else {
+    video.crossOrigin = 'anonymous';
+  }
+
+  video.src = entry.src;
+
+  eventTime = entry.eventTime != null ? entry.eventTime : null;
+  lastEventLabel = entry.eventLabel || '';
+  updateEventUI();
+  refreshVideoList();
+
+  const handler = () => {
+    video.removeEventListener('loadedmetadata', handler);
+    if (typeof onReady === 'function') onReady();
+  };
+  if (video.readyState >= 1) {
+    if (typeof onReady === 'function') onReady();
+  } else {
+    video.addEventListener('loadedmetadata', handler);
+  }
+}
+
+/* Load file/url */
+fileInput.addEventListener('change', (e)=>{
+  const files = e.target.files;
+  if (!files || !files.length) return;
+  const URL_ = window.URL || window.webkitURL;
+  for (const f of files){
+    const url = URL_.createObjectURL(f);
+    videoEntries.push({
+      name: f.name,
+      src: url,
+      isLocal: true,
+      eventTime: null,
+      eventLabel: ''
+    });
+  }
+  if (currentVideoIndex === -1 && videoEntries.length > 0){
+    loadVideoByIndex(0);
+  } else {
+    refreshVideoList();
+  }
+});
+
+loadUrlBtn.addEventListener('click', ()=>{
+  const url = prompt('Wklej URL do pliku mp4/webm:');
+  if (!url) return;
+  const name = url.split('/').pop() || 'Wideo z URL';
+  videoEntries.push({
+    name,
+    src: url,
+    isLocal: false,
+    eventTime: null,
+    eventLabel: ''
+  });
+  const idx = videoEntries.length - 1;
+  loadVideoByIndex(idx);
+});
+
+videoList.addEventListener('change', (e)=>{
+  const idx = parseInt(e.target.value, 10);
+  if (!isNaN(idx)) {
+    loadVideoByIndex(idx);
+  }
+});
+
+/* SET EVENT */
+setEventBtn.addEventListener('click', setEventAtCurrent);
+document.addEventListener('keydown', (e)=>{
+  if (e.code === 'KeyE') { e.preventDefault(); setEventAtCurrent(); }
+  if (e.code === 'Space') { if (ongoingTest && ongoingTest.running) { e.preventDefault(); reactNow(); } }
+  if (e.code === 'KeyS') { e.preventDefault(); startTestBtn.click(); }
+});
+
+function setEventAtCurrent(){
+  if (currentVideoIndex < 0 || !videoEntries[currentVideoIndex]) {
+    alert('Wczytaj wideo i wybierz je z listy przed ustawieniem zdarzenia.');
+    return;
+  }
+  eventTime = video.currentTime;
+  lastEventLabel = prompt('Opis zdarzenia (opcjonalnie):', lastEventLabel || '') || lastEventLabel;
+  videoEntries[currentVideoIndex].eventTime = eventTime;
+  videoEntries[currentVideoIndex].eventLabel = lastEventLabel;
+  updateEventUI();
+  refreshVideoList();
+  alert(`Ustawiono zdarzenie dla wideo "${videoEntries[currentVideoIndex].name}": ${eventTime.toFixed(3)} s ${lastEventLabel? '— ' + lastEventLabel : ''}`);
+}
+function updateEventUI(){
+  if (eventTime == null){
+    eventMarker.style.display = 'none';
+    eventTimeText.textContent = '—';
+  } else {
+    eventMarker.style.display = 'block';
+    eventTimeText.textContent = eventTime.toFixed(3) + 's';
+  }
+}
+
+/* --- ZOOM & PAN --- */
+function updateTransform(){
+  transformer.style.setProperty('--tx', `${tx}px`);
+  transformer.style.setProperty('--ty', `${ty}px`);
+  transformer.style.setProperty('--scale', `${scale}`);
+  zoomLabel.textContent = `${Math.round(scale*100)}%`;
+  zoomSlider.value = scale;
+  localStorage.setItem('fly_zoom', String(scale));
+}
+zoomSlider.addEventListener('input', (e)=>{
+  scale = parseFloat(e.target.value);
+  updateTransform();
+});
+
+/* Fit / presets */
+fitBtn.addEventListener('click', ()=>{ scale = 1; tx = 0; ty = 0; updateTransform(); });
+smallBtn.addEventListener('click', ()=>{ scale = 0.8; tx = 0; ty = 0; updateTransform(); });
+medBtn.addEventListener('click', ()=>{ scale = 1.2; tx = 0; ty = 0; updateTransform(); });
+largeBtn.addEventListener('click', ()=>{ scale = 1.6; tx = 0; ty = 0; updateTransform(); });
+
+/* PAN with pointer events */
+let pointerActive = false;
+let lastPointer = {x:0,y:0};
+videoWrap.addEventListener('pointerdown', (e)=>{
+  if (scale === 1) return;
+  pointerActive = true;
+  lastPointer.x = e.clientX; lastPointer.y = e.clientY;
+  videoWrap.setPointerCapture(e.pointerId);
+});
+videoWrap.addEventListener('pointermove', (e)=>{
+  if (!pointerActive) return;
+  const dx = e.clientX - lastPointer.x;
+  const dy = e.clientY - lastPointer.y;
+  lastPointer.x = e.clientX; lastPointer.y = e.clientY;
+  tx += dx;
+  ty += dy;
+  updateTransform();
+});
+videoWrap.addEventListener('pointerup', (e)=>{
+  if (!pointerActive) return;
+  pointerActive = false;
+  try{ videoWrap.releasePointerCapture(e.pointerId); }catch(_){}
+});
+videoWrap.addEventListener('pointercancel', ()=>{ pointerActive=false; });
+
+/* TOUCH: pinch-to-zoom for two fingers */
+let lastPinchDist = null;
+videoWrap.addEventListener('touchstart', (e)=>{
+  if (e.touches && e.touches.length === 2){
+    lastPinchDist = distanceBetweenTouches(e.touches[0], e.touches[1]);
+  }
+}, {passive:false});
+videoWrap.addEventListener('touchmove', (e)=>{
+  if (e.touches && e.touches.length === 2){
+    e.preventDefault();
+    const dist = distanceBetweenTouches(e.touches[0], e.touches[1]);
+    if (lastPinchDist){
+      const delta = dist - lastPinchDist;
+      let factor = 1 + delta / 300;
+      scale = Math.max(0.5, Math.min(2.5, scale * factor));
+      updateTransform();
+    }
+    lastPinchDist = dist;
+  }
+}, {passive:false});
+videoWrap.addEventListener('touchend', (e)=>{
+  if (!e.touches || e.touches.length < 2) lastPinchDist = null;
+});
+
+function distanceBetweenTouches(a,b){
+  const dx = a.clientX - b.clientX;
+  const dy = a.clientY - b.clientY;
+  return Math.sqrt(dx*dx + dy*dy);
+}
+
+/* --- Test logic: losowy start przed zdarzeniem, losowy wybór wideo --- */
+startTestBtn.addEventListener('click', startTest);
+stopTestBtn.addEventListener('click', stopTest);
+
+/* Reakcja na dotyk/klik bez opóźnienia click na mobile */
+reactBtn.addEventListener('pointerdown', (e)=>{
+  e.preventDefault();
+  reactNow();
+});
+
+function startTest(){
+  if (!videoEntries.length) {
+    alert('Wczytaj co najmniej jedno wideo przed testem.');
+    return;
+  }
+
+  const trials = Math.max(1, parseInt(trialsCountInput.value)||1);
+
+  let from = parseFloat(randomFromInput.value);
+  let to = parseFloat(randomToInput.value);
+  if (isNaN(from)) from = 1.5;
+  if (isNaN(to)) to = 2.5;
+  if (from < 0) from = 0;
+  if (to < 0) to = 0;
+  if (to < from) { const tmp = from; from = to; to = tmp; }
+
+  // lista indeksów filmów, które mają ustawione zdarzenie
+  const videoIndices = [];
+  videoEntries.forEach((v,i)=>{
+    if (v.eventTime != null) videoIndices.push(i);
+  });
+  if (!videoIndices.length){
+    alert('Ustaw punkt zdarzenia (E) na co najmniej jednym wideo przed testem.');
+    return;
+  }
+
+  results = [];
+  updateResultsUI();
+  ongoingTest = {
+    running:true,
+    trialsTotal:trials,
+    currentTrial:0,
+    offsetMin:from,
+    offsetMax:to,
+    videoIndices
+  };
+  runNextTrial();
+}
+
+function runNextTrial(){
+  if (!ongoingTest || !ongoingTest.running) return;
+  if (ongoingTest.currentTrial >= ongoingTest.trialsTotal){
+    ongoingTest.running = false;
+    trialInfo.textContent = `Test zakończony. ${results.length} wyników.`;
+    updateResultsUI();
+    return;
+  }
+  const trialIndex = ongoingTest.currentTrial + 1;
+
+  // losujemy wideo z listy z ustawionym zdarzeniem
+  const videoIndices = ongoingTest.videoIndices;
+  const randomVideoIndex = videoIndices[Math.floor(Math.random() * videoIndices.length)];
+  const chosenEntry = videoEntries[randomVideoIndex];
+
+  function prepareTrial(){
+    const minOffset = Math.max(0, ongoingTest.offsetMin || 0);
+    const maxOffset = Math.max(minOffset, ongoingTest.offsetMax || minOffset);
+    const range = maxOffset - minOffset;
+    const randomBefore = range > 0 ? (minOffset + Math.random() * range) : minOffset;
+
+    let startTime = eventTime - randomBefore;
+    if (!isFinite(startTime) || startTime < 0) startTime = 0;
+    if (video.duration && startTime > video.duration) {
+      startTime = Math.max(0, video.duration - 0.1);
+    }
+
+    video.currentTime = startTime;
+    video.pause();
+
+    trialInfo.textContent = `Próba ${trialIndex} / ${ongoingTest.trialsTotal} — wideo: ${chosenEntry.name}, losowo ~${randomBefore.toFixed(2)}s przed zdarzeniem...`;
+
+    setTimeout(()=>{
+      video.play().then(()=>{
+        trialInfo.textContent = `Próba ${trialIndex} / ${ongoingTest.trialsTotal} — wideo: ${chosenEntry.name}. Reaguj na zdarzenie.`;
+      }).catch(err=>{
+        console.warn('Play rejected:', err);
+        alert('Autoodtwarzanie zablokowane. Dotknij wideo, a potem kliknij Start ponownie.');
+      });
+    }, 140);
+  }
+
+  loadVideoByIndex(randomVideoIndex, prepareTrial);
+}
+
+function reactNow(){
+  if (!ongoingTest || !ongoingTest.running){
+    alert('Brak trwającego testu.');
+    return;
+  }
+
+  const pressVideoTime = video.currentTime; // s
+  const reactionMs = (pressVideoTime - eventTime) * 1000; // może być ujemne (za wcześnie)
+  const reactionRounded = Math.round(reactionMs * 10) / 10;
+
+  try { video.pause(); } catch(_){}
+
+  ongoingTest.currentTrial += 1;
+  const classification = classifyReaction(reactionMs);
+  const note = classification.valid ? 'OK' : 'Przewidziałeś';
+
+  const currentVideoName = videoEntries[currentVideoIndex]?.name || '';
+
+  results.push({
+    trial: ongoingTest.currentTrial,
+    ms: reactionRounded,
+    iso: new Date().toISOString(),
+    note,
+    rating: classification.label,
+    valid: classification.valid,
+    color: classification.color,
+    videoName: currentVideoName
+  });
+
+  updateResultsUI();
+
+  setTimeout(()=>{
+    if (ongoingTest.currentTrial < ongoingTest.trialsTotal) {
+      runNextTrial();
+    } else {
+      ongoingTest.running = false;
+      trialInfo.textContent = `Test zakończony. ${results.length} wyników.`;
+    }
+  }, 700);
+}
+
+function stopTest(){
+  if (!ongoingTest) return;
+  ongoingTest.running = false;
+  try { video.pause(); } catch(_){}
+  trialInfo.textContent = 'Test zatrzymany.';
+}
+
+function classifyReaction(ms){
+  const m = Math.round(ms);
+  // m < 0 → PRZED zdarzeniem = przewidywanie
+  if (m < 0) return { label: 'Przewidziałeś', valid: false, color: 'danger' };
+  if (m < 120) return { label: 'Przewidziałeś', valid: false, color: 'danger' };
+  if (m <= 170) return { label: 'Rewelacja', valid: true, color: 'gold' };
+  if (m <= 240) return { label: 'Bardzo dobrze', valid: true, color: 'green' };
+  if (m <= 270) return { label: 'Dobrze', valid: true, color: 'orange' };
+  return { label: 'Do poprawy', valid: true, color: 'muted' };
+}
+
+/* RESULTS UI + STATYSTYKI + WYNIK KOŃCOWY + WYKRES GAUSSA */
+function updateResultsUI(){
+  resultsBody.innerHTML = '';
+  results.forEach((r, idx)=>{
+    const tr = document.createElement('tr');
+
+    const td1 = document.createElement('td'); td1.textContent = (idx+1);
+
+    const td2 = document.createElement('td');
+    td2.textContent = r.iso.replace('T',' ').slice(0,19);
+
+    const td3 = document.createElement('td');
+    td3.textContent = `${r.ms} ms`;
+    td3.style.fontWeight='700';
+
+    const td4 = document.createElement('td');
+    const badge = document.createElement('span');
+    badge.className = 'badge';
+    badge.textContent = r.rating || (r.note || '');
+
+    if (r.valid === false) {
+      badge.style.background = 'rgba(176,0,32,0.08)';
+      badge.style.color = '#b00020';
+      badge.style.border = '1px solid rgba(176,0,32,0.25)';
+    } else {
+      if (r.color === 'gold') {
+        badge.style.background = 'rgba(249,219,46,0.12)';
+        badge.style.color = '#b8860b';
+        badge.style.border = '1px solid rgba(249,219,46,0.35)';
+      }
+      if (r.color === 'green') {
+        badge.style.background = 'rgba(11,138,62,0.08)';
+        badge.style.color = '#0b8a3e';
+        badge.style.border = '1px solid rgba(11,138,62,0.25)';
+      }
+      if (r.color === 'orange') {
+        badge.style.background = 'rgba(208,107,0,0.08)';
+        badge.style.color = '#d06b00';
+        badge.style.border = '1px solid rgba(208,107,0,0.25)';
+      }
+    }
+    td4.appendChild(badge);
+
+    tr.appendChild(td1); 
+    tr.appendChild(td2); 
+    tr.appendChild(td3); 
+    tr.appendChild(td4);
+    resultsBody.appendChild(tr);
+  });
+
+  const validResults = results.filter(r => r.valid === true);
+  const predictedCount = results.length - validResults.length;
+  const totalTrials = results.length;
+
+  if (validResults.length < 3) {
+    statsDiv.innerHTML = `
+      <div class="stats-panel stats-panel-warning">
+        <div class="stats-panel-title">Za mało prób do oceny wyniku</div>
+        <div>
+          Prób ogółem: <b>${totalTrials}</b><br/>
+          Przewidzianych (za wcześnie): <b>${predictedCount}</b>
+        </div>
+      </div>
+    `;
+    drawEmptyGauss('Za mało danych do krzywej (min. 3 ważne próby).');
+    return;
+  }
+
+  const nums = validResults.map(r => r.ms);
+  const min = Math.min(...nums);
+  const max = Math.max(...nums);
+
+  const mean = nums.reduce((a,b)=>a+b,0) / nums.length;
+  const variance = nums.reduce((sum, v)=> sum + Math.pow(v - mean, 2), 0) / nums.length;
+  const stdDev = Math.sqrt(variance);
+
+  let consistencyLabel = '';
+  let consistencyColor = '';
+
+  if (stdDev < 15) {
+    consistencyLabel = 'ELITARNA POWTARZALNOŚĆ';
+    consistencyColor = '#0b8a3e';
+  } else if (stdDev < 30) {
+    consistencyLabel = 'BARDZO DOBRA POWTARZALNOŚĆ';
+    consistencyColor = '#2e7d32';
+  } else if (stdDev < 50) {
+    consistencyLabel = 'PRZECIĘTNA POWTARZALNOŚĆ';
+    consistencyColor = '#d06b00';
+  } else {
+    consistencyLabel = 'NISKA POWTARZALNOŚĆ';
+    consistencyColor = '#b00020';
+  }
+
+  const predictedRatio = totalTrials > 0 ? (predictedCount / totalTrials) : 0;
+
+  // mniejsza waga szybkości, większa powtarzalności/przewidywania
+  const speedScoreRaw = 100 - Math.max(0, (mean - 180) * 0.15);
+  const consistencyPenalty = Math.max(0, (stdDev - 10) * 1.5);
+  const predictionPenalty = predictedRatio * 200;
+
+  let finalScore = Math.round(speedScoreRaw - consistencyPenalty - predictionPenalty);
+  finalScore = Math.max(0, Math.min(100, finalScore));
+
+  let finalLabel = '';
+  let finalColor = '';
+
+  if (finalScore >= 90) {
+    finalLabel = 'MISTRZ REAKCJI (bez przewidywania)';
+    finalColor = '#0b8a3e';
+  } else if (finalScore >= 75) {
+    finalLabel = 'Bardzo dobry wynik';
+    finalColor = '#2e7d32';
+  } else if (finalScore >= 60) {
+    finalLabel = 'Nie najgorzej';
+    finalColor = '#d06b00';
+  } else {
+    finalLabel = 'Słabo Ci to idzie';
+    finalColor = '#b00020';
+  }
+
+  statsDiv.innerHTML = `
+    <div class="stats-shell">
+      <div class="stats-score">
+        <div class="stats-score-main">
+          <div class="stats-score-label">Ostateczny wynik</div>
+          <div class="stats-score-value" style="color:${finalColor}">${finalScore}</div>
+          <div class="stats-score-desc" style="color:${finalColor}">${finalLabel}</div>
+        </div>
+        <div class="stats-score-meta">
+          Próby ważne: <b>${validResults.length}</b> / ${totalTrials}<br/>
+          Przewidzianych: <b>${predictedCount}</b> (${Math.round(predictedRatio*100)}%)
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-tile">
+          <div class="stat-tile-label">Średni czas</div>
+          <div class="stat-tile-value">${mean.toFixed(1)} ms</div>
+        </div>
+        <div class="stat-tile">
+          <div class="stat-tile-label">Powtarzalność (SD)</div>
+          <div class="stat-tile-value" style="color:${consistencyColor}">±${stdDev.toFixed(1)} ms</div>
+        </div>
+        <div class="stat-tile">
+          <div class="stat-tile-label">Min</div>
+          <div class="stat-tile-value">${min.toFixed(1)} ms</div>
+        </div>
+        <div class="stat-tile">
+          <div class="stat-tile-label">Max</div>
+          <div class="stat-tile-value">${max.toFixed(1)} ms</div>
+        </div>
+      </div>
+
+      <div class="stats-footer">
+        Im wyższy wynik i niższe SD przy zerowym przewidywaniu, tym lepsza kontrola reakcji.
+      </div>
+    </div>
+  `;
+
+  drawGaussCurve(nums, mean, stdDev);
+}
+
+/* Rysowanie wykresu Gaussa */
+function drawEmptyGauss(msg){
+  if (!gaussCtx) return;
+  const ctx = gaussCtx;
+  const W = gaussCanvas.width;
+  const H = gaussCanvas.height;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle = '#f5f7fb';
+  ctx.fillRect(0,0,W,H);
+  ctx.fillStyle = '#888';
+  ctx.font = '12px system-ui, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('Brak danych', W/2, H/2 - 8);
+  if (msg){
+    ctx.fillText(msg, W/2, H/2 + 10);
+  }
+  gaussInfo.textContent = msg || 'Wykres pojawi się po zakończeniu testu (min. 3 ważne próby).';
+}
+
+function drawGaussCurve(samples, mean, stdDev){
+  if (!gaussCtx) return;
+  const ctx = gaussCtx;
+  const W = gaussCanvas.width;
+  const H = gaussCanvas.height;
+
+  ctx.clearRect(0,0,W,H);
+
+  const paddingLeft = 35;
+  const paddingRight = 10;
+  const paddingTop = 10;
+  const paddingBottom = 22;
+
+  const plotW = W - paddingLeft - paddingRight;
+  const plotH = H - paddingTop - paddingBottom;
+  const baseY = H - paddingBottom;
+
+  if (stdDev < 1e-3) {
+    ctx.fillStyle = '#f5f7fb';
+    ctx.fillRect(0,0,W,H);
+    ctx.strokeStyle = '#ccd2e5';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(paddingLeft, baseY);
+    ctx.lineTo(W - paddingRight, baseY);
+    ctx.stroke();
+
+    const x = paddingLeft + plotW/2;
+    ctx.strokeStyle = '#00AEEB';
+    ctx.setLineDash([4,3]);
+    ctx.beginPath();
+    ctx.moveTo(x, baseY);
+    ctx.lineTo(x, paddingTop);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    ctx.fillStyle = '#00AEEB';
+    ctx.font = '11px system-ui, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'bottom';
+    ctx.fillText(`${mean.toFixed(1)} ms (idealnie powtarzalnie)`, x, paddingTop + 14);
+
+    gaussInfo.textContent = `Średnia: ${mean.toFixed(1)} ms • SD ≈ 0 ms — prawie idealna powtarzalność.`;
+    return;
+  }
+
+  const minSample = Math.min(...samples);
+  const maxSample = Math.max(...samples);
+
+  const left = Math.min(minSample, mean - 3*stdDev);
+  const right = Math.max(maxSample, mean + 3*stdDev);
+  const range = right - left || 1;
+
+  function xToCanvas(val){
+    return paddingLeft + ((val - left) / range) * plotW;
+  }
+
+  function normalPDF(x, mu, sigma){
+    const z = (x - mu) / sigma;
+    return Math.exp(-0.5 * z * z) / (sigma * Math.sqrt(2*Math.PI));
+  }
+
+  const steps = 120;
+  const xs = [];
+  const ys = [];
+  let maxPdf = 0;
+  for (let i=0;i<=steps;i++){
+    const x = left + (range * i / steps);
+    const pdf = normalPDF(x, mean, stdDev);
+    xs.push(x);
+    ys.push(pdf);
+    if (pdf > maxPdf) maxPdf = pdf;
+  }
+
+  ctx.fillStyle = '#f5f7fb';
+  ctx.fillRect(0,0,W,H);
+
+  ctx.strokeStyle = '#ccd2e5';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(paddingLeft, baseY);
+  ctx.lineTo(W - paddingRight, baseY);
+  ctx.stroke();
+
+  const approxStep = 20;
+  const startTick = Math.ceil(left / approxStep) * approxStep;
+  const endTick = Math.floor(right / approxStep) * approxStep;
+  ctx.fillStyle = '#99a1bd';
+  ctx.font = '10px system-ui, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+
+  for (let t = startTick; t <= endTick; t += approxStep){
+    const cx = xToCanvas(t);
+    ctx.strokeStyle = '#eef1f8';
+    ctx.beginPath();
+    ctx.moveTo(cx, baseY);
+    ctx.lineTo(cx, paddingTop);
+    ctx.stroke();
+    ctx.fillStyle = '#99a1bd';
+    ctx.fillText(t.toFixed(0), cx, baseY + 3);
+  }
+
+  ctx.strokeStyle = '#00AEEB';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ys.forEach((pdf, i)=>{
+    const xVal = xs[i];
+    const cx = xToCanvas(xVal);
+    const norm = pdf / maxPdf;
+    const cy = baseY - norm * plotH;
+    if (i===0) ctx.moveTo(cx, cy);
+    else ctx.lineTo(cx, cy);
+  });
+  ctx.stroke();
+
+  const meanX = xToCanvas(mean);
+  ctx.strokeStyle = '#f9db2e';
+  ctx.setLineDash([5,3]);
+  ctx.beginPath();
+  ctx.moveTo(meanX, baseY);
+  ctx.lineTo(meanX, paddingTop);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  ctx.fillStyle = '#f9db2e';
+  ctx.font = '11px system-ui, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'bottom';
+  ctx.fillText(`μ = ${mean.toFixed(1)} ms`, meanX, paddingTop + 14);
+
+  const sigma1Left = xToCanvas(mean - stdDev);
+  const sigma1Right = xToCanvas(mean + stdDev);
+  ctx.strokeStyle = 'rgba(0,174,235,0.35)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(sigma1Left, baseY);
+  ctx.lineTo(sigma1Left, paddingTop+5);
+  ctx.moveTo(sigma1Right, baseY);
+  ctx.lineTo(sigma1Right, paddingTop+5);
+  ctx.stroke();
+
+  ctx.fillStyle = '#00AEEB';
+  ctx.font = '10px system-ui, sans-serif';
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'top';
+  ctx.fillText('-1σ', sigma1Left - 2, paddingTop + 6);
+  ctx.textAlign = 'left';
+  ctx.fillText('+1σ', sigma1Right + 2, paddingTop + 6);
+
+  ctx.fillStyle = '#d06b00';
+  samples.forEach(v=>{
+    const cx = xToCanvas(v);
+    const cy = baseY - 3;
+    ctx.beginPath();
+    ctx.arc(cx, cy, 3, 0, Math.PI*2);
+    ctx.fill();
+  });
+
+  gaussInfo.textContent = `Średnia: ${mean.toFixed(1)} ms • SD: ±${stdDev.toFixed(1)} ms — im węższa krzywa, tym lepsza powtarzalność.`;
+}
+
+/* EXPORT CSV */
+exportCsvBtn.addEventListener('click', ()=>{
+  if (results.length === 0) { alert('Brak wyników do eksportu'); return; }
+  const lines = [['trial','iso','ms','note','video']];
+  results.forEach(r => lines.push([r.trial, r.iso, r.ms, r.note, r.videoName || '']));
+  const csv = lines.map(l=>l.map(cell=> `"${String(cell).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'reaction_results.csv'; a.click();
+  URL.revokeObjectURL(url);
+});
+
+/* INITIALIZE on load */
+window.addEventListener('load', ()=>{
+  const stored = parseFloat(localStorage.getItem('fly_zoom') || '1');
+  if (!isNaN(stored)){ scale = stored; updateTransform(); }
+  updateResultsUI();
+  refreshVideoList();
+});
+
+/* reset transform on double-tap/click */
+transformer.addEventListener('dblclick', ()=>{
+  scale = 1; tx = 0; ty = 0; updateTransform();
+});
+
+video.addEventListener('loadedmetadata', async () => {
+  // Twój kod Safari bootstrap – pozostawiam zgodnie z oryginałem,
+  // zakładając że IS_SAFARI / IS_LOCAL_FILE / safariBootstrapped są zdefiniowane gdzieś wyżej.
+  if (typeof IS_SAFARI !== 'undefined' && typeof IS_LOCAL_FILE !== 'undefined' && typeof safariBootstrapped !== 'undefined') {
+    if (IS_SAFARI && IS_LOCAL_FILE && !safariBootstrapped) {
+      safariBootstrapped = true;
+      try {
+        video.muted = true;
+        video.currentTime = 0;
+        await video.play();
+        video.pause();
+        video.currentTime = 0;
+      } catch (e) {
+        console.warn('Safari bootstrap failed:', e);
+      }
+    }
+  }
+});
+
+video.addEventListener('dragstart', (e)=> e.preventDefault());
+</script>
+</body>
+</html>
