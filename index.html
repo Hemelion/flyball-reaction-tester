@@ -262,7 +262,7 @@
         </div>
       </div>
       <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
-        <div class="small muted">v2.1</div>
+        <div class="small muted">v2.2</div>
       </div>
     </header>
 
@@ -688,8 +688,8 @@ function classifyReaction(ms){
   const m = Math.round(ms);
   // m < 0 → PRZED zdarzeniem = przewidywanie
   if (m < 0) return { label: 'Przewidziałeś', valid: false, color: 'danger' };
-  if (m < 140) return { label: 'Przewidziałeś', valid: false, color: 'danger' };
-  if (m <= 180) return { label: 'Rewelacja', valid: true, color: 'gold' };
+  if (m < 120) return { label: 'Przewidziałeś', valid: false, color: 'danger' };
+  if (m <= 170) return { label: 'Rewelacja', valid: true, color: 'gold' };
   if (m <= 240) return { label: 'Bardzo dobrze', valid: true, color: 'green' };
   if (m <= 270) return { label: 'Dobrze', valid: true, color: 'orange' };
   return { label: 'Do poprawy', valid: true, color: 'muted' };
@@ -1062,8 +1062,24 @@ transformer.addEventListener('dblclick', ()=>{
   scale = 1; tx = 0; ty = 0; updateTransform();
 });
 
-video.addEventListener('loadedmetadata', ()=>{
-  if (window.innerWidth < 600 && scale === 1) { scale = 1.15; updateTransform(); }
+video.addEventListener('loadedmetadata', async () => {
+
+  if (IS_SAFARI && IS_LOCAL_FILE && !safariBootstrapped) {
+    safariBootstrapped = true;
+
+    try {
+      video.muted = true;
+      video.currentTime = 0;
+
+      await video.play();      // 🔑 uruchamia dekoder
+      video.pause();
+
+      video.currentTime = 0;   // wracamy na start
+    } catch (e) {
+      console.warn('Safari bootstrap failed:', e);
+    }
+  }
+
 });
 
 video.addEventListener('dragstart', (e)=> e.preventDefault());
