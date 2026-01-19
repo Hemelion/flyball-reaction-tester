@@ -8,8 +8,6 @@
   <b>Web-based reaction time tester synchronized with a real video trigger.</b><br/>
 </p>
 
----
-
 ## Table of Contents
 
 - [Overview](#overview)
@@ -28,8 +26,6 @@
 - [Changelog](#changelog)
 - [Disclaimer](#disclaimer)
 
----
-
 ## Overview
 
 This app was built for the **Unleashed Flyball Team** to train and objectively measure reaction times **against real video footage** – for example, the exact frame when a dog leaves the box or when a light turns on.
@@ -42,8 +38,6 @@ Unlike typical “click when the screen turns green” games, this tool:
 - rewards **repeatability** more than raw speed.
 
 Everything happens **locally in your browser** – no backend, no uploads to a server.
-
----
 
 ## How It Works
 
@@ -67,8 +61,6 @@ Everything happens **locally in your browser** – no backend, no uploads to a s
    - fits a Gaussian curve to your valid times,
    - computes standard deviation (SD),
    - calculates a final score 0–100 weighted towards **low SD & no prediction**.
-
----
 
 ## Scoring & Philosophy
 
@@ -104,8 +96,6 @@ Conceptually:
 
 So:  
 **no prediction + tight cluster = high score**, even if absolute ms are not world‑class.
-
----
 
 ## Usage
 
@@ -171,8 +161,6 @@ In the **Gaussian curve** card:
 - A normal distribution curve fitted to valid trials,
 - Mean \(\mu\) and ±1σ lines,
 - Individual trials plotted as dots.
-
----
 
 ## Controls & Shortcuts
 
