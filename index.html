@@ -564,6 +564,7 @@
             <li>Użyj suwaka Zoom lub gestu pinch, aby powiększyć fragment wideo.</li>
             <li>Przeciągnij (drag/pan) aby przesunąć widok przy zoomie.</li>
             <li>Celem jest jak najwęższa krzywa (idealnie powtarzalne czasy reakcji) i brak przewidywania.</li>
+            <li><strong>Zainstaluj jako aplikację:</strong> iOS: Udostępnij → Dodaj do ekranu głównego. Android/Desktop: Menu → Zainstaluj.</li>
           </ul>
         </div>
       </aside>
@@ -1569,12 +1570,16 @@ fsStyle.textContent = `
     bottom: 0;
     width: 100%;
     height: 100%;
+    height: 100dvh; /* Dynamic viewport height for PWA/mobile */
+    height: -webkit-fill-available; /* iOS Safari fallback */
     background: #000;
     z-index: 9999;
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
     overflow: hidden;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    box-sizing: border-box;
   }
   #fullscreenOverlay.active {
     display: flex !important;
@@ -1792,6 +1797,7 @@ fsStyle.textContent = `
     width: calc(100% - 24px);
     max-width: 600px;
     margin: 12px auto;
+    margin-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
     background: linear-gradient(90deg, #00AEEB, #00b8f5);
     color: white;
     padding: 24px 20px;
@@ -1816,6 +1822,7 @@ fsStyle.textContent = `
       font-size: 20px;
       width: calc(100% - 20px);
       margin: 10px auto;
+      margin-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
       border-radius: 14px;
     }
     .fs-trial-info {
@@ -1878,6 +1885,12 @@ let savedScale = 1;
 let savedTx = 0;
 let savedTy = 0;
 
+// Fix viewport height for PWA/iOS
+function updateFullscreenHeight() {
+  const vh = window.innerHeight;
+  fullscreenOverlay.style.height = vh + 'px';
+}
+
 function enterFullscreenTestMode() {
   if (isFullscreenTestMode) return;
   isFullscreenTestMode = true;
@@ -1900,11 +1913,19 @@ function enterFullscreenTestMode() {
   // Move video to fullscreen container
   fsVideoContainer.appendChild(video);
   
+  // Fix height for PWA/mobile
+  updateFullscreenHeight();
+  window.addEventListener('resize', updateFullscreenHeight);
+  window.addEventListener('orientationchange', updateFullscreenHeight);
+  
   // Show fullscreen overlay
   fullscreenOverlay.classList.add('active');
   
-  // Prevent body scroll
+  // Prevent body scroll and fix iOS bouncing
   document.body.style.overflow = 'hidden';
+  document.body.style.position = 'fixed';
+  document.body.style.width = '100%';
+  document.body.style.height = '100%';
   
   // Try to request fullscreen on mobile (optional, may not work on all devices)
   if (document.documentElement.requestFullscreen) {
@@ -1922,6 +1943,10 @@ function exitFullscreenTestMode() {
   hideResultBubble();
   hideSummaryBubble();
   
+  // Remove resize listeners
+  window.removeEventListener('resize', updateFullscreenHeight);
+  window.removeEventListener('orientationchange', updateFullscreenHeight);
+  
   // Exit browser fullscreen if active
   if (document.fullscreenElement || document.webkitFullscreenElement) {
     if (document.exitFullscreen) {
@@ -1933,6 +1958,7 @@ function exitFullscreenTestMode() {
   
   // Hide fullscreen overlay
   fullscreenOverlay.classList.remove('active');
+  fullscreenOverlay.style.height = ''; // Reset inline height
   
   // Reset transform to default before moving video back
   scale = 1;
@@ -1954,8 +1980,11 @@ function exitFullscreenTestMode() {
   // Restore controls attribute
   video.setAttribute('controls', '');
   
-  // Restore body scroll
+  // Restore body styles
   document.body.style.overflow = '';
+  document.body.style.position = '';
+  document.body.style.width = '';
+  document.body.style.height = '';
   
   // Force layout recalculation first, then restore transform
   setTimeout(() => {
