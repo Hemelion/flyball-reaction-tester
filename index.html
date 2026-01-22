@@ -261,11 +261,14 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    padding: clamp(16px, 4vw, 32px);
+    justify-content: flex-start;
+    padding: clamp(12px, 3vw, 32px);
     text-align: center;
     z-index: 5;
     border-radius: 10px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
   }
   .instruction-overlay.hidden {
     display: none;
@@ -275,10 +278,12 @@
     visibility: hidden;
   }
   .instruction-title {
-    font-size: clamp(18px, 4vw, 26px);
+    font-size: clamp(16px, 3.5vw, 26px);
     font-weight: 700;
     color: #fff;
-    margin-bottom: clamp(12px, 2vw, 20px);
+    margin-bottom: clamp(8px, 1.5vw, 20px);
+    margin-top: clamp(8px, 2vw, 20px);
+    flex-shrink: 0;
   }
   .instruction-title span {
     color: var(--primary);
@@ -286,17 +291,18 @@
   .instruction-steps {
     display: flex;
     flex-direction: column;
-    gap: clamp(8px, 1.5vw, 14px);
+    gap: clamp(6px, 1.2vw, 14px);
     width: 100%;
     max-width: 420px;
+    flex-shrink: 0;
   }
   .instruction-step {
     display: flex;
     align-items: flex-start;
-    gap: clamp(10px, 2vw, 14px);
+    gap: clamp(8px, 1.5vw, 14px);
     text-align: left;
     background: rgba(255,255,255,0.06);
-    padding: clamp(10px, 2vw, 14px);
+    padding: clamp(8px, 1.5vw, 14px);
     border-radius: 10px;
     border: 1px solid rgba(255,255,255,0.08);
   }
@@ -395,7 +401,6 @@
             
             <!-- Instruction overlay -->
             <div class="instruction-overlay" id="instructionOverlay">
-              <div class="instruction-title">Jak <span>testować reakcję</span>?</div>
               <div class="instruction-steps">
                 <div class="instruction-step">
                   <div class="instruction-step-num">1</div>
@@ -1336,21 +1341,27 @@ transformer.addEventListener('dblclick', ()=>{
   scale = 1; tx = 0; ty = 0; updateTransform();
 });
 
+// Safari detection and bootstrap
+const IS_SAFARI = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+let safariBootstrapped = false;
+
 video.addEventListener('loadedmetadata', async () => {
-  // Twój kod Safari bootstrap – pozostawiam zgodnie z oryginałem,
-  // zakładając że IS_SAFARI / IS_LOCAL_FILE / safariBootstrapped są zdefiniowane gdzieś wyżej.
-  if (typeof IS_SAFARI !== 'undefined' && typeof IS_LOCAL_FILE !== 'undefined' && typeof safariBootstrapped !== 'undefined') {
-    if (IS_SAFARI && IS_LOCAL_FILE && !safariBootstrapped) {
-      safariBootstrapped = true;
-      try {
-        video.muted = true;
-        video.currentTime = 0;
-        await video.play();
-        video.pause();
-        video.currentTime = 0;
-      } catch (e) {
-        console.warn('Safari bootstrap failed:', e);
-      }
+  // Safari needs a user-initiated play to unlock video playback
+  // For local files, we try to bootstrap the video
+  const entry = videoEntries[currentVideoIndex];
+  const isLocalFile = entry && entry.isLocal;
+  
+  if (IS_SAFARI && isLocalFile && !safariBootstrapped) {
+    safariBootstrapped = true;
+    try {
+      video.muted = true;
+      video.currentTime = 0;
+      await video.play();
+      video.pause();
+      video.muted = false;
+      video.currentTime = 0;
+    } catch (e) {
+      console.warn('Safari bootstrap failed:', e);
     }
   }
 });
@@ -1404,13 +1415,16 @@ fsStyle.textContent = `
     position: fixed;
     top: 0;
     left: 0;
-    width: 100vw;
-    height: 100vh;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
     background: #000;
     z-index: 9999;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
+    overflow: hidden;
   }
   #fullscreenOverlay.active {
     display: flex !important;
@@ -1418,6 +1432,7 @@ fsStyle.textContent = `
   .fs-video-container {
     flex: 1;
     width: 100%;
+    min-height: 0;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1427,9 +1442,11 @@ fsStyle.textContent = `
   .fs-video-container video {
     width: 100%;
     height: 100%;
+    max-width: 100%;
+    max-height: 100%;
     object-fit: contain;
-    max-height: calc(100vh - 120px);
     pointer-events: none;
+    transform: none !important;
   }
   .fs-trial-info {
     position: absolute;
@@ -1622,12 +1639,14 @@ fsStyle.textContent = `
     background: rgba(255,255,255,0.15);
   }
   .fs-react-btn {
-    width: 100%;
-    max-width: 100%;
+    width: calc(100% - 24px);
+    max-width: 600px;
+    margin: 12px auto;
     background: linear-gradient(90deg, #00AEEB, #00b8f5);
     color: white;
     padding: 24px 20px;
     border: none;
+    border-radius: 16px;
     font-size: 22px;
     font-weight: 700;
     cursor: pointer;
@@ -1636,14 +1655,18 @@ fsStyle.textContent = `
     -webkit-user-select: none;
     user-select: none;
     flex-shrink: 0;
+    box-shadow: 0 8px 24px rgba(0, 174, 235, 0.3);
   }
   .fs-react-btn:active {
     background: linear-gradient(90deg, #0090c5, #009dd5);
   }
   @media (max-width: 700px) {
     .fs-react-btn {
-      padding: 28px 20px;
+      padding: 22px 20px;
       font-size: 20px;
+      width: calc(100% - 20px);
+      margin: 10px auto;
+      border-radius: 14px;
     }
     .fs-trial-info {
       font-size: 12px;
@@ -1700,12 +1723,26 @@ const fsSummaryExit = document.getElementById('fsSummaryExit');
 let originalVideoParent = null;
 let isFullscreenTestMode = false;
 
+// Store transform state for fullscreen
+let savedScale = 1;
+let savedTx = 0;
+let savedTy = 0;
+
 function enterFullscreenTestMode() {
   if (isFullscreenTestMode) return;
   isFullscreenTestMode = true;
   
   // Store original parent
   originalVideoParent = video.parentElement;
+  
+  // Save current transform state and reset it
+  savedScale = scale;
+  savedTx = tx;
+  savedTy = ty;
+  scale = 1;
+  tx = 0;
+  ty = 0;
+  updateTransform();
   
   // Remove controls attribute to hide native controls
   video.removeAttribute('controls');
@@ -1758,7 +1795,10 @@ function exitFullscreenTestMode() {
   // Restore body scroll
   document.body.style.overflow = '';
   
-  // Reset transform for normal view
+  // Restore saved transform state
+  scale = savedScale;
+  tx = savedTx;
+  ty = savedTy;
   updateTransform();
 }
 
