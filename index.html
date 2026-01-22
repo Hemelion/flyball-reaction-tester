@@ -207,6 +207,55 @@
   .fit-buttons{display:flex;gap:8px}
   .muted{color:var(--mid)}
 
+  /* NOWOCZESNA SEKCJA UWAGI */
+  .notes-card{
+    background:linear-gradient(135deg,#f8faff 0%,#f0f4ff 100%);
+    border:1px solid #e4e9f8;
+  }
+  .notes-header{
+    font-weight:600;
+    font-size:14px;
+    color:var(--dark);
+    margin-bottom:12px;
+    padding-bottom:10px;
+    border-bottom:1px solid #e4e9f8;
+  }
+  .notes-list{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  .note-item{
+    padding:12px 14px;
+    background:rgba(255,255,255,0.7);
+    border-radius:10px;
+    border:1px solid rgba(228,233,248,0.6);
+    transition:all 0.2s ease;
+  }
+  .note-item:hover{
+    background:rgba(255,255,255,0.95);
+    box-shadow:0 4px 12px rgba(11,20,40,0.06);
+    transform:translateY(-1px);
+  }
+  .note-label{
+    font-weight:600;
+    font-size:12px;
+    color:var(--dark);
+    margin-bottom:4px;
+  }
+  .note-text{
+    font-size:12px;
+    color:var(--mid);
+    line-height:1.5;
+  }
+  .note-item.highlight{
+    background:linear-gradient(135deg,rgba(0,174,235,0.08) 0%,rgba(0,174,235,0.04) 100%);
+    border-color:rgba(0,174,235,0.2);
+  }
+  .note-item.highlight .note-label{
+    color:var(--accent);
+  }
+
   /* NOWY WYGLĄD STATYSTYK */
   .stats-shell{
     margin-top:6px;
@@ -558,14 +607,22 @@
           </div>
         </div>
 
-        <div class="card" style="margin-top:12px">
-          <div class="small muted">Uwagi</div>
-          <ul class="small muted">
-            <li>Użyj suwaka Zoom lub gestu pinch, aby powiększyć fragment wideo.</li>
-            <li>Przeciągnij (drag/pan) aby przesunąć widok przy zoomie.</li>
-            <li>Celem jest jak najwęższa krzywa (idealnie powtarzalne czasy reakcji) i brak przewidywania.</li>
-            <li><strong>Zainstaluj jako aplikację:</strong> iOS: Udostępnij → Dodaj do ekranu głównego. Android/Desktop: Menu → Zainstaluj.</li>
-          </ul>
+        <div class="card notes-card" style="margin-top:12px">
+          <div class="notes-header">Uwagi</div>
+          <div class="notes-list">
+            <div class="note-item">
+              <div class="note-label">Zoom wideo</div>
+              <div class="note-text">Użyj suwaka lub gestu pinch, aby powiększyć fragment wideo. Przeciągnij widok, aby przesunąć kadr.</div>
+            </div>
+            <div class="note-item">
+              <div class="note-label">Cel treningu</div>
+              <div class="note-text">Dąż do jak najwęższej krzywej – oznacza to powtarzalne czasy reakcji. Unikaj przewidywania!</div>
+            </div>
+            <div class="note-item highlight">
+              <div class="note-label">Zainstaluj aplikację</div>
+              <div class="note-text">iOS: Udostępnij → Dodaj do ekranu głównego<br>Android/Desktop: Menu → Zainstaluj</div>
+            </div>
+          </div>
         </div>
       </aside>
     </div>
