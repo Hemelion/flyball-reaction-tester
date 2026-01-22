@@ -6,7 +6,7 @@
 
 <p align="center">
   <b>Web-based reaction time tester synchronized with real video triggers.</b><br/>
-  <i>Version 3.5</i>
+  <i>Version 3.8</i>
 </p>
 
 ---
@@ -55,8 +55,10 @@ Everything happens **locally in your browser** – no backend, no uploads to a s
 - **Video controls completely hidden** to prevent distraction (especially important on mobile)
 - Large, touch-friendly **"Reaguj (Space)"** button always visible at the bottom
 - **Real-time result bubbles** showing your reaction time and rating after each trial
+- **Test summary screen** at the end with final score, mean, SD, and quick actions
 - Animated feedback with color-coded results
 - Optimized for both desktop and mobile devices
+- **Auto-fit video on load** - videos are automatically scaled to fit properly
 - Automatic exit from fullscreen when test completes
 
 ### 📊 Comprehensive Statistics
@@ -83,6 +85,12 @@ Everything happens **locally in your browser** – no backend, no uploads to a s
 ### 💾 Data Export
 - Export all results to CSV format
 - Includes trial number, timestamp, reaction time, rating, and video name
+
+### 📲 Progressive Web App (PWA)
+- **Install on device** - add to home screen on iOS/Android
+- **Offline support** - core app works without internet connection
+- **Native app feel** - runs in standalone mode without browser UI
+- **Auto-updates** - service worker ensures you always have the latest version
 
 ---
 
@@ -178,6 +186,7 @@ The event marker shows in the top-right corner of the video.
 4. Press the **"Reaguj (Space)"** button or **Space** key when the event occurs
 5. See your result in the bubble overlay
 6. Repeat until all trials complete
+7. View the **test summary** with your final score and options to retry or exit
 
 ### 5. Review Results
 
@@ -208,9 +217,19 @@ A **result bubble** appears in the center showing:
   - 🔴 Red: "Przewidziałeś" (Predicted/Too Early)
   - ⚪ Gray: "Do poprawy" (Needs Improvement)
 
+### Test Summary Screen
+After all trials complete, a **summary bubble** appears showing:
+- **Final Score** (0-100) with color-coded indicator
+- **Performance label** (e.g., "MISTRZ REAKCJI!", "Bardzo dobry wynik")
+- **Average reaction time** (mean in ms)
+- **Consistency** (standard deviation ±ms)
+- **Valid trials count** (e.g., "4 / 5")
+- **Quick actions**: "Jeszcze raz" (Try Again) or "Zakończ" (Exit)
+
 ### Exiting Fullscreen
-- **Automatic**: When all trials complete
-- **Manual**: Click the **"Stop"** button (before starting, or the test will abort)
+- **After summary**: Click "Zakończ" to exit
+- **Try again**: Click "Jeszcze raz" to restart with same settings
+- **Manual abort**: The test runs until completion (no Stop button in fullscreen)
 
 ---
 
@@ -239,8 +258,9 @@ A **result bubble** appears in the center showing:
 | Button | Action |
 |--------|--------|
 | Start (S) | Begin the test in fullscreen mode |
-| Stop | Abort the test and exit fullscreen |
 | Reaguj (Space) | Record reaction (in fullscreen) |
+| Jeszcze raz | Restart test (in summary screen) |
+| Zakończ | Exit fullscreen (in summary screen) |
 | Eksport CSV | Download results as CSV file |
 
 ---
@@ -261,10 +281,29 @@ A **result bubble** appears in the center showing:
 ## Technical Notes
 
 - **Browser compatibility**: Works best in Chrome, Firefox, Safari, and Edge
-- **Mobile support**: Fully responsive, optimized for touch
+- **Mobile support**: Fully responsive, optimized for touch with layout fixes for iOS Safari and Chrome
+- **PWA support**: Installable as app on mobile and desktop
+- **Offline capable**: Core functionality works without internet
 - **Local processing**: All data stays in your browser
-- **No installation**: Just open the HTML file
+- **No installation required**: Just open the HTML file, or install as PWA
+- **Auto-fit on load**: Videos automatically fit to container when loaded
 - **Safari note**: Local files work best; CORS-restricted remote URLs may not allow frame-accurate seeking
+
+### Installing as PWA
+
+**On iOS (Safari):**
+1. Open the app in Safari
+2. Tap the Share button
+3. Select "Add to Home Screen"
+
+**On Android (Chrome):**
+1. Open the app in Chrome
+2. Tap the menu (⋮)
+3. Select "Add to Home Screen" or "Install App"
+
+**On Desktop (Chrome/Edge):**
+1. Look for the install icon in the address bar
+2. Click "Install"
 
 ---
 
