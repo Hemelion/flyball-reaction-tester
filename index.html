@@ -99,7 +99,6 @@
   .btn-ghost{background:transparent;border:1px solid #e6e9ef;color:var(--dark)}
 
   .react-row{display:flex;gap:12px;margin-top:12px;align-items:center;flex-wrap:wrap}
-  .react-big{flex:1;background:linear-gradient(90deg,var(--accent),#00b8f5);color:white;padding:14px;border-radius:12px;font-size:18px;box-shadow:0 8px 22px rgba(0,170,235,0.12);border:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation;-webkit-user-select:none;}
 
   aside .card{padding:12px}
   .stat{font-size:13px;color:var(--mid)}
@@ -172,7 +171,6 @@
   @media (max-width:700px){
     .logo{width:48px;height:48px}
     .brand h1{font-size:16px}
-    .react-big{font-size:18px;padding:16px}
     .video-wrap{max-height:42vh;max-width:100% !important;width:100% !important;}
     .video-inner{max-width:100% !important;width:100% !important;}
     video{max-height:42vh;max-width:100% !important;width:100% !important;}
@@ -410,7 +408,7 @@
         </div>
       </div>
       <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
-        <div class="small muted">v3.7</div>
+        <div class="small muted">v3.8</div>
       </div>
     </header>
 
@@ -486,8 +484,7 @@
           </div>
 
           <div class="react-row">
-            <button id="reactBtn" class="react-big">Reaguj (Space)</button>
-            <div style="min-width:220px">
+            <div style="flex:1">
               <div class="small muted">Ustawienia testu</div>
               <div style="display:flex;gap:8px;margin-top:8px">
                 <input id="trialsCount" type="number" value="5" min="1" />
@@ -583,7 +580,6 @@ const medBtn = document.getElementById('medBtn');
 const largeBtn = document.getElementById('largeBtn');
 const instructionOverlay = document.getElementById('instructionOverlay');
 
-const reactBtn = document.getElementById('reactBtn');
 const startTestBtn = document.getElementById('startTestBtn');
 const stopTestBtn = document.getElementById('stopTestBtn');
 const trialsCountInput = document.getElementById('trialsCount');
@@ -659,6 +655,12 @@ function loadVideoByIndex(index, onReady){
   lastEventLabel = entry.eventLabel || '';
   updateEventUI();
   refreshVideoList();
+  
+  // Auto-fit: reset zoom/pan when loading video
+  scale = 1;
+  tx = 0;
+  ty = 0;
+  updateTransform();
 
   const handler = () => {
     video.removeEventListener('loadedmetadata', handler);
@@ -898,12 +900,6 @@ function distanceBetweenTouches(a,b){
 /* --- Test logic: losowy start przed zdarzeniem, losowy wybór wideo --- */
 startTestBtn.addEventListener('click', startTest);
 stopTestBtn.addEventListener('click', stopTest);
-
-/* Reakcja na dotyk/klik bez opóźnienia click na mobile */
-reactBtn.addEventListener('pointerdown', (e)=>{
-  e.preventDefault();
-  reactNow();
-});
 
 function startTest(){
   if (!videoEntries.length) {
