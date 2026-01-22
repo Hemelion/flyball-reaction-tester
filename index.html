@@ -7,7 +7,7 @@
 
 <!-- PWA Meta Tags -->
 <meta name="description" content="Web-based reaction time tester synchronized with real video triggers for Unleashed Flyball Team" />
-<meta name="theme-color" content="#00AEEB" id="themeColorMeta" />
+<meta name="theme-color" content="#00AEEB" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="apple-mobile-web-app-title" content="Flyball Reaction" />
@@ -32,7 +32,7 @@
   }
 
   *{box-sizing:border-box}
-  html{height:100%;overflow:hidden;background-color:#000}
+  html{height:100%;overflow:hidden}
   body{height:100%;margin:0;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;background:linear-gradient(180deg,var(--bg),#eef3f9);font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;color:var(--dark)}
   .wrap{max-width:var(--max-width);margin:16px auto;padding:16px;overflow-x:hidden}
   header{display:flex;align-items:center;gap:12px;margin-bottom:14px}
@@ -1921,13 +1921,6 @@ function enterFullscreenTestMode() {
   // Show fullscreen overlay
   fullscreenOverlay.classList.add('active');
   
-  // Change theme color to black for iOS safe area
-  const themeColorMeta = document.getElementById('themeColorMeta');
-  if (themeColorMeta) themeColorMeta.content = '#000000';
-  
-  // Set body background to black for iOS safe area
-  document.body.style.backgroundColor = '#000';
-  
   // Prevent body scroll and fix iOS bouncing
   document.body.style.overflow = 'hidden';
   document.body.style.position = 'fixed';
@@ -1986,11 +1979,6 @@ function exitFullscreenTestMode() {
   
   // Restore controls attribute
   video.setAttribute('controls', '');
-  
-  // Restore theme color and body background
-  const themeColorMeta = document.getElementById('themeColorMeta');
-  if (themeColorMeta) themeColorMeta.content = '#00AEEB';
-  document.body.style.backgroundColor = '';
   
   // Restore body styles
   document.body.style.overflow = '';
