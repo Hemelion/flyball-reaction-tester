@@ -43,6 +43,7 @@
     align-items:center;
     justify-content:center;
     max-height:60vh;
+    min-height: clamp(280px, 40vh, 400px);
     touch-action:none;
   }
   .video-inner {
@@ -132,7 +133,8 @@
   }
 
   .small{font-size:13px;color:var(--mid)}
-  input,select{padding:8px;border-radius:8px;border:1px solid #e6e9ef;width:100%;font-size:13px}
+  input,select{padding:8px;border-radius:8px;border:1px solid #e6e9ef;font-size:13px}
+  input[type="number"]{width:100%}
   .row{display:flex;gap:8px}
 
   .zoom-panel{display:flex;gap:8px;align-items:center;margin-top:10px}
@@ -247,6 +249,111 @@
     border:1px dashed #f5c2c2;
     color:#b00020;
   }
+
+  /* Instruction overlay */
+  .instruction-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(16px, 4vw, 32px);
+    text-align: center;
+    z-index: 5;
+    border-radius: 10px;
+  }
+  .instruction-overlay.hidden {
+    display: none;
+  }
+  /* Hide video inner content when instruction is visible */
+  .video-wrap:has(.instruction-overlay:not(.hidden)) .video-inner {
+    visibility: hidden;
+  }
+  .instruction-title {
+    font-size: clamp(18px, 4vw, 26px);
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: clamp(12px, 2vw, 20px);
+  }
+  .instruction-title span {
+    color: var(--primary);
+  }
+  .instruction-steps {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(8px, 1.5vw, 14px);
+    width: 100%;
+    max-width: 420px;
+  }
+  .instruction-step {
+    display: flex;
+    align-items: flex-start;
+    gap: clamp(10px, 2vw, 14px);
+    text-align: left;
+    background: rgba(255,255,255,0.06);
+    padding: clamp(10px, 2vw, 14px);
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .instruction-step-num {
+    flex-shrink: 0;
+    width: clamp(26px, 5vw, 32px);
+    height: clamp(26px, 5vw, 32px);
+    background: linear-gradient(135deg, var(--primary) 0%, #c9a900 100%);
+    color: #111;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: clamp(12px, 2.5vw, 15px);
+  }
+  .instruction-step-content {
+    flex: 1;
+    min-width: 0;
+  }
+  .instruction-step-title {
+    font-weight: 600;
+    color: #fff;
+    font-size: clamp(13px, 2.5vw, 15px);
+    margin-bottom: 2px;
+  }
+  .instruction-step-desc {
+    color: rgba(255,255,255,0.65);
+    font-size: clamp(11px, 2vw, 13px);
+    line-height: 1.4;
+  }
+  .instruction-step-key {
+    display: inline-block;
+    background: rgba(255,255,255,0.15);
+    color: #fff;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: clamp(10px, 1.8vw, 12px);
+    font-weight: 600;
+    font-family: monospace;
+    margin-left: 4px;
+  }
+  .instruction-footer {
+    margin-top: clamp(14px, 2.5vw, 20px);
+    color: rgba(255,255,255,0.5);
+    font-size: clamp(10px, 1.8vw, 12px);
+  }
+  @media (max-width: 500px) {
+    .instruction-step {
+      padding: 10px;
+    }
+    .instruction-step-num {
+      width: 24px;
+      height: 24px;
+      font-size: 11px;
+    }
+  }
 </style>
 </head>
 <body>
@@ -262,7 +369,7 @@
         </div>
       </div>
       <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
-        <div class="small muted">v2.3</div>
+        <div class="small muted">v3.5</div>
       </div>
     </header>
 
@@ -285,10 +392,42 @@
               </div>
             </div>
             <div class="event-marker" id="eventMarker" style="display:none">Zdarzenie: <span id="eventTimeText">—</span></div>
+            
+            <!-- Instruction overlay -->
+            <div class="instruction-overlay" id="instructionOverlay">
+              <div class="instruction-title">Jak <span>testować reakcję</span>?</div>
+              <div class="instruction-steps">
+                <div class="instruction-step">
+                  <div class="instruction-step-num">1</div>
+                  <div class="instruction-step-content">
+                    <div class="instruction-step-title">Wczytaj wideo</div>
+                    <div class="instruction-step-desc">Wybierz plik(i) wideo z dysku lub wklej URL. Możesz dodać wiele filmów naraz.</div>
+                  </div>
+                </div>
+                <div class="instruction-step">
+                  <div class="instruction-step-num">2</div>
+                  <div class="instruction-step-content">
+                    <div class="instruction-step-title">Ustaw zdarzenie</div>
+                    <div class="instruction-step-desc">Przewiń do klatki, na którą chcesz reagować i naciśnij <span class="instruction-step-key">E</span></div>
+                  </div>
+                </div>
+                <div class="instruction-step">
+                  <div class="instruction-step-num">3</div>
+                  <div class="instruction-step-content">
+                    <div class="instruction-step-title">Rozpocznij test</div>
+                    <div class="instruction-step-desc">Naciśnij <span class="instruction-step-key">S</span> lub kliknij Start. Reaguj przyciskiem <span class="instruction-step-key">Space</span> gdy zobaczysz zdarzenie.</div>
+                  </div>
+                </div>
+              </div>
+              <div class="instruction-footer">Cel: reaguj szybko, ale nie przewiduj!</div>
+            </div>
           </div>
 
           <div class="controls" style="margin-top:12px">
-            <input id="fileInput" type="file" accept="video/*" style="flex:1" />
+            <input id="fileInput" type="file" accept="video/*" multiple style="flex:1" />
+            <select id="videoList" class="small" style="min-width:180px">
+              <option value="">Brak wideo</option>
+            </select>
             <button class="btn btn-ghost" id="loadUrlBtn">Wczytaj URL</button>
             <button class="btn btn-primary" id="setEventBtn">Ustaw zdarzenie (E)</button>
             <div class="fit-buttons">
@@ -393,6 +532,7 @@ const video = document.getElementById('video');
 const transformer = document.getElementById('transformer');
 const videoWrap = document.getElementById('videoWrap');
 const fileInput = document.getElementById('fileInput');
+const videoList = document.getElementById('videoList');
 const loadUrlBtn = document.getElementById('loadUrlBtn');
 const setEventBtn = document.getElementById('setEventBtn');
 const eventMarker = document.getElementById('eventMarker');
@@ -403,6 +543,7 @@ const fitBtn = document.getElementById('fitBtn');
 const smallBtn = document.getElementById('smallBtn');
 const medBtn = document.getElementById('medBtn');
 const largeBtn = document.getElementById('largeBtn');
+const instructionOverlay = document.getElementById('instructionOverlay');
 
 const reactBtn = document.getElementById('reactBtn');
 const startTestBtn = document.getElementById('startTestBtn');
@@ -421,50 +562,119 @@ const gaussCanvas = document.getElementById('gaussCanvas');
 const gaussInfo = document.getElementById('gaussInfo');
 const gaussCtx = gaussCanvas.getContext('2d');
 
-let currentVideoKey = null;
-let currentFileObject = null;
 let eventTime = null;
 let lastEventLabel = '';
 let ongoingTest = null;
 let results = [];
+
+/* Wiele wideo */
+let videoEntries = []; // { name, src, isLocal, eventTime, eventLabel }
+let currentVideoIndex = -1;
 
 /* Transform state */
 let scale = parseFloat(localStorage.getItem('fly_zoom') || '1');
 let tx = 0, ty = 0;
 updateTransform();
 
-/* Helpers: identyfikacja wideo (na przyszłość) */
-function setVideoIdentityFromFile(f){
-  currentFileObject = f;
-  currentVideoKey = `file:${f.name}|${f.size}|${f.lastModified}`;
+/* --- Instruction overlay --- */
+function hideInstructionOverlay() {
+  if (instructionOverlay) {
+    instructionOverlay.classList.add('hidden');
+  }
 }
-function setVideoIdentityFromUrl(url){
-  currentFileObject = null;
-  currentVideoKey = `url:${url}`;
+
+/* --- WIELE WIDEO: pomocnicze funkcje --- */
+function refreshVideoList(){
+  videoList.innerHTML = '';
+  if (!videoEntries.length){
+    const opt = document.createElement('option');
+    opt.value = '';
+    opt.textContent = 'Brak wideo';
+    videoList.appendChild(opt);
+    return;
+  }
+  videoEntries.forEach((v, i)=>{
+    const opt = document.createElement('option');
+    opt.value = String(i);
+    let label = `${i+1}. ${v.name}`;
+    if (v.eventTime != null) label += ` (E: ${v.eventTime.toFixed(2)}s)`;
+    opt.textContent = label;
+    if (i === currentVideoIndex) opt.selected = true;
+    videoList.appendChild(opt);
+  });
+}
+
+function loadVideoByIndex(index, onReady){
+  const entry = videoEntries[index];
+  if (!entry) return;
+  currentVideoIndex = index;
+
+  // Hide instruction overlay when video is loaded
+  hideInstructionOverlay();
+
+  try { video.pause(); } catch(_){}
+  video.removeAttribute('src');
+  video.load();
+  video.src = entry.src;
+
+  eventTime = entry.eventTime != null ? entry.eventTime : null;
+  lastEventLabel = entry.eventLabel || '';
+  updateEventUI();
+  refreshVideoList();
+
+  const handler = () => {
+    video.removeEventListener('loadedmetadata', handler);
+    if (typeof onReady === 'function') onReady();
+  };
+  if (video.readyState >= 1) {
+    if (typeof onReady === 'function') onReady();
+  } else {
+    video.addEventListener('loadedmetadata', handler);
+  }
 }
 
 /* Load file/url */
 fileInput.addEventListener('change', (e)=>{
-  const f = e.target.files && e.target.files[0];
-  if (!f) return;
-  const url = URL.createObjectURL(f);
-  video.src = url;
-  video.load();
-  setVideoIdentityFromFile(f);
-  eventTime = null;
-  updateEventUI();
-  tx = 0; ty = 0; updateTransform();
+  const files = e.target.files;
+  if (!files || !files.length) return;
+  const URL_ = window.URL || window.webkitURL;
+  for (const f of files){
+    const url = URL_.createObjectURL(f);
+    videoEntries.push({
+      name: f.name,
+      src: url,
+      isLocal: true,
+      eventTime: null,
+      eventLabel: ''
+    });
+  }
+  if (currentVideoIndex === -1 && videoEntries.length > 0){
+    loadVideoByIndex(0);
+  } else {
+    refreshVideoList();
+  }
 });
 
 loadUrlBtn.addEventListener('click', ()=>{
   const url = prompt('Wklej URL do pliku mp4/webm:');
   if (!url) return;
-  video.src = url;
-  video.load();
-  setVideoIdentityFromUrl(url);
-  eventTime = null;
-  updateEventUI();
-  tx = 0; ty = 0; updateTransform();
+  const name = url.split('/').pop() || 'Wideo z URL';
+  videoEntries.push({
+    name,
+    src: url,
+    isLocal: false,
+    eventTime: null,
+    eventLabel: ''
+  });
+  const idx = videoEntries.length - 1;
+  loadVideoByIndex(idx);
+});
+
+videoList.addEventListener('change', (e)=>{
+  const idx = parseInt(e.target.value, 10);
+  if (!isNaN(idx)) {
+    loadVideoByIndex(idx);
+  }
 });
 
 /* SET EVENT */
@@ -476,11 +686,17 @@ document.addEventListener('keydown', (e)=>{
 });
 
 function setEventAtCurrent(){
-  if (!video.src) { alert('Wczytaj wideo najpierw.'); return; }
+  if (currentVideoIndex < 0 || !videoEntries[currentVideoIndex]) {
+    alert('Wczytaj wideo i wybierz je z listy przed ustawieniem zdarzenia.');
+    return;
+  }
   eventTime = video.currentTime;
   lastEventLabel = prompt('Opis zdarzenia (opcjonalnie):', lastEventLabel || '') || lastEventLabel;
+  videoEntries[currentVideoIndex].eventTime = eventTime;
+  videoEntries[currentVideoIndex].eventLabel = lastEventLabel;
   updateEventUI();
-  alert(`Ustawiono zdarzenie: ${eventTime.toFixed(3)} s ${lastEventLabel? '— ' + lastEventLabel : ''}`);
+  refreshVideoList();
+  alert(`Ustawiono zdarzenie dla wideo "${videoEntries[currentVideoIndex].name}": ${eventTime.toFixed(3)} s ${lastEventLabel? '— ' + lastEventLabel : ''}`);
 }
 function updateEventUI(){
   if (eventTime == null){
@@ -567,7 +783,7 @@ function distanceBetweenTouches(a,b){
   return Math.sqrt(dx*dx + dy*dy);
 }
 
-/* --- Test logic: losowy start przed zdarzeniem, bazujemy na video.currentTime --- */
+/* --- Test logic: losowy start przed zdarzeniem, losowy wybór wideo --- */
 startTestBtn.addEventListener('click', startTest);
 stopTestBtn.addEventListener('click', stopTest);
 
@@ -578,8 +794,11 @@ reactBtn.addEventListener('pointerdown', (e)=>{
 });
 
 function startTest(){
-  if (!video.src) { alert('Wczytaj wideo najpierw'); return; }
-  if (eventTime == null) { alert('Ustaw punkt zdarzenia (E) przed testem'); return; }
+  if (!videoEntries.length) {
+    alert('Wczytaj co najmniej jedno wideo przed testem.');
+    return;
+  }
+
   const trials = Math.max(1, parseInt(trialsCountInput.value)||1);
 
   let from = parseFloat(randomFromInput.value);
@@ -590,6 +809,16 @@ function startTest(){
   if (to < 0) to = 0;
   if (to < from) { const tmp = from; from = to; to = tmp; }
 
+  // lista indeksów filmów, które mają ustawione zdarzenie
+  const videoIndices = [];
+  videoEntries.forEach((v,i)=>{
+    if (v.eventTime != null) videoIndices.push(i);
+  });
+  if (!videoIndices.length){
+    alert('Ustaw punkt zdarzenia (E) na co najmniej jednym wideo przed testem.');
+    return;
+  }
+
   results = [];
   updateResultsUI();
   ongoingTest = {
@@ -597,8 +826,14 @@ function startTest(){
     trialsTotal:trials,
     currentTrial:0,
     offsetMin:from,
-    offsetMax:to
+    offsetMax:to,
+    videoIndices
   };
+  
+  // Enter fullscreen test mode
+  enterFullscreenTestMode();
+  updateFsTrialInfo('Przygotuj się...');
+  
   runNextTrial();
 }
 
@@ -608,34 +843,52 @@ function runNextTrial(){
     ongoingTest.running = false;
     trialInfo.textContent = `Test zakończony. ${results.length} wyników.`;
     updateResultsUI();
+    
+    // Show summary bubble instead of immediately exiting
+    showTestSummary();
+    
     return;
   }
   const trialIndex = ongoingTest.currentTrial + 1;
 
-  const minOffset = Math.max(0, ongoingTest.offsetMin || 0);
-  const maxOffset = Math.max(minOffset, ongoingTest.offsetMax || minOffset);
-  const range = maxOffset - minOffset;
-  const randomBefore = range > 0 ? (minOffset + Math.random() * range) : minOffset;
+  // losujemy wideo z listy z ustawionym zdarzeniem
+  const videoIndices = ongoingTest.videoIndices;
+  const randomVideoIndex = videoIndices[Math.floor(Math.random() * videoIndices.length)];
+  const chosenEntry = videoEntries[randomVideoIndex];
 
-  let startTime = eventTime - randomBefore;
-  if (!isFinite(startTime) || startTime < 0) startTime = 0;
-  if (video.duration && startTime > video.duration) {
-    startTime = Math.max(0, video.duration - 0.1);
+  function prepareTrial(){
+    const minOffset = Math.max(0, ongoingTest.offsetMin || 0);
+    const maxOffset = Math.max(minOffset, ongoingTest.offsetMax || minOffset);
+    const range = maxOffset - minOffset;
+    const randomBefore = range > 0 ? (minOffset + Math.random() * range) : minOffset;
+
+    let startTime = eventTime - randomBefore;
+    if (!isFinite(startTime) || startTime < 0) startTime = 0;
+    if (video.duration && startTime > video.duration) {
+      startTime = Math.max(0, video.duration - 0.1);
+    }
+
+    video.currentTime = startTime;
+    video.pause();
+
+    const infoText = `Próba ${trialIndex} / ${ongoingTest.trialsTotal} — ${chosenEntry.name}`;
+    trialInfo.textContent = infoText + `, losowo ~${randomBefore.toFixed(2)}s przed zdarzeniem...`;
+    updateFsTrialInfo(infoText);
+
+    setTimeout(()=>{
+      video.play().then(()=>{
+        const playingText = `Próba ${trialIndex} / ${ongoingTest.trialsTotal} — Reaguj!`;
+        trialInfo.textContent = `Próba ${trialIndex} / ${ongoingTest.trialsTotal} — wideo: ${chosenEntry.name}. Reaguj na zdarzenie.`;
+        updateFsTrialInfo(playingText);
+      }).catch(err=>{
+        console.warn('Play rejected:', err);
+        exitFullscreenTestMode();
+        alert('Autoodtwarzanie zablokowane. Dotknij wideo, a potem kliknij Start ponownie.');
+      });
+    }, 140);
   }
 
-  video.currentTime = startTime;
-  video.pause();
-
-  trialInfo.textContent = `Próba ${trialIndex} / ${ongoingTest.trialsTotal} — losowo ~${randomBefore.toFixed(2)}s przed zdarzeniem...`;
-
-  setTimeout(()=>{
-    video.play().then(()=>{
-      trialInfo.textContent = `Próba ${trialIndex} / ${ongoingTest.trialsTotal} — gra. Reaguj na zdarzenie.`;
-    }).catch(err=>{
-      console.warn('Play rejected:', err);
-      alert('Autoodtwarzanie zablokowane. Dotknij wideo, a potem kliknij Start ponownie.');
-    });
-  }, 140);
+  loadVideoByIndex(randomVideoIndex, prepareTrial);
 }
 
 function reactNow(){
@@ -654,6 +907,8 @@ function reactNow(){
   const classification = classifyReaction(reactionMs);
   const note = classification.valid ? 'OK' : 'Przewidziałeś';
 
+  const currentVideoName = videoEntries[currentVideoIndex]?.name || '';
+
   results.push({
     trial: ongoingTest.currentTrial,
     ms: reactionRounded,
@@ -661,17 +916,32 @@ function reactNow(){
     note,
     rating: classification.label,
     valid: classification.valid,
-    color: classification.color
+    color: classification.color,
+    videoName: currentVideoName
   });
 
   updateResultsUI();
+  
+  // Update fullscreen info with result
+  const resultText = `${reactionRounded} ms — ${classification.label}`;
+  updateFsTrialInfo(resultText);
+  
+  // Show result bubble with rating
+  showResultBubble(reactionRounded, classification.label, classification.color);
 
   setTimeout(()=>{
+    // Hide result bubble before next trial
+    hideResultBubble();
+    
     if (ongoingTest.currentTrial < ongoingTest.trialsTotal) {
       runNextTrial();
     } else {
       ongoingTest.running = false;
       trialInfo.textContent = `Test zakończony. ${results.length} wyników.`;
+      updateResultsUI();
+      
+      // Show summary bubble instead of immediately exiting
+      showTestSummary();
     }
   }, 700);
 }
@@ -681,6 +951,9 @@ function stopTest(){
   ongoingTest.running = false;
   try { video.pause(); } catch(_){}
   trialInfo.textContent = 'Test zatrzymany.';
+  
+  // Exit fullscreen test mode when test is stopped
+  exitFullscreenTestMode();
 }
 
 function classifyReaction(ms){
@@ -789,6 +1062,7 @@ function updateResultsUI(){
 
   const predictedRatio = totalTrials > 0 ? (predictedCount / totalTrials) : 0;
 
+  // mniejsza waga szybkości, większa powtarzalności/przewidywania
   const speedScoreRaw = 100 - Math.max(0, (mean - 180) * 0.15);
   const consistencyPenalty = Math.max(0, (stdDev - 10) * 1.5);
   const predictionPenalty = predictedRatio * 200;
@@ -1040,8 +1314,8 @@ function drawGaussCurve(samples, mean, stdDev){
 /* EXPORT CSV */
 exportCsvBtn.addEventListener('click', ()=>{
   if (results.length === 0) { alert('Brak wyników do eksportu'); return; }
-  const lines = [['trial','iso','ms','note']];
-  results.forEach(r => lines.push([r.trial, r.iso, r.ms, r.note]));
+  const lines = [['trial','iso','ms','note','video']];
+  results.forEach(r => lines.push([r.trial, r.iso, r.ms, r.note, r.videoName || '']));
   const csv = lines.map(l=>l.map(cell=> `"${String(cell).replace(/"/g,'""')}"`).join(',')).join('\n');
   const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
   const url = URL.createObjectURL(blob);
@@ -1054,6 +1328,7 @@ window.addEventListener('load', ()=>{
   const stored = parseFloat(localStorage.getItem('fly_zoom') || '1');
   if (!isNaN(stored)){ scale = stored; updateTransform(); }
   updateResultsUI();
+  refreshVideoList();
 });
 
 /* reset transform on double-tap/click */
@@ -1062,26 +1337,560 @@ transformer.addEventListener('dblclick', ()=>{
 });
 
 video.addEventListener('loadedmetadata', async () => {
-
-  if (IS_SAFARI && IS_LOCAL_FILE && !safariBootstrapped) {
-    safariBootstrapped = true;
-
-    try {
-      video.muted = true;
-      video.currentTime = 0;
-
-      await video.play();      // uruchamia dekoder
-      video.pause();
-
-      video.currentTime = 0;   // wracamy na start
-    } catch (e) {
-      console.warn('Safari bootstrap failed:', e);
+  // Twój kod Safari bootstrap – pozostawiam zgodnie z oryginałem,
+  // zakładając że IS_SAFARI / IS_LOCAL_FILE / safariBootstrapped są zdefiniowane gdzieś wyżej.
+  if (typeof IS_SAFARI !== 'undefined' && typeof IS_LOCAL_FILE !== 'undefined' && typeof safariBootstrapped !== 'undefined') {
+    if (IS_SAFARI && IS_LOCAL_FILE && !safariBootstrapped) {
+      safariBootstrapped = true;
+      try {
+        video.muted = true;
+        video.currentTime = 0;
+        await video.play();
+        video.pause();
+        video.currentTime = 0;
+      } catch (e) {
+        console.warn('Safari bootstrap failed:', e);
+      }
     }
   }
-
 });
 
 video.addEventListener('dragstart', (e)=> e.preventDefault());
+
+/* ======== FULLSCREEN TEST MODE ======== */
+const fullscreenOverlay = document.createElement('div');
+fullscreenOverlay.id = 'fullscreenOverlay';
+fullscreenOverlay.innerHTML = `
+  <div class="fs-video-container" id="fsVideoContainer"></div>
+  <div class="fs-trial-info" id="fsTrialInfo">Przygotuj się...</div>
+  <div class="fs-result-bubble" id="fsResultBubble">
+    <div class="fs-result-ms" id="fsResultMs">0 ms</div>
+    <div class="fs-result-rating" id="fsResultRating">—</div>
+  </div>
+  <div class="fs-summary-bubble" id="fsSummaryBubble">
+    <div class="fs-summary-title">Podsumowanie testu</div>
+    <div class="fs-summary-score">
+      <span class="fs-summary-score-label">Punkty:</span>
+      <span class="fs-summary-score-value" id="fsSummaryScore">0</span>
+    </div>
+    <div class="fs-summary-label" id="fsSummaryLabel">—</div>
+    <div class="fs-summary-stats">
+      <div class="fs-summary-stat">
+        <span class="fs-summary-stat-label">Średni czas:</span>
+        <span class="fs-summary-stat-value" id="fsSummaryMean">— ms</span>
+      </div>
+      <div class="fs-summary-stat">
+        <span class="fs-summary-stat-label">Powtarzalność (SD):</span>
+        <span class="fs-summary-stat-value" id="fsSummarySD">— ms</span>
+      </div>
+      <div class="fs-summary-stat">
+        <span class="fs-summary-stat-label">Ważne próby:</span>
+        <span class="fs-summary-stat-value" id="fsSummaryValid">0 / 0</span>
+      </div>
+    </div>
+    <div class="fs-summary-buttons">
+      <button class="fs-summary-btn fs-summary-btn-primary" id="fsSummaryAgain">Jeszcze raz</button>
+      <button class="fs-summary-btn fs-summary-btn-secondary" id="fsSummaryExit">Zakończ</button>
+    </div>
+  </div>
+  <button class="fs-react-btn" id="fsReactBtn">Reaguj (Space)</button>
+`;
+document.body.appendChild(fullscreenOverlay);
+
+const fsStyle = document.createElement('style');
+fsStyle.textContent = `
+  #fullscreenOverlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #000;
+    z-index: 9999;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  #fullscreenOverlay.active {
+    display: flex !important;
+  }
+  .fs-video-container {
+    flex: 1;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+  }
+  .fs-video-container video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    max-height: calc(100vh - 120px);
+    pointer-events: none;
+  }
+  .fs-trial-info {
+    position: absolute;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.7);
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    z-index: 10001;
+    text-align: center;
+    max-width: 90%;
+  }
+  .fs-result-bubble {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.5);
+    background: rgba(0,0,0,0.85);
+    color: #fff;
+    padding: 24px 40px;
+    border-radius: 20px;
+    text-align: center;
+    z-index: 10002;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    border: 2px solid rgba(255,255,255,0.1);
+  }
+  .fs-result-bubble.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  .fs-result-ms {
+    font-size: 42px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    margin-bottom: 8px;
+  }
+  .fs-result-rating {
+    font-size: 20px;
+    font-weight: 700;
+    padding: 8px 20px;
+    border-radius: 999px;
+    display: inline-block;
+  }
+  .fs-result-bubble.rating-gold .fs-result-rating {
+    background: rgba(249,219,46,0.2);
+    color: #f9db2e;
+    border: 2px solid rgba(249,219,46,0.5);
+  }
+  .fs-result-bubble.rating-green .fs-result-rating {
+    background: rgba(11,138,62,0.2);
+    color: #4caf50;
+    border: 2px solid rgba(76,175,80,0.5);
+  }
+  .fs-result-bubble.rating-orange .fs-result-rating {
+    background: rgba(208,107,0,0.2);
+    color: #ff9800;
+    border: 2px solid rgba(255,152,0,0.5);
+  }
+  .fs-result-bubble.rating-danger .fs-result-rating {
+    background: rgba(176,0,32,0.2);
+    color: #f44336;
+    border: 2px solid rgba(244,67,54,0.5);
+  }
+  .fs-result-bubble.rating-muted .fs-result-rating {
+    background: rgba(150,150,150,0.2);
+    color: #aaa;
+    border: 2px solid rgba(150,150,150,0.5);
+  }
+  /* Summary bubble styles */
+  .fs-summary-bubble {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.8);
+    background: rgba(0,0,0,0.95);
+    border-radius: clamp(16px, 4vw, 24px);
+    padding: clamp(20px, 5vw, 40px);
+    text-align: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: 50;
+    min-width: clamp(280px, 80vw, 420px);
+    max-width: 90vw;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    border: 2px solid rgba(249,219,46,0.3);
+  }
+  .fs-summary-bubble.show {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  .fs-summary-title {
+    font-size: clamp(18px, 4vw, 24px);
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: clamp(15px, 4vw, 25px);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .fs-summary-score {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .fs-summary-score-label {
+    font-size: clamp(14px, 3vw, 18px);
+    color: #aaa;
+  }
+  .fs-summary-score-value {
+    font-size: clamp(48px, 12vw, 72px);
+    font-weight: 800;
+    color: var(--primary);
+    line-height: 1;
+  }
+  .fs-summary-label {
+    font-size: clamp(14px, 3.5vw, 18px);
+    font-weight: 600;
+    padding: 8px 20px;
+    border-radius: 20px;
+    display: inline-block;
+    margin-bottom: clamp(15px, 4vw, 25px);
+  }
+  .fs-summary-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: clamp(20px, 5vw, 30px);
+    padding: 15px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 12px;
+  }
+  .fs-summary-stat {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: clamp(13px, 3vw, 16px);
+  }
+  .fs-summary-stat-label {
+    color: #888;
+  }
+  .fs-summary-stat-value {
+    color: #fff;
+    font-weight: 600;
+  }
+  .fs-summary-buttons {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .fs-summary-btn {
+    flex: 1;
+    min-width: 120px;
+    padding: clamp(12px, 3vw, 16px) clamp(20px, 4vw, 30px);
+    border: none;
+    border-radius: 12px;
+    font-size: clamp(14px, 3.5vw, 18px);
+    font-weight: 700;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    transition: transform 0.15s, background 0.15s;
+  }
+  .fs-summary-btn:active {
+    transform: scale(0.97);
+  }
+  .fs-summary-btn-primary {
+    background: linear-gradient(90deg, #00AEEB, #00b8f5);
+    color: white;
+  }
+  .fs-summary-btn-primary:active {
+    background: linear-gradient(90deg, #0090c5, #009dd5);
+  }
+  .fs-summary-btn-secondary {
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+  .fs-summary-btn-secondary:active {
+    background: rgba(255,255,255,0.15);
+  }
+  .fs-react-btn {
+    width: 100%;
+    max-width: 100%;
+    background: linear-gradient(90deg, #00AEEB, #00b8f5);
+    color: white;
+    padding: 24px 20px;
+    border: none;
+    font-size: 22px;
+    font-weight: 700;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    -webkit-user-select: none;
+    user-select: none;
+    flex-shrink: 0;
+  }
+  .fs-react-btn:active {
+    background: linear-gradient(90deg, #0090c5, #009dd5);
+  }
+  @media (max-width: 700px) {
+    .fs-react-btn {
+      padding: 28px 20px;
+      font-size: 20px;
+    }
+    .fs-trial-info {
+      font-size: 12px;
+      padding: 6px 12px;
+    }
+    .fs-result-bubble {
+      padding: 18px 30px;
+    }
+    .fs-result-ms {
+      font-size: 32px;
+    }
+    .fs-result-rating {
+      font-size: 16px;
+      padding: 6px 16px;
+    }
+    .fs-summary-bubble {
+      padding: 16px;
+    }
+    .fs-summary-buttons {
+      flex-direction: column;
+    }
+    .fs-summary-btn {
+      width: 100%;
+    }
+  }
+  /* Hide native video controls in fullscreen mode */
+  #fullscreenOverlay video::-webkit-media-controls {
+    display: none !important;
+  }
+  #fullscreenOverlay video::-webkit-media-controls-enclosure {
+    display: none !important;
+  }
+  #fullscreenOverlay video::-webkit-media-controls-panel {
+    display: none !important;
+  }
+`;
+document.head.appendChild(fsStyle);
+
+const fsVideoContainer = document.getElementById('fsVideoContainer');
+const fsTrialInfo = document.getElementById('fsTrialInfo');
+const fsReactBtn = document.getElementById('fsReactBtn');
+const fsResultBubble = document.getElementById('fsResultBubble');
+const fsResultMs = document.getElementById('fsResultMs');
+const fsResultRating = document.getElementById('fsResultRating');
+const fsSummaryBubble = document.getElementById('fsSummaryBubble');
+const fsSummaryScore = document.getElementById('fsSummaryScore');
+const fsSummaryLabel = document.getElementById('fsSummaryLabel');
+const fsSummaryMean = document.getElementById('fsSummaryMean');
+const fsSummarySD = document.getElementById('fsSummarySD');
+const fsSummaryValid = document.getElementById('fsSummaryValid');
+const fsSummaryAgain = document.getElementById('fsSummaryAgain');
+const fsSummaryExit = document.getElementById('fsSummaryExit');
+
+let originalVideoParent = null;
+let isFullscreenTestMode = false;
+
+function enterFullscreenTestMode() {
+  if (isFullscreenTestMode) return;
+  isFullscreenTestMode = true;
+  
+  // Store original parent
+  originalVideoParent = video.parentElement;
+  
+  // Remove controls attribute to hide native controls
+  video.removeAttribute('controls');
+  
+  // Move video to fullscreen container
+  fsVideoContainer.appendChild(video);
+  
+  // Show fullscreen overlay
+  fullscreenOverlay.classList.add('active');
+  
+  // Prevent body scroll
+  document.body.style.overflow = 'hidden';
+  
+  // Try to request fullscreen on mobile (optional, may not work on all devices)
+  if (document.documentElement.requestFullscreen) {
+    document.documentElement.requestFullscreen().catch(() => {});
+  } else if (document.documentElement.webkitRequestFullscreen) {
+    document.documentElement.webkitRequestFullscreen().catch(() => {});
+  }
+}
+
+function exitFullscreenTestMode() {
+  if (!isFullscreenTestMode) return;
+  isFullscreenTestMode = false;
+  
+  // Hide result bubble and summary bubble if visible
+  hideResultBubble();
+  hideSummaryBubble();
+  
+  // Exit browser fullscreen if active
+  if (document.fullscreenElement || document.webkitFullscreenElement) {
+    if (document.exitFullscreen) {
+      document.exitFullscreen().catch(() => {});
+    } else if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen().catch(() => {});
+    }
+  }
+  
+  // Hide fullscreen overlay
+  fullscreenOverlay.classList.remove('active');
+  
+  // Move video back to original container
+  if (originalVideoParent) {
+    originalVideoParent.appendChild(video);
+  }
+  
+  // Restore controls attribute
+  video.setAttribute('controls', '');
+  
+  // Restore body scroll
+  document.body.style.overflow = '';
+  
+  // Reset transform for normal view
+  updateTransform();
+}
+
+function updateFsTrialInfo(text) {
+  fsTrialInfo.textContent = text;
+}
+
+function showResultBubble(ms, rating, colorClass) {
+  // Remove all rating classes
+  fsResultBubble.classList.remove('rating-gold', 'rating-green', 'rating-orange', 'rating-danger', 'rating-muted');
+  
+  // Add appropriate color class
+  fsResultBubble.classList.add('rating-' + colorClass);
+  
+  // Update content
+  fsResultMs.textContent = ms + ' ms';
+  fsResultRating.textContent = rating;
+  
+  // Show bubble
+  fsResultBubble.classList.add('show');
+}
+
+function hideResultBubble() {
+  fsResultBubble.classList.remove('show');
+}
+
+function showSummaryBubble(score, scoreLabel, scoreColor, mean, stdDev, sdColor, validCount, totalCount) {
+  // Update score
+  fsSummaryScore.textContent = score;
+  fsSummaryScore.style.color = scoreColor;
+  
+  // Update label
+  fsSummaryLabel.textContent = scoreLabel;
+  fsSummaryLabel.style.background = scoreColor + '20';
+  fsSummaryLabel.style.color = scoreColor;
+  fsSummaryLabel.style.border = '2px solid ' + scoreColor + '50';
+  
+  // Update stats
+  fsSummaryMean.textContent = mean.toFixed(1) + ' ms';
+  fsSummarySD.textContent = '±' + stdDev.toFixed(1) + ' ms';
+  fsSummarySD.style.color = sdColor;
+  fsSummaryValid.textContent = validCount + ' / ' + totalCount;
+  
+  // Hide react button when showing summary
+  fsReactBtn.style.display = 'none';
+  
+  // Show bubble
+  fsSummaryBubble.classList.add('show');
+}
+
+function hideSummaryBubble() {
+  fsSummaryBubble.classList.remove('show');
+  fsReactBtn.style.display = '';
+}
+
+// Calculate and show summary after test
+function showTestSummary() {
+  const validResults = results.filter(r => r.valid === true);
+  const totalTrials = results.length;
+  
+  if (validResults.length < 3) {
+    // Not enough data, show simplified summary
+    showSummaryBubble(
+      '?',
+      'Za mało ważnych prób',
+      '#888',
+      0,
+      0,
+      '#888',
+      validResults.length,
+      totalTrials
+    );
+    return;
+  }
+  
+  const nums = validResults.map(r => r.ms);
+  const mean = nums.reduce((a, b) => a + b, 0) / nums.length;
+  const variance = nums.reduce((sum, v) => sum + Math.pow(v - mean, 2), 0) / nums.length;
+  const stdDev = Math.sqrt(variance);
+  
+  // Calculate consistency color
+  let sdColor = '#b00020';
+  if (stdDev < 15) sdColor = '#0b8a3e';
+  else if (stdDev < 30) sdColor = '#2e7d32';
+  else if (stdDev < 50) sdColor = '#d06b00';
+  
+  // Calculate final score (same as in updateResultsUI)
+  const predictedCount = totalTrials - validResults.length;
+  const predictedRatio = totalTrials > 0 ? (predictedCount / totalTrials) : 0;
+  const speedScoreRaw = 100 - Math.max(0, (mean - 180) * 0.15);
+  const consistencyPenalty = Math.max(0, (stdDev - 10) * 1.5);
+  const predictionPenalty = predictedRatio * 200;
+  let finalScore = Math.round(speedScoreRaw - consistencyPenalty - predictionPenalty);
+  finalScore = Math.max(0, Math.min(100, finalScore));
+  
+  let finalLabel = '';
+  let finalColor = '';
+  if (finalScore >= 90) {
+    finalLabel = 'MISTRZ REAKCJI!';
+    finalColor = '#0b8a3e';
+  } else if (finalScore >= 75) {
+    finalLabel = 'Bardzo dobry wynik';
+    finalColor = '#2e7d32';
+  } else if (finalScore >= 60) {
+    finalLabel = 'Nie najgorzej';
+    finalColor = '#d06b00';
+  } else {
+    finalLabel = 'Słabo Ci to idzie';
+    finalColor = '#b00020';
+  }
+  
+  showSummaryBubble(finalScore, finalLabel, finalColor, mean, stdDev, sdColor, validResults.length, totalTrials);
+}
+
+// Fullscreen react button handler
+fsReactBtn.addEventListener('pointerdown', (e) => {
+  e.preventDefault();
+  reactNow();
+});
+
+// Summary button handlers
+fsSummaryAgain.addEventListener('click', () => {
+  hideSummaryBubble();
+  // Reset and start new test with same settings
+  results = [];
+  updateResultsUI();
+  startTest();
+});
+
+fsSummaryExit.addEventListener('click', () => {
+  exitFullscreenTestMode();
+});
 </script>
 </body>
 </html>
