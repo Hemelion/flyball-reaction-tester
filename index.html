@@ -2,7 +2,7 @@
 <html lang="pl">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
 <title>Unleashed Flyball Team - Flyball Reaction</title>
 <style>
   :root{
@@ -22,8 +22,9 @@
   }
 
   *{box-sizing:border-box}
-  html,body{height:100%;margin:0;background:linear-gradient(180deg,var(--bg),#eef3f9);font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;color:var(--dark)}
-  .wrap{max-width:var(--max-width);margin:16px auto;padding:16px}
+  html{height:100%;overflow:hidden}
+  body{height:100%;margin:0;overflow-x:hidden;overflow-y:auto;-webkit-overflow-scrolling:touch;background:linear-gradient(180deg,var(--bg),#eef3f9);font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;color:var(--dark)}
+  .wrap{max-width:var(--max-width);margin:16px auto;padding:16px;overflow-x:hidden}
   header{display:flex;align-items:center;gap:12px;margin-bottom:14px}
   .brand{display:flex;align-items:center;gap:12px}
   .logo img{width:56px;height:56px;border-radius:12px;display:block;align-items:center;object-fit:contain;}
@@ -169,8 +170,11 @@
     .logo{width:48px;height:48px}
     .brand h1{font-size:16px}
     .react-big{font-size:18px;padding:16px}
-    .video-wrap{max-height:42vh}
-    video{max-height:42vh}
+    .video-wrap{max-height:42vh;max-width:100vw !important;width:100% !important;}
+    video{max-height:42vh;max-width:100% !important;}
+    .wrap{max-width:100vw;overflow-x:hidden}
+    .card{max-width:100%;overflow:hidden}
+    .grid{max-width:100vw;overflow-x:hidden}
   }
 
   .event-marker {
@@ -400,7 +404,7 @@
         </div>
       </div>
       <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
-        <div class="small muted">v3.6</div>
+        <div class="small muted">v3.7</div>
       </div>
     </header>
 
@@ -716,6 +720,7 @@ document.addEventListener('keydown', (e)=>{
 function setEventAtCurrent(){
   if (currentVideoIndex < 0 || !videoEntries[currentVideoIndex]) {
     alert('Wczytaj wideo i wybierz je z listy przed ustawieniem zdarzenia.');
+    forceLayoutRecalc();
     return;
   }
   eventTime = video.currentTime;
@@ -725,6 +730,51 @@ function setEventAtCurrent(){
   updateEventUI();
   refreshVideoList();
   alert(`Ustawiono zdarzenie dla wideo "${videoEntries[currentVideoIndex].name}": ${eventTime.toFixed(3)} s ${lastEventLabel? '— ' + lastEventLabel : ''}`);
+  // Force layout recalculation after alert closes on mobile
+  forceLayoutRecalc();
+}
+
+// Helper function to force layout recalculation on mobile after alert/prompt
+function forceLayoutRecalc() {
+  setTimeout(() => {
+    // Force reflow by toggling display
+    window.scrollTo(0, 0);
+    
+    // Reset video container dimensions
+    const wrap = document.getElementById('videoWrap');
+    const vid = document.getElementById('video');
+    const trans = document.getElementById('transformer');
+    
+    if (wrap) {
+      wrap.style.width = '100%';
+      wrap.style.maxWidth = '100%';
+    }
+    if (vid) {
+      vid.style.width = '';
+      vid.style.maxWidth = '100%';
+      vid.style.height = '';
+    }
+    if (trans) {
+      // Ensure transformer is within bounds
+      trans.style.width = '';
+      trans.style.maxWidth = '100%';
+    }
+    
+    // Force document reflow
+    document.body.style.display = 'none';
+    void document.body.offsetHeight; // trigger reflow
+    document.body.style.display = '';
+    
+    // Double-check scroll position
+    window.scrollTo(0, 0);
+    
+    // Reset visual viewport if zoomed (iOS Safari)
+    if (window.visualViewport && window.visualViewport.scale !== 1) {
+      // Can't directly set scale, but scrolling helps reset it
+      document.documentElement.scrollLeft = 0;
+      document.documentElement.scrollTop = 0;
+    }
+  }, 100);
 }
 function updateEventUI(){
   if (eventTime == null){
@@ -824,6 +874,7 @@ reactBtn.addEventListener('pointerdown', (e)=>{
 function startTest(){
   if (!videoEntries.length) {
     alert('Wczytaj co najmniej jedno wideo przed testem.');
+    forceLayoutRecalc();
     return;
   }
 
@@ -844,6 +895,7 @@ function startTest(){
   });
   if (!videoIndices.length){
     alert('Ustaw punkt zdarzenia (E) na co najmniej jednym wideo przed testem.');
+    forceLayoutRecalc();
     return;
   }
 
@@ -912,6 +964,7 @@ function runNextTrial(){
         console.warn('Play rejected:', err);
         exitFullscreenTestMode();
         alert('Autoodtwarzanie zablokowane. Dotknij wideo, a potem kliknij Start ponownie.');
+        forceLayoutRecalc();
       });
     }, 140);
   }
@@ -922,6 +975,7 @@ function runNextTrial(){
 function reactNow(){
   if (!ongoingTest || !ongoingTest.running){
     alert('Brak trwającego testu.');
+    forceLayoutRecalc();
     return;
   }
 
@@ -1341,7 +1395,7 @@ function drawGaussCurve(samples, mean, stdDev){
 
 /* EXPORT CSV */
 exportCsvBtn.addEventListener('click', ()=>{
-  if (results.length === 0) { alert('Brak wyników do eksportu'); return; }
+  if (results.length === 0) { alert('Brak wyników do eksportu'); forceLayoutRecalc(); return; }
   const lines = [['trial','iso','ms','note','video']];
   results.forEach(r => lines.push([r.trial, r.iso, r.ms, r.note, r.videoName || '']));
   const csv = lines.map(l=>l.map(cell=> `"${String(cell).replace(/"/g,'""')}"`).join(',')).join('\n');
@@ -1840,6 +1894,18 @@ function exitFullscreenTestMode() {
   // Hide fullscreen overlay
   fullscreenOverlay.classList.remove('active');
   
+  // Reset transform to default before moving video back
+  scale = 1;
+  tx = 0;
+  ty = 0;
+  updateTransform();
+  
+  // Reset video element styles to prevent overflow
+  video.style.width = '';
+  video.style.height = '';
+  video.style.maxWidth = '100%';
+  video.style.transform = '';
+  
   // Move video back to original container
   if (originalVideoParent) {
     originalVideoParent.appendChild(video);
@@ -1851,11 +1917,17 @@ function exitFullscreenTestMode() {
   // Restore body scroll
   document.body.style.overflow = '';
   
-  // Restore saved transform state
-  scale = savedScale;
-  tx = savedTx;
-  ty = savedTy;
-  updateTransform();
+  // Force layout recalculation first, then restore transform
+  setTimeout(() => {
+    // Restore saved transform state after layout is stable
+    scale = savedScale;
+    tx = savedTx;
+    ty = savedTy;
+    updateTransform();
+    
+    // Force final layout recalculation on mobile
+    forceLayoutRecalc();
+  }, 50);
 }
 
 function updateFsTrialInfo(text) {
