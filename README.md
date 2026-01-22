@@ -5,8 +5,11 @@
 </p>
 
 <p align="center">
-  <b>Web-based reaction time tester synchronized with a real video trigger.</b><br/>
+  <b>Web-based reaction time tester synchronized with real video triggers.</b><br/>
+  <i>Version 3.5</i>
 </p>
+
+---
 
 ## Table of Contents
 
@@ -14,167 +17,257 @@
 - [Key Features](#key-features)
 - [How It Works](#how-it-works)
 - [Scoring & Philosophy](#scoring--philosophy)
-- [Usage](#usage)
-  - [1. Load video](#1-load-video)
-  - [2. Mark the event](#2-mark-the-event)
-  - [3. Configure the test](#3-configure-the-test)
-  - [4. Run the test](#4-run-the-test)
-  - [5. Read your stats](#5-read-your-stats)
+- [Usage Guide](#usage-guide)
+- [Fullscreen Test Mode](#fullscreen-test-mode)
 - [Controls & Shortcuts](#controls--shortcuts)
-- [Browser Notes](#browser-notes)
-- [Technical Notes](#technical-notes)
-- [Changelog](#changelog)
-- [Disclaimer](#disclaimer)
+- [Rating System](#rating-system)
+
+---
 
 ## Overview
 
 This app was built for the **Unleashed Flyball Team** to train and objectively measure reaction times **against real video footage** – for example, the exact frame when a dog leaves the box or when a light turns on.
 
-Unlike typical “click when the screen turns green” games, this tool:
+Unlike typical "click when the screen turns green" games, this tool:
 
-- lets you **synchronize a single frame in your own video** as the trigger event,
-- measures how consistently you react **after** that frame appears,
-- strongly penalizes **anticipation** (pressing before the actual event),
-- rewards **repeatability** more than raw speed.
+- Lets you **load multiple videos** and set trigger events on each
+- **Randomly selects videos** during testing to prevent memorization
+- Measures how consistently you react **after** that frame appears
+- Strongly penalizes **anticipation** (pressing before the actual event)
+- Rewards **repeatability** more than raw speed
+- Provides an **immersive fullscreen test mode** optimized for mobile devices
 
 Everything happens **locally in your browser** – no backend, no uploads to a server.
 
+---
+
+## Key Features
+
+### 🎬 Multi-Video Support
+- Load multiple video files at once (use file picker or drag & drop)
+- Set different event markers on each video
+- Videos are randomly selected during test runs to prevent pattern memorization
+- Dropdown selector to switch between loaded videos
+- Load videos from URL for remote files
+
+### 📱 Fullscreen Test Mode
+- **Immersive fullscreen experience** during testing
+- **Video controls completely hidden** to prevent distraction (especially important on mobile)
+- Large, touch-friendly **"Reaguj (Space)"** button always visible at the bottom
+- **Real-time result bubbles** showing your reaction time and rating after each trial
+- Animated feedback with color-coded results
+- Optimized for both desktop and mobile devices
+- Automatic exit from fullscreen when test completes
+
+### 📊 Comprehensive Statistics
+- **Gaussian distribution curve** of your reaction times
+- Mean (μ), standard deviation (SD), min/max values
+- **Final score (0-100)** based on consistency and honesty
+- Visual representation of repeatability
+- Detailed breakdown of valid vs. predicted trials
+
+### 🎯 Anti-Cheating Design
+- Random video selection (when multiple videos loaded)
+- Random start offset before event (configurable range)
+- **Prediction detection** (reactions < 120ms marked as anticipated)
+- Heavy scoring penalties for anticipation
+- Unpredictable timing makes it impossible to "game" the system
+
+### 🔍 Video Controls
+- Zoom slider (0.5x to 2.5x)
+- Pinch-to-zoom on mobile devices
+- Pan/drag when zoomed in
+- Preset zoom levels: **Fit**, **Small**, **Medium**, **Large**
+- Double-click/tap to reset zoom
+
+### 💾 Data Export
+- Export all results to CSV format
+- Includes trial number, timestamp, reaction time, rating, and video name
+
+---
+
 ## How It Works
 
-1. You load a video and scrub to the frame where the event happens.
-2. You press **“Set event (E)”**, and the app records that video time as the event (`eventTime`).
-3. For each trial:
-   - The app picks a random offset between `randomFrom` and `randomTo` seconds,
-   - Starts playback that many seconds **before** the event,
-   - You watch the video and press **React** exactly when the event occurs.
-4. Reaction time is computed as:
+1. **Load videos**: Select one or more video files, or load from URL
+2. **Mark events**: Scrub to the exact frame and press **"Ustaw zdarzenie (E)"** for each video
+3. **Start the test**: Click **"Start (S)"** to enter fullscreen test mode
+4. **React**: Watch the video and press the React button exactly when the event occurs
+5. **See results**: A bubble shows your time and rating after each trial
+6. **Review stats**: After all trials, view comprehensive statistics and Gaussian curve
 
-   \[
-   \text{reactionMs} = (\text{pressVideoTime} - \text{eventTime}) \cdot 1000
-   \]
+### Reaction Time Calculation
 
-   - If this is **negative** or below 140 ms → you **predicted**, not reacted.
-   - Otherwise it’s counted as a valid reaction.
+```
+reactionMs = (pressVideoTime - eventTime) × 1000
+```
 
-5. After enough trials, the app:
-   - discards predicted trials from the main stats,
-   - fits a Gaussian curve to your valid times,
-   - computes standard deviation (SD),
-   - calculates a final score 0–100 weighted towards **low SD & no prediction**.
+- **Negative or < 120 ms** → Marked as "Przewidziałeś" (Predicted) – not a valid reaction
+- **120-170 ms** → "Rewelacja" (Excellent)
+- **171-240 ms** → "Bardzo dobrze" (Very Good)
+- **241-270 ms** → "Dobrze" (Good)
+- **> 270 ms** → "Do poprawy" (Needs Improvement)
+
+---
 
 ## Scoring & Philosophy
 
-The goal is **train the brain not to jump early**, but to fire **consistently** on the signal.
+The goal is to **train the brain not to jump early**, but to fire **consistently** on the signal.
 
-- **Prediction**
-  - Any trial with reaction \< 0 ms or \< 140 ms is labeled `"Predicted"` and `valid = false`.
-  - Predicted trials are:
-    - shown in the table (red badge),
-    - excluded from Gaussian stats,
-    - heavily penalize your final score.
+### Prediction Detection
+- Any trial with reaction < 0 ms or < 120 ms is labeled **"Przewidziałeś"** (Predicted)
+- Predicted trials are:
+  - Shown in the table with a red badge
+  - Excluded from Gaussian statistics
+  - **Heavily penalize** your final score
 
-- **Repeatability**
-  - Standard deviation (SD) of valid times is the key metric.
-  - Rough interpretation:
-    - \< 15 ms → “Elite repeatability”
-    - 15–30 ms → “Very good”
-    - 30–50 ms → “Average”
-    - \> 50 ms → “Low repeatability”
+### Repeatability (Most Important)
+Standard deviation (SD) of valid times is the key metric:
 
-- **Speed (important but secondary)**
-  - Faster average reaction time is better, but its weight in the final score is **reduced**.
-  - A slightly slower but extremely consistent and honest responder will outscore a fast but jumpy one.
+| SD Range | Rating |
+|----------|--------|
+| < 15 ms | 🏆 ELITARNA POWTARZALNOŚĆ (Elite) |
+| 15-30 ms | ✅ BARDZO DOBRA POWTARZALNOŚĆ (Very Good) |
+| 30-50 ms | ⚠️ PRZECIĘTNA POWTARZALNOŚĆ (Average) |
+| > 50 ms | ❌ NISKA POWTARZALNOŚĆ (Low) |
 
-### Final score (0–100)
+### Final Score (0-100)
+The score is calculated based on:
+- **Speed** (small weight) – faster average is better
+- **Consistency** (medium weight) – lower SD is better
+- **Honesty** (large weight) – no predictions is best
 
-Conceptually:
+**Formula concept:**
+```
+Score = 100 - speedPenalty - consistencyPenalty - predictionPenalty
+```
 
-- Start from 100,
-- Subtract a **small penalty** for being slow,
-- Subtract a **strong penalty** for high SD,
-- Subtract a **very strong penalty** for predicted trials.
+A slightly slower but extremely consistent and honest responder will **outscore** a fast but jumpy one.
 
-So:  
-**no prediction + tight cluster = high score**, even if absolute ms are not world‑class.
+---
 
-## Usage
+## Usage Guide
 
-### 1. Load video
+### 1. Load Videos
 
-- Click **“Choose file”** and select a local video (`mp4`, `webm`, …), or  
-- Click **“Load URL”** and paste a direct link to a video file.
+- Click the **file input** and select one or more video files (`mp4`, `webm`, etc.)
+- Or click **"Wczytaj URL"** to load a video from a direct URL
+- Use the **dropdown** to switch between loaded videos
 
-On Safari: local files work best; CORS-restricted remote URLs may not allow frame-accurate seeking.
+### 2. Mark Events
 
-### 2. Mark the event
+For each video:
+1. Use the video controls to scrub to the exact frame of interest
+2. Click **"Ustaw zdarzenie (E)"** or press **E**
+3. Optionally enter a description (e.g., "Dog hits the box")
 
-1. Use the native video controls to scrub to the exact frame of interest.
-2. Click **“Set event (E)”** or press **E**.
-3. Optionally enter a short description for the event (e.g. `"Dog hits the box"`).
+The event marker shows in the top-right corner of the video.
 
-An overlay in the top-right shows the event time in seconds.
+### 3. Configure Test Settings
 
-### 3. Configure the test
+| Setting | Description | Default |
+|---------|-------------|---------|
+| Powtórzeń | Number of trials to run | 5 |
+| Losowo od (s) | Minimum random offset before event | 1.5 |
+| do (s) | Maximum random offset before event | 2.5 |
 
-In the right part of the main card:
+### 4. Run the Test
 
-- **Repetitions** – how many trials to run (default: `5`).
-- **Random from (s)** – minimum random offset before the event (default: `1.5`).
-- **Random to (s)** – maximum random offset before the event (default: `2.5`).
+1. Click **"Start (S)"** or press **S**
+2. The app enters **fullscreen test mode**
+3. Watch the video – don't anticipate!
+4. Press the **"Reaguj (Space)"** button or **Space** key when the event occurs
+5. See your result in the bubble overlay
+6. Repeat until all trials complete
 
-For each trial, the app will start the video at:
+### 5. Review Results
 
-\[
-\text{startTime} = \text{eventTime} - \text{randomOffset}
-\]
+After the test:
+- **Results table**: Each trial with timestamp, time in ms, and rating
+- **Statistics panel**: Final score, mean, SD, min, max
+- **Gaussian curve**: Visual distribution of your reaction times
+- **Export CSV**: Download all results for further analysis
 
-with `randomOffset` uniformly drawn from `[from, to]`.
+---
 
-### 4. Run the test
+## Fullscreen Test Mode
 
-- Click **“Start (S)”** or press **S**.
-- Watch the video; do not anticipate the moment.
-- When the event occurs, either:
-  - click **“React (Space)”**, or
-  - press the **Space** bar.
+When the test starts, the app enters an immersive fullscreen mode designed for focus:
 
-The app will pause the video, record your reaction time, and after a short pause automatically move to the next trial until all repetitions are done.
+### What You See
+- **Full-screen video** without any native controls
+- **Trial info** at the top showing current progress (e.g., "Próba 3 / 5 — Reaguj!")
+- **Large React button** at the bottom, always accessible
 
-You can stop at any time with **“Stop”**.
+### After Each Reaction
+A **result bubble** appears in the center showing:
+- Your reaction time in milliseconds (large text)
+- Your rating with color-coded badge:
+  - 🟡 Gold: "Rewelacja" (Excellent)
+  - 🟢 Green: "Bardzo dobrze" (Very Good)  
+  - 🟠 Orange: "Dobrze" (Good)
+  - 🔴 Red: "Przewidziałeś" (Predicted/Too Early)
+  - ⚪ Gray: "Do poprawy" (Needs Improvement)
 
-### 5. Read your stats
+### Exiting Fullscreen
+- **Automatic**: When all trials complete
+- **Manual**: Click the **"Stop"** button (before starting, or the test will abort)
 
-In the **Results** panel:
-
-- The **table** shows each trial:
-  - time stamp,
-  - reaction in ms,
-  - rating / badge.
-- The **Statystyki / Stats** section shows:
-  - final score 0–100 with a short label,
-  - number of valid vs predicted trials,
-  - mean, SD, min, max,
-  - a short explanatory note.
-
-In the **Gaussian curve** card:
-
-- A normal distribution curve fitted to valid trials,
-- Mean \(\mu\) and ±1σ lines,
-- Individual trials plotted as dots.
+---
 
 ## Controls & Shortcuts
 
-**Global / Test**
+### Keyboard Shortcuts
 
-- **E** – set event at current video time.
-- **S** – start the reaction test.
-- **Space** – react (only when test is running).
-- **Stop** button – aborts the test and pauses video.
+| Key | Action |
+|-----|--------|
+| **E** | Set event at current video time |
+| **S** | Start the reaction test |
+| **Space** | React (only during active test) |
 
-**Video / View**
+### Video Controls
 
-- Mouse/touch **drag** (with zoom \> 1) – pan the video.
-- **Pinch** (mobile) – zoom in/out.
-- **Zoom slider** – adjust zoom level.
-- Preset buttons: **Fit**, **Small**, **Medium**, **Large**.
-- **Double-click** on video – reset transform (zoom/pan).
+| Control | Action |
+|---------|--------|
+| Zoom slider | Adjust zoom 0.5x – 2.5x |
+| Pinch (mobile) | Zoom in/out |
+| Drag (when zoomed) | Pan the video |
+| Double-click | Reset zoom and position |
+| Fit / Small / Medium / Large | Preset zoom levels |
+
+### Test Controls
+
+| Button | Action |
+|--------|--------|
+| Start (S) | Begin the test in fullscreen mode |
+| Stop | Abort the test and exit fullscreen |
+| Reaguj (Space) | Record reaction (in fullscreen) |
+| Eksport CSV | Download results as CSV file |
+
+---
+
+## Rating System
+
+| Reaction Time | Rating (Polish) | Rating (English) | Valid |
+|---------------|-----------------|------------------|-------|
+| < 0 ms | Przewidziałeś | Predicted | ❌ No |
+| 0-119 ms | Przewidziałeś | Predicted | ❌ No |
+| 120-170 ms | Rewelacja | Excellent | ✅ Yes |
+| 171-240 ms | Bardzo dobrze | Very Good | ✅ Yes |
+| 241-270 ms | Dobrze | Good | ✅ Yes |
+| > 270 ms | Do poprawy | Needs Improvement | ✅ Yes |
+
+---
+
+## Technical Notes
+
+- **Browser compatibility**: Works best in Chrome, Firefox, Safari, and Edge
+- **Mobile support**: Fully responsive, optimized for touch
+- **Local processing**: All data stays in your browser
+- **No installation**: Just open the HTML file
+- **Safari note**: Local files work best; CORS-restricted remote URLs may not allow frame-accurate seeking
+
+---
+
+<p align="center">
+  Made with ❤️ for the <b>Unleashed Flyball Team</b>
+</p>
