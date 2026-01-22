@@ -1,15 +1,13 @@
 # Unleashed Flyball Team – Flyball Reaction Tester
 
 <p align="center">
-  <img src="https://scontent-waw2-2.xx.fbcdn.net/v/t39.30808-6/529307358_1197038148893518_7517647576720036195_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=4Nn3zZ6vxcMQ7kNvwE9UG1n&_nc_oc=AdmFPyQxfQDPtGE9zbUZlW2QRw6ddeEo-8-TqnYUffmH36fAQEu5DaRTzvNboIA0tor1fheKaD1iIzfogDezUbFK&_nc_zt=23&_nc_ht=scontent-waw2-2.xx&_nc_gid=RvD7VEsdGz09--2-mtRVfQ&oh=00_AfoRLC7AWMpg1r_Trxt1U75brvbGJmWgU90bHeIS9SVEZw&oe=697287A9" alt="Unleashed Flyball Team" width="200" style="border-radius:16px;">
+  <img src="logo.png" alt="Unleashed Flyball Team" width="200" style="border-radius:16px;">
 </p>
 
 <p align="center">
   <b>Web-based reaction time tester synchronized with real video triggers.</b><br/>
   <i>Version 3.8</i>
 </p>
-
----
 
 ## Table of Contents
 
@@ -21,8 +19,6 @@
 - [Fullscreen Test Mode](#fullscreen-test-mode)
 - [Controls & Shortcuts](#controls--shortcuts)
 - [Rating System](#rating-system)
-
----
 
 ## Overview
 
@@ -38,8 +34,6 @@ Unlike typical "click when the screen turns green" games, this tool:
 - Provides an **immersive fullscreen test mode** optimized for mobile devices
 
 Everything happens **locally in your browser** – no backend, no uploads to a server.
-
----
 
 ## Key Features
 
@@ -92,8 +86,6 @@ Everything happens **locally in your browser** – no backend, no uploads to a s
 - **Native app feel** - runs in standalone mode without browser UI
 - **Auto-updates** - service worker ensures you always have the latest version
 
----
-
 ## How It Works
 
 1. **Load videos**: Select one or more video files, or load from URL
@@ -114,8 +106,6 @@ reactionMs = (pressVideoTime - eventTime) × 1000
 - **171-240 ms** → "Bardzo dobrze" (Very Good)
 - **241-270 ms** → "Dobrze" (Good)
 - **> 270 ms** → "Do poprawy" (Needs Improvement)
-
----
 
 ## Scoring & Philosophy
 
@@ -150,8 +140,6 @@ Score = 100 - speedPenalty - consistencyPenalty - predictionPenalty
 ```
 
 A slightly slower but extremely consistent and honest responder will **outscore** a fast but jumpy one.
-
----
 
 ## Usage Guide
 
@@ -196,8 +184,6 @@ After the test:
 - **Gaussian curve**: Visual distribution of your reaction times
 - **Export CSV**: Download all results for further analysis
 
----
-
 ## Fullscreen Test Mode
 
 When the test starts, the app enters an immersive fullscreen mode designed for focus:
@@ -231,8 +217,6 @@ After all trials complete, a **summary bubble** appears showing:
 - **Try again**: Click "Jeszcze raz" to restart with same settings
 - **Manual abort**: The test runs until completion (no Stop button in fullscreen)
 
----
-
 ## Controls & Shortcuts
 
 ### Keyboard Shortcuts
@@ -263,8 +247,6 @@ After all trials complete, a **summary bubble** appears showing:
 | Zakończ | Exit fullscreen (in summary screen) |
 | Eksport CSV | Download results as CSV file |
 
----
-
 ## Rating System
 
 | Reaction Time | Rating (Polish) | Rating (English) | Valid |
@@ -275,8 +257,6 @@ After all trials complete, a **summary bubble** appears showing:
 | 171-240 ms | Bardzo dobrze | Very Good | ✅ Yes |
 | 241-270 ms | Dobrze | Good | ✅ Yes |
 | > 270 ms | Do poprawy | Needs Improvement | ✅ Yes |
-
----
 
 ## Technical Notes
 
@@ -304,8 +284,6 @@ After all trials complete, a **summary bubble** appears showing:
 **On Desktop (Chrome/Edge):**
 1. Look for the install icon in the address bar
 2. Click "Install"
-
----
 
 <p align="center">
   Made with ❤️ for the <b>Unleashed Flyball Team</b>
