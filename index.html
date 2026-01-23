@@ -730,7 +730,7 @@
         </div>
       </div>
       <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
-        <span class="version-badge">v3.9</span>
+        <span class="version-badge">v3.10</span>
       </div>
     </header>
 
@@ -1263,22 +1263,30 @@ function startTest(){
     return;
   }
 
-  results = [];
-  updateResultsUI();
-  ongoingTest = {
-    running:true,
-    trialsTotal:trials,
-    currentTrial:0,
-    offsetMin:from,
-    offsetMax:to,
-    videoIndices
-  };
+  // Hide keyboard on mobile by blurring active element
+  if (document.activeElement && document.activeElement !== document.body) {
+    document.activeElement.blur();
+  }
   
-  // Enter fullscreen test mode
-  enterFullscreenTestMode();
-  updateFsTrialInfo('Przygotuj się...');
-  
-  runNextTrial();
+  // Small delay to let keyboard hide before entering fullscreen
+  setTimeout(() => {
+    results = [];
+    updateResultsUI();
+    ongoingTest = {
+      running:true,
+      trialsTotal:trials,
+      currentTrial:0,
+      offsetMin:from,
+      offsetMax:to,
+      videoIndices
+    };
+    
+    // Enter fullscreen test mode
+    enterFullscreenTestMode();
+    updateFsTrialInfo('Przygotuj się...');
+    
+    runNextTrial();
+  }, 150);
 }
 
 function runNextTrial(){
