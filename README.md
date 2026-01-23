@@ -6,7 +6,7 @@
 
 <p align="center">
   <b>Web-based reaction time tester synchronized with real video triggers.</b><br/>
-  <i>Version 3.8</i>
+  <i>Version 3.9</i>
 </p>
 
 ## Table of Contents
