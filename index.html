@@ -246,6 +246,15 @@
     box-shadow:0 4px 12px rgba(14,165,233,0.4);
     transform:translateY(-1px);
   }
+  .btn-success{
+    background:linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color:white;
+    box-shadow:0 2px 4px rgba(16,185,129,0.3);
+  }
+  .btn-success:hover{
+    box-shadow:0 4px 12px rgba(16,185,129,0.4);
+    transform:translateY(-1px);
+  }
   .btn-ghost{
     background:var(--bg-subtle);
     border:1px solid var(--border);
@@ -512,6 +521,83 @@
     font-size:11px;
   }
   .no-plans-message{
+    font-size:12px;
+    color:var(--mid);
+    text-align:center;
+    padding:16px;
+  }
+
+  /* Example Trainings */
+  .example-trainings-card{
+    background:linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    border:1px solid #93c5fd;
+  }
+  .example-trainings-header{
+    font-weight:700;
+    font-size:14px;
+    color:var(--dark);
+    margin-bottom:14px;
+    padding-bottom:12px;
+    border-bottom:1px solid #93c5fd;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .example-trainings-header::before{
+    content:'';
+    width:4px;
+    height:16px;
+    background:linear-gradient(180deg, #3b82f6 0%, #2563eb 100%);
+    border-radius:2px;
+  }
+  .example-trainings-list{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    max-height:200px;
+    overflow-y:auto;
+  }
+  .example-training-item{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:10px 12px;
+    background:var(--card);
+    border-radius:var(--radius-sm);
+    border:1px solid var(--border-light);
+    transition:var(--transition);
+  }
+  .example-training-item:hover{
+    border-color:var(--border);
+    box-shadow:var(--shadow-sm);
+  }
+  .example-training-info{
+    flex:1;
+    min-width:0;
+  }
+  .example-training-name{
+    font-weight:600;
+    font-size:13px;
+    color:var(--dark);
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .example-training-meta{
+    font-size:11px;
+    color:var(--mid);
+    margin-top:2px;
+  }
+  .example-training-actions{
+    display:flex;
+    gap:6px;
+    margin-left:8px;
+  }
+  .example-training-actions .btn{
+    padding:4px 8px;
+    font-size:11px;
+  }
+  .example-loading-message{
     font-size:12px;
     color:var(--mid);
     text-align:center;
@@ -809,7 +895,7 @@
         </div>
       </div>
       <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
-        <span class="version-badge">v3.11</span>
+        <span class="version-badge">v3.13</span>
       </div>
     </header>
 
@@ -954,6 +1040,14 @@
           </div>
           <div id="trainingPlansList" class="training-plans-list">
             <div class="no-plans-message">Brak zapisanych treningów. Dodaj filmy, ustaw zdarzenia i kliknij "Zapisz".</div>
+          </div>
+        </div>
+
+        <!-- KARTA: Przykładowe treningi -->
+        <div class="card example-trainings-card" style="margin-top:12px">
+          <div class="example-trainings-header">Przykładowe treningi</div>
+          <div id="exampleTrainingsList" class="example-trainings-list">
+            <div class="example-loading-message">Ładowanie przykładowych treningów...</div>
           </div>
         </div>
 
@@ -2995,6 +3089,133 @@ openVideoDB().then(() => {
   console.error('Error opening IndexedDB:', err);
   refreshTrainingPlansList();
 });
+
+// ===================== EXAMPLE TRAININGS =====================
+const exampleTrainingsList = document.getElementById('exampleTrainingsList');
+
+// Przykładowe treningi osadzone bezpośrednio w kodzie
+const exampleTrainingsData = {
+  "exampleTrainings": [
+    {
+      "id": "przyklad_startu_1",
+      "name": "Przykładowy trening 1",
+      "description": "Trening z 3 filmami startowymi",
+      "videos": [
+        {
+          "name": "Start 1",
+          "src": "https://drive.usercontent.google.com/download?id=1ldIkDs23kCduwu5bI2f2zt369u-Gp2Gx&export=download&authuser=0",
+          "eventTime": 0.08,
+          "eventLabel": "Pierwsze zolte swiatlo"
+        },
+        {
+          "name": "Start 2",
+          "src": "https://drive.usercontent.google.com/download?id=1ho3pFFiAB_YGjX4xTij4HoPtP-DtUagr&export=download&authuser=0",
+          "eventTime": 0.17,
+          "eventLabel": "Pierwsze zolte swiatlo"
+        },
+        {
+          "name": "Start 3",
+          "src": "https://drive.usercontent.google.com/download?id=1Q3RCr70UKTpBvFh7cQkzpbgUirwQSLxo&export=download&authuser=0",
+          "eventTime": 0.11,
+          "eventLabel": "Pierwsze zolte swiatlo"
+        }
+      ]
+    }
+  ]
+};
+
+function refreshExampleTrainingsList() {
+  if (!exampleTrainingsData || !exampleTrainingsData.exampleTrainings || exampleTrainingsData.exampleTrainings.length === 0) {
+    exampleTrainingsList.innerHTML = '<div class="example-loading-message">Brak przykładowych treningów.</div>';
+    return;
+  }
+
+  exampleTrainingsList.innerHTML = exampleTrainingsData.exampleTrainings.map((training, index) => {
+    const videoCount = training.videos.length;
+    const eventsCount = training.videos.filter(v => v.eventTime != null).length;
+    const description = training.description || '';
+
+    return `
+      <div class="example-training-item" data-example-id="${training.id}">
+        <div class="example-training-info">
+          <div class="example-training-name">${escapeHtml(training.name)}</div>
+          <div class="example-training-meta">${videoCount} film(ów), ${eventsCount} zdarzeń${description ? ' • ' + escapeHtml(description) : ''}</div>
+        </div>
+        <div class="example-training-actions">
+          <button class="btn btn-accent" onclick="loadExampleTraining(${index})">Wczytaj</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+async function loadExampleTraining(index) {
+  if (!exampleTrainingsData || !exampleTrainingsData.exampleTrainings[index]) {
+    alert('Nie znaleziono przykładowego treningu.');
+    return;
+  }
+
+  const training = exampleTrainingsData.exampleTrainings[index];
+
+  // Ask user if they want to replace or add
+  const hasExisting = videoEntries.length > 0;
+  let shouldReplace = true;
+  if (hasExisting) {
+    shouldReplace = confirm('Czy chcesz zastąpić obecne filmy? (OK = zastąp, Anuluj = dodaj do obecnych)');
+  }
+
+  // Show loading indicator
+  const loadBtn = document.querySelector(`[onclick="loadExampleTraining(${index})"]`);
+  if (loadBtn) {
+    loadBtn.disabled = true;
+    loadBtn.textContent = 'Ładowanie...';
+  }
+
+  try {
+    if (shouldReplace) {
+      // Clear existing videos (revoke blob URLs for local files)
+      videoEntries.forEach(v => {
+        if (v.isLocal && v.src) {
+          try { URL.revokeObjectURL(v.src); } catch(_){}
+        }
+      });
+      videoEntries = [];
+      currentVideoIndex = -1;
+    }
+
+    // Add videos from the example training
+    for (const v of training.videos) {
+      videoEntries.push({
+        name: v.name,
+        src: v.src,
+        isLocal: false,
+        eventTime: v.eventTime,
+        eventLabel: v.eventLabel || ''
+      });
+    }
+
+    // Load first video (or first new video)
+    if (videoEntries.length > 0) {
+      const indexToLoad = shouldReplace ? 0 : videoEntries.length - training.videos.length;
+      loadVideoByIndex(Math.max(0, indexToLoad));
+    } else {
+      refreshVideoList();
+    }
+
+    alert(`Wczytano przykładowy trening "${training.name}" z ${training.videos.length} filmami.`);
+  } catch (err) {
+    console.error('Error loading example training:', err);
+    alert('Wystąpił błąd podczas wczytywania przykładowego treningu.');
+  } finally {
+    if (loadBtn) {
+      loadBtn.disabled = false;
+      loadBtn.textContent = 'Wczytaj';
+    }
+  }
+}
+
+// Load example trainings on page load
+refreshExampleTrainingsList();
 </script>
 </body>
 </html>
