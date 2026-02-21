@@ -436,8 +436,87 @@
     border:1px solid rgba(255,255,255,0.2);
   }
 
-  .fit-buttons{display:flex;gap:6px}
-  .fit-buttons .btn{padding:8px 12px;font-size:12px}
+  /* Saved Training Plans */
+  .training-plans-card{
+    background:linear-gradient(135deg, #fefce8 0%, #fef9c3 100%);
+    border:1px solid #fde047;
+  }
+  .training-plans-header{
+    font-weight:700;
+    font-size:14px;
+    color:var(--dark);
+    margin-bottom:14px;
+    padding-bottom:12px;
+    border-bottom:1px solid #fde047;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .training-plans-header::before{
+    content:'';
+    width:4px;
+    height:16px;
+    background:linear-gradient(180deg, #fbbf24 0%, #d97706 100%);
+    border-radius:2px;
+  }
+  .training-plans-actions{
+    display:flex;
+    gap:8px;
+    margin-bottom:12px;
+  }
+  .training-plans-list{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    max-height:200px;
+    overflow-y:auto;
+  }
+  .training-plan-item{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:10px 12px;
+    background:var(--card);
+    border-radius:var(--radius-sm);
+    border:1px solid var(--border-light);
+    transition:var(--transition);
+  }
+  .training-plan-item:hover{
+    border-color:var(--border);
+    box-shadow:var(--shadow-sm);
+  }
+  .training-plan-info{
+    flex:1;
+    min-width:0;
+  }
+  .training-plan-name{
+    font-weight:600;
+    font-size:13px;
+    color:var(--dark);
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .training-plan-meta{
+    font-size:11px;
+    color:var(--mid);
+    margin-top:2px;
+  }
+  .training-plan-actions{
+    display:flex;
+    gap:6px;
+    margin-left:8px;
+  }
+  .training-plan-actions .btn{
+    padding:4px 8px;
+    font-size:11px;
+  }
+  .no-plans-message{
+    font-size:12px;
+    color:var(--mid);
+    text-align:center;
+    padding:16px;
+  }
 
   /* NOWOCZESNA SEKCJA UWAGI */
   .notes-card{
@@ -730,7 +809,7 @@
         </div>
       </div>
       <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
-        <span class="version-badge">v3.10</span>
+        <span class="version-badge">v3.11</span>
       </div>
     </header>
 
@@ -788,12 +867,6 @@
             </select>
             <button class="btn btn-ghost" id="loadUrlBtn">Wczytaj URL</button>
             <button class="btn btn-primary" id="setEventBtn">Ustaw zdarzenie (E)</button>
-            <div class="fit-buttons">
-              <button class="btn btn-ghost" id="fitBtn">Fit</button>
-              <button class="btn btn-ghost" id="smallBtn">Small</button>
-              <button class="btn btn-ghost" id="medBtn">Medium</button>
-              <button class="btn btn-ghost" id="largeBtn">Large</button>
-            </div>
           </div>
 
           <div class="zoom-panel">
@@ -873,6 +946,17 @@
           </div>
         </div>
 
+        <!-- KARTA: Zapisane treningi -->
+        <div class="card training-plans-card" style="margin-top:12px">
+          <div class="training-plans-header">Zapisane treningi</div>
+          <div class="training-plans-actions">
+            <button class="btn btn-primary btn-sm" id="saveTrainingBtn">Zapisz obecny trening</button>
+          </div>
+          <div id="trainingPlansList" class="training-plans-list">
+            <div class="no-plans-message">Brak zapisanych treningów. Dodaj filmy, ustaw zdarzenia i kliknij "Zapisz".</div>
+          </div>
+        </div>
+
         <div class="card notes-card" style="margin-top:12px">
           <div class="notes-header">Uwagi</div>
           <div class="notes-list">
@@ -908,10 +992,6 @@ const eventMarker = document.getElementById('eventMarker');
 const eventTimeText = document.getElementById('eventTimeText');
 const zoomSlider = document.getElementById('zoomSlider');
 const zoomLabel = document.getElementById('zoomLabel');
-const fitBtn = document.getElementById('fitBtn');
-const smallBtn = document.getElementById('smallBtn');
-const medBtn = document.getElementById('medBtn');
-const largeBtn = document.getElementById('largeBtn');
 const instructionOverlay = document.getElementById('instructionOverlay');
 
 const startTestBtn = document.getElementById('startTestBtn');
@@ -1169,12 +1249,6 @@ zoomSlider.addEventListener('input', (e)=>{
   scale = parseFloat(e.target.value);
   updateTransform();
 });
-
-/* Fit / presets */
-fitBtn.addEventListener('click', ()=>{ scale = 1; tx = 0; ty = 0; updateTransform(); });
-smallBtn.addEventListener('click', ()=>{ scale = 0.8; tx = 0; ty = 0; updateTransform(); });
-medBtn.addEventListener('click', ()=>{ scale = 1.2; tx = 0; ty = 0; updateTransform(); });
-largeBtn.addEventListener('click', ()=>{ scale = 1.6; tx = 0; ty = 0; updateTransform(); });
 
 /* PAN with pointer events */
 let pointerActive = false;
@@ -2586,6 +2660,341 @@ if ('serviceWorker' in navigator) {
       });
   });
 }
+
+/* ===================== TRAINING PLANS MANAGEMENT ===================== */
+const TRAINING_PLANS_KEY = 'flyball_training_plans';
+const VIDEO_DB_NAME = 'FlyballVideoDB';
+const VIDEO_STORE_NAME = 'videos';
+const saveTrainingBtn = document.getElementById('saveTrainingBtn');
+const trainingPlansList = document.getElementById('trainingPlansList');
+
+// IndexedDB for storing video files
+let videoDB = null;
+
+function openVideoDB() {
+  return new Promise((resolve, reject) => {
+    if (videoDB) {
+      resolve(videoDB);
+      return;
+    }
+    const request = indexedDB.open(VIDEO_DB_NAME, 1);
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => {
+      videoDB = request.result;
+      resolve(videoDB);
+    };
+    request.onupgradeneeded = (event) => {
+      const db = event.target.result;
+      if (!db.objectStoreNames.contains(VIDEO_STORE_NAME)) {
+        db.createObjectStore(VIDEO_STORE_NAME, { keyPath: 'id' });
+      }
+    };
+  });
+}
+
+async function saveVideoToIndexedDB(videoId, blob, fileName) {
+  const db = await openVideoDB();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction([VIDEO_STORE_NAME], 'readwrite');
+    const store = transaction.objectStore(VIDEO_STORE_NAME);
+    const request = store.put({ id: videoId, blob, fileName });
+    request.onsuccess = () => resolve();
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function getVideoFromIndexedDB(videoId) {
+  const db = await openVideoDB();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction([VIDEO_STORE_NAME], 'readonly');
+    const store = transaction.objectStore(VIDEO_STORE_NAME);
+    const request = store.get(videoId);
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function deleteVideoFromIndexedDB(videoId) {
+  const db = await openVideoDB();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction([VIDEO_STORE_NAME], 'readwrite');
+    const store = transaction.objectStore(VIDEO_STORE_NAME);
+    const request = store.delete(videoId);
+    request.onsuccess = () => resolve();
+    request.onerror = () => reject(request.error);
+  });
+}
+
+// Convert blob URL to actual blob
+async function fetchBlobFromObjectURL(blobUrl) {
+  const response = await fetch(blobUrl);
+  return await response.blob();
+}
+
+// Get saved training plans from localStorage
+function getSavedTrainingPlans() {
+  try {
+    const data = localStorage.getItem(TRAINING_PLANS_KEY);
+    return data ? JSON.parse(data) : [];
+  } catch (e) {
+    console.error('Error loading training plans:', e);
+    return [];
+  }
+}
+
+// Save training plans to localStorage
+function saveTrainingPlansToStorage(plans) {
+  try {
+    localStorage.setItem(TRAINING_PLANS_KEY, JSON.stringify(plans));
+  } catch (e) {
+    console.error('Error saving training plans:', e);
+    alert('Nie udało się zapisać treningów. Sprawdź dostępne miejsce w przeglądarce.');
+  }
+}
+
+// Save current training
+async function saveCurrentTraining() {
+  if (videoEntries.length === 0) {
+    alert('Brak filmów do zapisania. Dodaj co najmniej jeden film.');
+    return;
+  }
+  
+  const planName = prompt('Podaj nazwę treningu:', `Trening ${new Date().toLocaleDateString('pl-PL')}`);
+  if (!planName) return;
+  
+  // Show saving indicator
+  saveTrainingBtn.disabled = true;
+  saveTrainingBtn.textContent = 'Zapisywanie...';
+  
+  try {
+    const planId = Date.now();
+    const videosToSave = [];
+    
+    for (let i = 0; i < videoEntries.length; i++) {
+      const v = videoEntries[i];
+      const videoData = {
+        name: v.name,
+        eventTime: v.eventTime,
+        eventLabel: v.eventLabel || '',
+        isLocal: v.isLocal
+      };
+      
+      if (v.isLocal) {
+        // Save local video blob to IndexedDB
+        const videoId = `${planId}_video_${i}`;
+        try {
+          const blob = await fetchBlobFromObjectURL(v.src);
+          await saveVideoToIndexedDB(videoId, blob, v.name);
+          videoData.videoId = videoId;
+          videoData.src = null; // Don't store blob URL
+        } catch (err) {
+          console.error('Error saving local video:', err);
+          alert(`Błąd podczas zapisywania filmu "${v.name}". Film może być zbyt duży.`);
+          saveTrainingBtn.disabled = false;
+          saveTrainingBtn.textContent = 'Zapisz obecny trening';
+          return;
+        }
+      } else {
+        // URL-based video - just store the URL
+        videoData.src = v.src;
+        videoData.videoId = null;
+      }
+      
+      videosToSave.push(videoData);
+    }
+    
+    const plan = {
+      id: planId,
+      name: planName,
+      createdAt: new Date().toISOString(),
+      videos: videosToSave
+    };
+    
+    const plans = getSavedTrainingPlans();
+    plans.push(plan);
+    saveTrainingPlansToStorage(plans);
+    refreshTrainingPlansList();
+    
+    alert(`Trening "${planName}" został zapisany z ${videosToSave.length} filmami.`);
+  } catch (err) {
+    console.error('Error saving training:', err);
+    alert('Wystąpił błąd podczas zapisywania treningu.');
+  } finally {
+    saveTrainingBtn.disabled = false;
+    saveTrainingBtn.textContent = 'Zapisz obecny trening';
+  }
+}
+
+// Load a training plan
+async function loadTrainingPlan(planId) {
+  const plans = getSavedTrainingPlans();
+  const plan = plans.find(p => p.id === planId);
+  if (!plan) {
+    alert('Nie znaleziono treningu.');
+    return;
+  }
+  
+  // Ask user if they want to replace or add
+  const hasExisting = videoEntries.length > 0;
+  let shouldReplace = true;
+  if (hasExisting) {
+    shouldReplace = confirm('Czy chcesz zastąpić obecne filmy? (OK = zastąp, Anuluj = dodaj do obecnych)');
+  }
+  
+  // Show loading indicator
+  const loadBtn = document.querySelector(`[onclick="loadTrainingPlan(${planId})"]`);
+  if (loadBtn) {
+    loadBtn.disabled = true;
+    loadBtn.textContent = 'Ładowanie...';
+  }
+  
+  try {
+    if (shouldReplace) {
+      // Clear existing videos (revoke blob URLs for local files)
+      videoEntries.forEach(v => {
+        if (v.isLocal && v.src) {
+          try { URL.revokeObjectURL(v.src); } catch(_){}
+        }
+      });
+      videoEntries = [];
+      currentVideoIndex = -1;
+    }
+    
+    // Add videos from the plan
+    for (const v of plan.videos) {
+      let src = v.src;
+      
+      if (v.isLocal && v.videoId) {
+        // Load video from IndexedDB
+        try {
+          const videoData = await getVideoFromIndexedDB(v.videoId);
+          if (videoData && videoData.blob) {
+            src = URL.createObjectURL(videoData.blob);
+          } else {
+            console.warn('Video not found in IndexedDB:', v.videoId);
+            alert(`Film "${v.name}" nie został znaleziony w pamięci. Możliwe, że dane zostały usunięte.`);
+            continue;
+          }
+        } catch (err) {
+          console.error('Error loading video from IndexedDB:', err);
+          continue;
+        }
+      }
+      
+      videoEntries.push({
+        name: v.name,
+        src: src,
+        isLocal: v.isLocal,
+        eventTime: v.eventTime,
+        eventLabel: v.eventLabel || ''
+      });
+    }
+    
+    // Load first video (or first new video)
+    if (videoEntries.length > 0) {
+      const indexToLoad = shouldReplace ? 0 : videoEntries.length - plan.videos.length;
+      loadVideoByIndex(Math.max(0, indexToLoad));
+    } else {
+      refreshVideoList();
+    }
+    
+    alert(`Wczytano trening "${plan.name}" z ${plan.videos.length} filmami.`);
+  } catch (err) {
+    console.error('Error loading training:', err);
+    alert('Wystąpił błąd podczas wczytywania treningu.');
+  } finally {
+    if (loadBtn) {
+      loadBtn.disabled = false;
+      loadBtn.textContent = 'Wczytaj';
+    }
+  }
+}
+
+// Delete a training plan
+async function deleteTrainingPlan(planId) {
+  const plans = getSavedTrainingPlans();
+  const plan = plans.find(p => p.id === planId);
+  if (!plan) return;
+  
+  if (!confirm(`Czy na pewno chcesz usunąć trening "${plan.name}"?`)) return;
+  
+  // Delete associated videos from IndexedDB
+  for (const v of plan.videos) {
+    if (v.isLocal && v.videoId) {
+      try {
+        await deleteVideoFromIndexedDB(v.videoId);
+      } catch (err) {
+        console.warn('Error deleting video from IndexedDB:', err);
+      }
+    }
+  }
+  
+  const updatedPlans = plans.filter(p => p.id !== planId);
+  saveTrainingPlansToStorage(updatedPlans);
+  refreshTrainingPlansList();
+}
+
+// Refresh the training plans list UI
+function refreshTrainingPlansList() {
+  const plans = getSavedTrainingPlans();
+  
+  if (plans.length === 0) {
+    trainingPlansList.innerHTML = '<div class="no-plans-message">Brak zapisanych treningów. Dodaj filmy, ustaw zdarzenia i kliknij "Zapisz".</div>';
+    return;
+  }
+  
+  trainingPlansList.innerHTML = plans.map(plan => {
+    const date = new Date(plan.createdAt).toLocaleDateString('pl-PL', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+    const videoCount = plan.videos.length;
+    const eventsCount = plan.videos.filter(v => v.eventTime != null).length;
+    const localCount = plan.videos.filter(v => v.isLocal).length;
+    const urlCount = videoCount - localCount;
+    
+    let typeInfo = '';
+    if (localCount > 0 && urlCount > 0) {
+      typeInfo = ` (${localCount} lok., ${urlCount} URL)`;
+    } else if (localCount > 0) {
+      typeInfo = ' (lokalne)';
+    } else if (urlCount > 0) {
+      typeInfo = ' (URL)';
+    }
+    
+    return `
+      <div class="training-plan-item" data-plan-id="${plan.id}">
+        <div class="training-plan-info">
+          <div class="training-plan-name">${escapeHtml(plan.name)}</div>
+          <div class="training-plan-meta">${videoCount} film(ów)${typeInfo}, ${eventsCount} zdarzeń • ${date}</div>
+        </div>
+        <div class="training-plan-actions">
+          <button class="btn btn-accent" onclick="loadTrainingPlan(${plan.id})">Wczytaj</button>
+          <button class="btn btn-ghost" onclick="deleteTrainingPlan(${plan.id})">Usuń</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// Helper to escape HTML
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+// Initialize training plans on page load
+saveTrainingBtn.addEventListener('click', saveCurrentTraining);
+openVideoDB().then(() => {
+  refreshTrainingPlansList();
+}).catch(err => {
+  console.error('Error opening IndexedDB:', err);
+  refreshTrainingPlansList();
+});
 </script>
 </body>
 </html>
