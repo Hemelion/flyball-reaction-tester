@@ -1,0 +1,579 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
+<title>Flyball Reaction PRO - Unleashed Flyball Team</title>
+<meta name="description" content="PRO version - Web-based reaction time tester for Unleashed Flyball Team" />
+<meta name="theme-color" content="#00AEEB" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Flyball PRO" />
+<link rel="apple-touch-icon" href="logo.png" />
+
+<!-- Facebook SDK -->
+<script async defer crossorigin="anonymous" src="https://connect.facebook.net/pl_PL/sdk.js"></script>
+
+<style>
+:root{--bg:#f0f4f8;--card:#fff;--accent:#0ea5e9;--accent-dark:#0284c7;--success:#10b981;--danger:#ef4444;--dark:#1e293b;--mid:#64748b;--light:#94a3b8;--border:#e2e8f0;--radius:16px;--radius-sm:10px;--shadow:0 4px 6px -1px rgba(15,23,42,0.05);--shadow-lg:0 20px 25px -5px rgba(15,23,42,0.1)}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--dark);font-size:14px}
+
+/* Security Block Screen */
+#security-block{position:fixed;inset:0;background:linear-gradient(135deg,#1e293b 0%,#0f172a 100%);z-index:99999;display:flex;align-items:center;justify-content:center;flex-direction:column;color:#fff;text-align:center;padding:40px}
+#security-block h1{font-size:28px;margin-bottom:16px;color:#ef4444}
+#security-block p{font-size:16px;color:#94a3b8;max-width:400px;line-height:1.6}
+#security-block.hidden{display:none}
+
+/* Login Screen */
+#login-screen{position:fixed;inset:0;background:linear-gradient(135deg,#0ea5e9 0%,#0284c7 50%,#0369a1 100%);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px}
+#login-screen.hidden{display:none}
+.login-card{background:#fff;border-radius:24px;padding:48px 40px;max-width:420px;width:100%;text-align:center;box-shadow:0 25px 50px -12px rgba(0,0,0,0.25)}
+.login-logo{width:80px;height:80px;margin:0 auto 24px;border-radius:16px}
+.login-title{font-size:24px;font-weight:700;color:var(--dark);margin-bottom:8px}
+.login-subtitle{font-size:14px;color:var(--mid);margin-bottom:32px}
+.login-pro-badge{display:inline-block;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;margin-bottom:24px}
+.login-divider{display:flex;align-items:center;gap:16px;margin:24px 0;color:var(--light);font-size:13px}
+.login-divider::before,.login-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.social-btn{width:100%;padding:14px 24px;border:2px solid var(--border);border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:12px;transition:all 0.2s;background:#fff;margin-bottom:12px}
+.social-btn:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,0.1)}
+.social-btn.facebook{color:#1877f2}
+.social-btn.facebook:hover{background:#1877f2;color:#fff;border-color:#1877f2}
+.social-btn svg{width:20px;height:20px}
+.login-footer{margin-top:24px;font-size:12px;color:var(--light)}
+
+/* User Bar */
+#user-bar{background:linear-gradient(135deg,#1e293b 0%,#334155 100%);color:#fff;padding:12px 20px;padding-top:calc(12px + env(safe-area-inset-top,0px));display:flex;align-items:center;justify-content:space-between;gap:16px;position:sticky;top:0;z-index:1000}
+#user-bar.hidden{display:none}
+.user-info{display:flex;align-items:center;gap:12px}
+.user-avatar{width:36px;height:36px;border-radius:50%;border:2px solid rgba(255,255,255,0.3);object-fit:cover}
+.user-name{font-weight:600;font-size:14px}
+.user-email{font-size:12px;color:#94a3b8}
+.user-provider{font-size:11px;padding:2px 8px;border-radius:10px;background:rgba(255,255,255,0.15);margin-left:8px}
+.logout-btn{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:#fff;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s}
+.logout-btn:hover{background:rgba(239,68,68,0.8);border-color:transparent}
+
+/* Main App Container */
+#app-container{display:none}
+#app-container.active{display:block}
+
+/* Simplified styles from main app */
+.wrap{max-width:1140px;margin:0 auto;padding:20px 24px}
+header{display:flex;align-items:center;gap:16px;margin-bottom:20px;padding:16px 20px;background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow)}
+.brand{display:flex;align-items:center;gap:14px}
+.logo img{width:52px;height:52px;border-radius:var(--radius-sm)}
+.brand h1{font-size:17px;font-weight:700;color:var(--dark)}
+.brand h1 span{color:var(--accent)}
+.card{background:var(--card);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);margin-bottom:16px}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.card-title{font-size:15px;font-weight:700;color:var(--dark)}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent-dark));color:#fff}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(14,165,233,0.3)}
+.btn-success{background:linear-gradient(135deg,var(--success),#059669);color:#fff}
+.btn-danger{background:linear-gradient(135deg,var(--danger),#dc2626);color:#fff}
+.video-wrap{position:relative;background:#000;border-radius:var(--radius);overflow:hidden;max-height:50vh}
+video{width:100%;display:block;max-height:50vh;object-fit:contain}
+.controls{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+input[type="file"],input[type="text"],input[type="number"],select{padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;background:var(--card);width:100%}
+input:focus,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(14,165,233,0.1)}
+.form-group{margin-bottom:12px}
+.form-group label{display:block;font-size:12px;font-weight:600;color:var(--mid);margin-bottom:6px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:10px;text-align:left;border-bottom:1px solid var(--border)}
+th{font-weight:600;color:var(--mid);font-size:12px}
+.badge{display:inline-block;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600}
+
+/* Toast */
+.toast-container{position:fixed;top:calc(60px + env(safe-area-inset-top));right:20px;z-index:10000;max-width:380px;width:calc(100% - 40px)}
+.toast{background:var(--card);border-radius:var(--radius-sm);box-shadow:var(--shadow-lg);padding:14px 18px;display:flex;align-items:center;gap:12px;margin-bottom:10px;animation:toastIn 0.3s ease}
+@keyframes toastIn{from{opacity:0;transform:translateX(100%)}to{opacity:1;transform:translateX(0)}}
+
+/* Floating Button */
+.floating-btn{position:fixed;bottom:calc(24px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);z-index:1000;padding:14px 28px;background:linear-gradient(135deg,var(--accent),var(--accent-dark));color:#fff;font-size:16px;font-weight:700;border:none;border-radius:50px;cursor:pointer;box-shadow:0 4px 20px rgba(14,165,233,0.4);display:flex;align-items:center;gap:10px}
+.floating-btn:hover{transform:translateX(-50%) translateY(-2px)}
+.floating-btn.running{background:linear-gradient(135deg,var(--danger),#dc2626)}
+.floating-btn svg{width:20px;height:20px;fill:currentColor}
+
+/* Responsive */
+@media(max-width:700px){
+  .wrap{padding:12px 16px}
+  header{padding:12px 16px;flex-wrap:wrap}
+  .logo img{width:44px;height:44px}
+  .brand h1{font-size:15px}
+  .video-wrap{max-height:42vh}
+  video{max-height:42vh}
+  .login-card{padding:32px 24px}
+  #user-bar{flex-wrap:wrap;gap:12px}
+  .user-info{flex:1}
+}
+</style>
+</head>
+<body>
+
+<!-- Security Block (shown if running locally or from wrong domain) -->
+<div id="security-block" class="hidden">
+  <h1>⛔ Dostęp zabroniony</h1>
+  <p>Ta aplikacja może być uruchomiona wyłącznie z autoryzowanej domeny. Lokalne uruchomienie pliku HTML nie jest dozwolone.</p>
+</div>
+
+<!-- Login Screen -->
+<div id="login-screen">
+  <div class="login-card">
+    <img src="logo.png" alt="Logo" class="login-logo" />
+    <div class="login-pro-badge">✨ WERSJA PRO</div>
+    <h2 class="login-title">Flyball Reaction</h2>
+    <p class="login-subtitle">Zaloguj się, aby uzyskać dostęp do wersji PRO</p>
+    
+    <button class="social-btn facebook" id="facebook-login-btn">
+      <svg viewBox="0 0 24 24"><path fill="currentColor" d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+      Zaloguj przez Facebook
+    </button>
+    
+    <p class="login-footer">Logując się, akceptujesz regulamin aplikacji PRO</p>
+  </div>
+</div>
+
+<!-- User Bar (shown after login) -->
+<div id="user-bar" class="hidden">
+  <div class="user-info">
+    <img id="user-avatar" class="user-avatar" src="" alt="Avatar" />
+    <div>
+      <div class="user-name"><span id="user-name">-</span><span id="user-provider" class="user-provider"></span></div>
+      <div class="user-email" id="user-email">-</div>
+    </div>
+  </div>
+  <button class="logout-btn" id="logout-btn">Wyloguj</button>
+</div>
+
+<!-- Main App Container (shown after login) -->
+<div id="app-container">
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="logo"><img src="logo.png" alt="Logo" /></div>
+        <h1>Unleashed Flyball Team<br><span>Flyball Reaction PRO</span></h1>
+      </div>
+    </header>
+    
+    <main>
+      <!-- Video Player Card -->
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">📹 Odtwarzacz wideo</h3>
+        </div>
+        <div class="video-wrap">
+          <video id="video" playsinline controls></video>
+        </div>
+        <div class="controls">
+          <input type="file" id="localFile" accept="video/*" multiple />
+          <select id="videoList"><option value="">Brak wideo</option></select>
+        </div>
+      </div>
+      
+      <!-- Test Settings Card -->
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">⚙️ Ustawienia testu</h3>
+        </div>
+        <div class="form-group">
+          <label>Liczba prób</label>
+          <input type="number" id="trialsCount" value="5" min="1" max="20" />
+        </div>
+        <div class="form-group">
+          <label>Czas przed zdarzeniem (sekundy)</label>
+          <div style="display:flex;gap:8px">
+            <input type="number" id="randomFrom" value="1.5" step="0.1" placeholder="Od" />
+            <input type="number" id="randomTo" value="2.5" step="0.1" placeholder="Do" />
+          </div>
+        </div>
+        <div class="controls">
+          <button class="btn btn-primary" id="setEventBtn">Ustaw zdarzenie (E)</button>
+          <button class="btn btn-success" id="startTestBtn">▶ Start testu</button>
+          <button class="btn btn-danger" id="stopTestBtn">⏹ Stop</button>
+        </div>
+      </div>
+      
+      <!-- Results Card -->
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">📊 Wyniki</h3>
+          <button class="btn" id="clearResultsBtn" style="background:var(--border);color:var(--dark)">Wyczyść</button>
+        </div>
+        <div id="trialInfo" style="padding:10px;background:var(--bg);border-radius:8px;margin-bottom:12px;font-size:13px;color:var(--mid)">
+          Gotowy do testu...
+        </div>
+        <table>
+          <thead><tr><th>#</th><th>Czas</th><th>Reakcja</th><th>Ocena</th></tr></thead>
+          <tbody id="resultsBody"></tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- Floating Start Button -->
+<button class="floating-btn hidden" id="floatingBtn">
+  <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+  <span>Start testu</span>
+</button>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+// ============ SECURITY & AUTHENTICATION ============
+const CONFIG = {
+  ALLOWED_DOMAINS: ['hemelion.github.io', 'localhost', '127.0.0.1'],
+  FACEBOOK_APP_ID: '1450344913471254'
+};
+
+// Security check - block local file access and unauthorized domains
+function checkSecurity() {
+  const protocol = window.location.protocol;
+  const hostname = window.location.hostname;
+  
+  // Block file:// protocol
+  if (protocol === 'file:') {
+    document.getElementById('security-block').classList.remove('hidden');
+    document.getElementById('login-screen').classList.add('hidden');
+    return false;
+  }
+  
+  // Check allowed domains (skip for localhost development)
+  if (!CONFIG.ALLOWED_DOMAINS.some(d => hostname.includes(d))) {
+    document.getElementById('security-block').classList.remove('hidden');
+    document.getElementById('login-screen').classList.add('hidden');
+    return false;
+  }
+  
+  return true;
+}
+
+// User state
+let currentUser = null;
+
+// Initialize Facebook SDK
+window.fbAsyncInit = function() {
+  FB.init({
+    appId: CONFIG.FACEBOOK_APP_ID,
+    cookie: true,
+    xfbml: true,
+    version: 'v18.0'
+  });
+};
+
+// Facebook login
+function loginWithFacebook() {
+  FB.login(function(response) {
+    if (response.authResponse) {
+      FB.api('/me', {fields: 'name,email,picture'}, function(userData) {
+        currentUser = {
+          name: userData.name,
+          email: userData.email || 'Brak dostępu do email',
+          picture: userData.picture?.data?.url || '',
+          provider: 'Facebook',
+          token: response.authResponse.accessToken
+        };
+        onLoginSuccess();
+      });
+    }
+  }, {scope: 'public_profile,email'});
+}
+
+// On successful login
+function onLoginSuccess() {
+  if (!currentUser) return;
+  
+  // Save session
+  sessionStorage.setItem('flyball_pro_user', JSON.stringify(currentUser));
+  
+  // Update UI
+  document.getElementById('login-screen').classList.add('hidden');
+  document.getElementById('user-bar').classList.remove('hidden');
+  document.getElementById('app-container').classList.add('active');
+  document.getElementById('floatingBtn').classList.remove('hidden');
+  
+  // Update user info
+  document.getElementById('user-avatar').src = currentUser.picture || 'logo.png';
+  document.getElementById('user-name').textContent = currentUser.name;
+  document.getElementById('user-email').textContent = currentUser.email;
+  document.getElementById('user-provider').textContent = currentUser.provider;
+  
+  showToast(`Witaj, ${currentUser.name}!`, 'success');
+}
+
+// Logout
+function logout() {
+  currentUser = null;
+  sessionStorage.removeItem('flyball_pro_user');
+  
+  // Facebook logout
+  if (typeof FB !== 'undefined') {
+    FB.getLoginStatus(function(response) {
+      if (response.status === 'connected') {
+        FB.logout();
+      }
+    });
+  }
+  
+  // Reset UI
+  document.getElementById('user-bar').classList.add('hidden');
+  document.getElementById('app-container').classList.remove('active');
+  document.getElementById('floatingBtn').classList.add('hidden');
+  document.getElementById('login-screen').classList.remove('hidden');
+}
+
+// Check for existing session
+function checkExistingSession() {
+  const saved = sessionStorage.getItem('flyball_pro_user');
+  if (saved) {
+    try {
+      currentUser = JSON.parse(saved);
+      onLoginSuccess();
+      return true;
+    } catch(e) {
+      sessionStorage.removeItem('flyball_pro_user');
+    }
+  }
+  return false;
+}
+
+// Toast notification
+function showToast(message, type = 'info') {
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.style.borderLeft = `4px solid ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#0ea5e9'}`;
+  toast.innerHTML = `<span>${message}</span>`;
+  container.appendChild(toast);
+  setTimeout(() => toast.remove(), 4000);
+}
+
+// ============ MAIN APP LOGIC ============
+const video = document.getElementById('video');
+const localFile = document.getElementById('localFile');
+const videoList = document.getElementById('videoList');
+const setEventBtn = document.getElementById('setEventBtn');
+const startTestBtn = document.getElementById('startTestBtn');
+const stopTestBtn = document.getElementById('stopTestBtn');
+const clearResultsBtn = document.getElementById('clearResultsBtn');
+const trialsCount = document.getElementById('trialsCount');
+const randomFrom = document.getElementById('randomFrom');
+const randomTo = document.getElementById('randomTo');
+const trialInfo = document.getElementById('trialInfo');
+const resultsBody = document.getElementById('resultsBody');
+const floatingBtn = document.getElementById('floatingBtn');
+
+let videoEntries = [];
+let currentVideoIndex = -1;
+let eventTime = null;
+let ongoingTest = null;
+let results = [];
+
+// Load local video files
+localFile.addEventListener('change', (e) => {
+  Array.from(e.target.files).forEach(file => {
+    const url = URL.createObjectURL(file);
+    videoEntries.push({ name: file.name, src: url, isLocal: true, eventTime: null });
+  });
+  refreshVideoList();
+  if (videoEntries.length > 0 && currentVideoIndex < 0) loadVideoByIndex(0);
+});
+
+function refreshVideoList() {
+  videoList.innerHTML = '';
+  if (!videoEntries.length) {
+    videoList.innerHTML = '<option value="">Brak wideo</option>';
+    return;
+  }
+  videoEntries.forEach((v, i) => {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = `${i+1}. ${v.name}${v.eventTime != null ? ` (E: ${v.eventTime.toFixed(2)}s)` : ''}`;
+    if (i === currentVideoIndex) opt.selected = true;
+    videoList.appendChild(opt);
+  });
+}
+
+function loadVideoByIndex(index, callback) {
+  const entry = videoEntries[index];
+  if (!entry) return;
+  currentVideoIndex = index;
+  video.src = entry.src;
+  video.load();
+  eventTime = entry.eventTime;
+  if (callback) video.addEventListener('loadedmetadata', callback, { once: true });
+  refreshVideoList();
+}
+
+videoList.addEventListener('change', (e) => {
+  const idx = parseInt(e.target.value);
+  if (!isNaN(idx)) loadVideoByIndex(idx);
+});
+
+// Set event time
+setEventBtn.addEventListener('click', () => {
+  if (currentVideoIndex < 0) {
+    showToast('Wczytaj wideo przed ustawieniem zdarzenia', 'error');
+    return;
+  }
+  eventTime = video.currentTime;
+  videoEntries[currentVideoIndex].eventTime = eventTime;
+  refreshVideoList();
+  showToast(`Zdarzenie ustawione na ${eventTime.toFixed(3)}s`, 'success');
+});
+
+// Keyboard shortcuts
+document.addEventListener('keydown', (e) => {
+  if (e.code === 'KeyE') { e.preventDefault(); setEventBtn.click(); }
+  if (e.code === 'Space' && ongoingTest?.running) { e.preventDefault(); reactNow(); }
+  if (e.code === 'KeyS') { e.preventDefault(); startTestBtn.click(); }
+  if (e.code === 'Escape' && ongoingTest) { stopTest(); }
+});
+
+// Start test
+startTestBtn.addEventListener('click', startTest);
+stopTestBtn.addEventListener('click', stopTest);
+floatingBtn.addEventListener('click', () => {
+  if (ongoingTest?.running) stopTest();
+  else startTest();
+});
+
+function startTest() {
+  if (!videoEntries.length) { showToast('Wczytaj wideo przed testem', 'error'); return; }
+  
+  const videoIndices = videoEntries.map((v, i) => v.eventTime != null ? i : -1).filter(i => i >= 0);
+  if (!videoIndices.length) { showToast('Ustaw zdarzenie (E) na co najmniej jednym wideo', 'error'); return; }
+  
+  const trials = Math.max(1, parseInt(trialsCount.value) || 5);
+  let from = parseFloat(randomFrom.value) || 1.5;
+  let to = parseFloat(randomTo.value) || 2.5;
+  if (to < from) [from, to] = [to, from];
+  
+  results = [];
+  updateResultsUI();
+  ongoingTest = { running: true, trialsTotal: trials, currentTrial: 0, offsetMin: from, offsetMax: to, videoIndices };
+  updateFloatingButton();
+  runNextTrial();
+}
+
+function runNextTrial() {
+  if (!ongoingTest?.running || ongoingTest.currentTrial >= ongoingTest.trialsTotal) {
+    ongoingTest.running = false;
+    trialInfo.textContent = `Test zakończony. ${results.length} wyników.`;
+    updateFloatingButton();
+    return;
+  }
+  
+  const { videoIndices, offsetMin, offsetMax, trialsTotal, currentTrial } = ongoingTest;
+  const randomIdx = videoIndices[Math.floor(Math.random() * videoIndices.length)];
+  const chosenEntry = videoEntries[randomIdx];
+  
+  loadVideoByIndex(randomIdx, () => {
+    const randomBefore = offsetMin + Math.random() * (offsetMax - offsetMin);
+    let startTime = eventTime - randomBefore;
+    if (startTime < 0) startTime = 0;
+    
+    video.currentTime = startTime;
+    video.pause();
+    trialInfo.textContent = `Próba ${currentTrial + 1}/${trialsTotal} — ${chosenEntry.name}`;
+    
+    setTimeout(() => {
+      video.play().catch(() => showToast('Autoodtwarzanie zablokowane', 'error'));
+    }, 150);
+  });
+}
+
+function reactNow() {
+  if (!ongoingTest?.running) return;
+  
+  const reactionMs = (video.currentTime - eventTime) * 1000;
+  video.pause();
+  ongoingTest.currentTrial++;
+  
+  const classification = classifyReaction(reactionMs);
+  results.push({
+    trial: ongoingTest.currentTrial,
+    ms: Math.round(reactionMs * 10) / 10,
+    rating: classification.label,
+    valid: classification.valid
+  });
+  
+  updateResultsUI();
+  setTimeout(() => runNextTrial(), 800);
+}
+
+function stopTest() {
+  if (ongoingTest) {
+    ongoingTest.running = false;
+    video.pause();
+    trialInfo.textContent = 'Test zatrzymany.';
+    updateFloatingButton();
+  }
+}
+
+function classifyReaction(ms) {
+  const m = Math.round(ms);
+  if (m < 120) return { label: 'Przewidziałeś', valid: false };
+  if (m <= 170) return { label: 'Rewelacja', valid: true };
+  if (m <= 240) return { label: 'Bardzo dobrze', valid: true };
+  if (m <= 270) return { label: 'Dobrze', valid: true };
+  return { label: 'Do poprawy', valid: true };
+}
+
+function updateResultsUI() {
+  resultsBody.innerHTML = results.map((r, i) => `
+    <tr>
+      <td>${i + 1}</td>
+      <td>${new Date().toLocaleTimeString()}</td>
+      <td style="font-weight:700">${r.ms} ms</td>
+      <td><span class="badge" style="background:${r.valid ? 'rgba(16,185,129,0.1);color:#059669' : 'rgba(239,68,68,0.1);color:#dc2626'}">${r.rating}</span></td>
+    </tr>
+  `).join('');
+}
+
+function updateFloatingButton() {
+  if (ongoingTest?.running) {
+    floatingBtn.classList.add('running');
+    floatingBtn.innerHTML = '<svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg><span>Stop</span>';
+  } else {
+    floatingBtn.classList.remove('running');
+    floatingBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg><span>Start testu</span>';
+  }
+}
+
+clearResultsBtn.addEventListener('click', () => {
+  results = [];
+  updateResultsUI();
+  showToast('Wyniki wyczyszczone', 'success');
+});
+
+// ============ INITIALIZATION ============
+document.addEventListener('DOMContentLoaded', () => {
+  // Security check first
+  if (!checkSecurity()) return;
+  
+  // Check existing session
+  if (checkExistingSession()) return;
+  
+  // Bind login button
+  document.getElementById('facebook-login-btn').addEventListener('click', loginWithFacebook);
+  document.getElementById('logout-btn').addEventListener('click', logout);
+});
+
+// Anti-tampering: detect DevTools and warn
+(function() {
+  const threshold = 160;
+  const check = () => {
+    const widthThreshold = window.outerWidth - window.innerWidth > threshold;
+    const heightThreshold = window.outerHeight - window.innerHeight > threshold;
+    if (widthThreshold || heightThreshold) {
+      console.log('%c⚠️ Wykryto narzędzia deweloperskie', 'color:red;font-size:20px;font-weight:bold');
+    }
+  };
+  setInterval(check, 1000);
+})();
+</script>
+</body>
+</html>
