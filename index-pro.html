@@ -1354,7 +1354,7 @@
 
           <div class="react-row">
             <div style="flex:1">
-              <div class="small muted">Ustawienia testu</div>
+              <div class="small muted" data-i18n="test.settings_label">Ustawienia testu</div>
               <div style="display:flex;gap:8px;margin-top:8px">
                 <input id="trialsCount" type="number" value="5" min="1" />
                 <input id="randomFrom" type="number" value="1.5" min="0" step="0.1" />
@@ -1708,7 +1708,7 @@ function onLoginSuccess() {
   document.getElementById('user-name').textContent = currentUser.name;
   document.getElementById('user-provider').textContent = currentUser.provider;
   
-  showToast(`Witaj, ${currentUser.name}!`, 'success', 'Zalogowano');
+  showToast(`${t('toast.welcome')}, ${currentUser.name}!`, 'success', t('toast.logged_in'));
 }
 
 // Logout
@@ -1964,14 +1964,14 @@ function updateFloatingButton() {
     floatingStartBtn.classList.add('running');
     floatingStartBtn.innerHTML = `
       <svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
-      <span>Stop</span>
+      <span>${t('test.stop')}</span>
       <span class="kbd">ESC</span>
     `;
   } else {
     floatingStartBtn.classList.remove('running');
     floatingStartBtn.innerHTML = `
       <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-      <span>Start testu</span>
+      <span>${t('test.start')}</span>
       <span class="kbd">S</span>
     `;
   }
@@ -2081,7 +2081,7 @@ fileInput.addEventListener('change', (e)=>{
 });
 
 loadUrlBtn.addEventListener('click', async ()=>{
-  const url = await showPrompt('Wklej URL do pliku mp4/webm:', '', 'Wczytaj wideo z URL');
+  const url = await showPrompt(t('video.load_url_prompt'), '', t('video.load_url_title'));
   if (!url) return;
   const name = url.split('/').pop() || 'Wideo z URL';
   videoEntries.push({
@@ -2127,12 +2127,12 @@ document.addEventListener('keydown', async (e)=>{
 
 async function setEventAtCurrent(){
   if (currentVideoIndex < 0 || !videoEntries[currentVideoIndex]) {
-    showToast('Wczytaj wideo i wybierz je z listy przed ustawieniem zdarzenia.', 'warning');
+    showToast(t('toast.load_video_first'), 'warning');
     forceLayoutRecalc();
     return;
   }
   eventTime = video.currentTime;
-  const newLabel = await showPrompt('Opis zdarzenia (opcjonalnie):', lastEventLabel || '', 'Opisz zdarzenie');
+  const newLabel = await showPrompt(t('video.event_desc_prompt'), lastEventLabel || '', t('video.event_desc_title'));
   if (newLabel !== null) {
     lastEventLabel = newLabel || lastEventLabel;
   }
@@ -2140,7 +2140,7 @@ async function setEventAtCurrent(){
   videoEntries[currentVideoIndex].eventLabel = lastEventLabel;
   updateEventUI();
   refreshVideoList();
-  showToast(`Ustawiono zdarzenie dla wideo "${videoEntries[currentVideoIndex].name}": ${eventTime.toFixed(3)} s ${lastEventLabel? '— ' + lastEventLabel : ''}`, 'success', 'Zdarzenie ustawione');
+  showToast(`${t('video.event_set')}: ${eventTime.toFixed(3)} s ${lastEventLabel? '— ' + lastEventLabel : ''}`, 'success', t('video.event_label'));
   // Force layout recalculation after alert closes on mobile
   forceLayoutRecalc();
 }
@@ -2300,7 +2300,7 @@ stopTestBtn.addEventListener('click', stopTest);
 
 function startTest(){
   if (!videoEntries.length) {
-    showToast('Wczytaj co najmniej jedno wideo przed testem.', 'warning');
+    showToast(t('toast.load_video_test'), 'warning');
     forceLayoutRecalc();
     return;
   }
@@ -2321,7 +2321,7 @@ function startTest(){
     if (v.eventTime != null) videoIndices.push(i);
   });
   if (!videoIndices.length){
-    showToast('Ustaw punkt zdarzenia (E) na co najmniej jednym wideo przed testem.', 'warning');
+    showToast(t('toast.set_event_first'), 'warning');
     forceLayoutRecalc();
     return;
   }
@@ -2357,7 +2357,7 @@ function runNextTrial(){
   if (!ongoingTest || !ongoingTest.running) return;
   if (ongoingTest.currentTrial >= ongoingTest.trialsTotal){
     ongoingTest.running = false;
-    trialInfo.textContent = `Test zakończony. ${results.length} wyników.`;
+    trialInfo.textContent = `${t('test.test_finished')} ${results.length} ${t('test.results_count')}.`;
     updateResultsUI();
     
     // Show summary bubble instead of immediately exiting
@@ -2387,14 +2387,14 @@ function runNextTrial(){
     video.currentTime = startTime;
     video.pause();
 
-    const infoText = `Próba ${trialIndex} / ${ongoingTest.trialsTotal} — ${chosenEntry.name}`;
+    const infoText = `${t('test.trial')} ${trialIndex} / ${ongoingTest.trialsTotal} — ${chosenEntry.name}`;
     trialInfo.textContent = infoText + `, losowo ~${randomBefore.toFixed(2)}s przed zdarzeniem...`;
     updateFsTrialInfo(infoText);
 
     setTimeout(()=>{
       video.play().then(()=>{
-        const playingText = `Próba ${trialIndex} / ${ongoingTest.trialsTotal} — Reaguj!`;
-        trialInfo.textContent = `Próba ${trialIndex} / ${ongoingTest.trialsTotal} — wideo: ${chosenEntry.name}. Reaguj na zdarzenie.`;
+        const playingText = `${t('test.trial')} ${trialIndex} / ${ongoingTest.trialsTotal} — ${t('test.react')}`;
+        trialInfo.textContent = `${t('test.trial')} ${trialIndex} / ${ongoingTest.trialsTotal} — wideo: ${chosenEntry.name}. ${t('test.react')}`;
         updateFsTrialInfo(playingText);
         // Ensure fullscreen overlay has focus for keyboard events
         if (isFullscreenTestMode) {
@@ -2403,7 +2403,7 @@ function runNextTrial(){
       }).catch(err=>{
         console.warn('Play rejected:', err);
         exitFullscreenTestMode();
-        showToast('Autoodtwarzanie zablokowane. Dotknij wideo, a potem kliknij Start ponownie.', 'warning');
+        showToast(t('toast.autoplay_blocked'), 'warning');
         forceLayoutRecalc();
       });
     }, 140);
@@ -2414,7 +2414,7 @@ function runNextTrial(){
 
 function reactNow(){
   if (!ongoingTest || !ongoingTest.running){
-    showToast('Brak trwającego testu.', 'info');
+    showToast(t('toast.no_test_running'), 'info');
     forceLayoutRecalc();
     return;
   }
@@ -2427,7 +2427,7 @@ function reactNow(){
 
   ongoingTest.currentTrial += 1;
   const classification = classifyReaction(reactionMs);
-  const note = classification.valid ? 'OK' : 'Przewidziałeś';
+  const note = classification.valid ? 'OK' : t('ratings.predicted');
 
   const currentVideoName = videoEntries[currentVideoIndex]?.name || '';
 
@@ -2459,7 +2459,7 @@ function reactNow(){
       runNextTrial();
     } else {
       ongoingTest.running = false;
-      trialInfo.textContent = `Test zakończony. ${results.length} wyników.`;
+      trialInfo.textContent = `${t('test.test_finished')} ${results.length} ${t('test.results_count')}.`;
       updateResultsUI();
       updateFloatingButton();
       
@@ -2473,7 +2473,7 @@ function stopTest(){
   if (!ongoingTest) return;
   ongoingTest.running = false;
   try { video.pause(); } catch(_){}
-  trialInfo.textContent = 'Test zatrzymany.';
+  trialInfo.textContent = t('test.test_stopped');
   updateFloatingButton();
   
   // Exit fullscreen test mode when test is stopped
@@ -2483,12 +2483,12 @@ function stopTest(){
 function classifyReaction(ms){
   const m = Math.round(ms);
   // m < 0 → PRZED zdarzeniem = przewidywanie
-  if (m < 0) return { label: 'Przewidziałeś', valid: false, color: 'danger' };
-  if (m < 120) return { label: 'Przewidziałeś', valid: false, color: 'danger' };
-  if (m <= 170) return { label: 'Rewelacja', valid: true, color: 'gold' };
-  if (m <= 240) return { label: 'Bardzo dobrze', valid: true, color: 'green' };
-  if (m <= 270) return { label: 'Dobrze', valid: true, color: 'orange' };
-  return { label: 'Do poprawy', valid: true, color: 'muted' };
+  if (m < 0) return { label: t('ratings.predicted'), valid: false, color: 'danger' };
+  if (m < 120) return { label: t('ratings.predicted'), valid: false, color: 'danger' };
+  if (m <= 170) return { label: t('ratings.excellent'), valid: true, color: 'gold' };
+  if (m <= 240) return { label: t('ratings.very_good'), valid: true, color: 'green' };
+  if (m <= 270) return { label: t('ratings.good'), valid: true, color: 'orange' };
+  return { label: t('ratings.needs_work'), valid: true, color: 'muted' };
 }
 
 /* RESULTS UI + STATYSTYKI + WYNIK KOŃCOWY + WYKRES GAUSSA */
@@ -2548,14 +2548,14 @@ function updateResultsUI(){
   if (validResults.length < 3) {
     statsDiv.innerHTML = `
       <div class="stats-panel stats-panel-warning">
-        <div class="stats-panel-title">Za mało prób do oceny wyniku</div>
+        <div class="stats-panel-title">${t('results.not_enough_trials')}</div>
         <div>
-          Prób ogółem: <b>${totalTrials}</b><br/>
-          Przewidzianych (za wcześnie): <b>${predictedCount}</b>
+          ${t('results.trials_total')}: <b>${totalTrials}</b><br/>
+          ${t('results.predicted_early')}: <b>${predictedCount}</b>
         </div>
       </div>
     `;
-    drawEmptyGauss('Za mało danych do krzywej (min. 3 ważne próby).');
+    drawEmptyGauss(t('chart.empty_msg'));
     return;
   }
 
@@ -2571,16 +2571,16 @@ function updateResultsUI(){
   let consistencyColor = '';
 
   if (stdDev < 15) {
-    consistencyLabel = 'ELITARNA POWTARZALNOŚĆ';
+    consistencyLabel = t('ratings.elite_consistency');
     consistencyColor = '#0b8a3e';
   } else if (stdDev < 30) {
-    consistencyLabel = 'BARDZO DOBRA POWTARZALNOŚĆ';
+    consistencyLabel = t('ratings.very_good_consistency');
     consistencyColor = '#2e7d32';
   } else if (stdDev < 50) {
-    consistencyLabel = 'PRZECIĘTNA POWTARZALNOŚĆ';
+    consistencyLabel = t('ratings.average_consistency');
     consistencyColor = '#d06b00';
   } else {
-    consistencyLabel = 'NISKA POWTARZALNOŚĆ';
+    consistencyLabel = t('ratings.low_consistency');
     consistencyColor = '#b00020';
   }
 
@@ -2598,16 +2598,16 @@ function updateResultsUI(){
   let finalColor = '';
 
   if (finalScore >= 90) {
-    finalLabel = 'MISTRZ REAKCJI (bez przewidywania)';
+    finalLabel = t('ratings.master');
     finalColor = '#0b8a3e';
   } else if (finalScore >= 75) {
-    finalLabel = 'Bardzo dobry wynik';
+    finalLabel = t('ratings.very_good_score');
     finalColor = '#2e7d32';
   } else if (finalScore >= 60) {
-    finalLabel = 'Nie najgorzej';
+    finalLabel = t('ratings.not_bad');
     finalColor = '#d06b00';
   } else {
-    finalLabel = 'Słabo Ci to idzie';
+    finalLabel = t('ratings.poor');
     finalColor = '#b00020';
   }
 
@@ -2615,37 +2615,37 @@ function updateResultsUI(){
     <div class="stats-shell">
       <div class="stats-score">
         <div class="stats-score-main">
-          <div class="stats-score-label">Ostateczny wynik</div>
+          <div class="stats-score-label">${t('results.final_score')}</div>
           <div class="stats-score-value" style="color:${finalColor}">${finalScore}</div>
           <div class="stats-score-desc" style="color:${finalColor}">${finalLabel}</div>
         </div>
         <div class="stats-score-meta">
-          Próby ważne: <b>${validResults.length}</b> / ${totalTrials}<br/>
-          Przewidzianych: <b>${predictedCount}</b> (${Math.round(predictedRatio*100)}%)
+          ${t('results.valid_trials')}: <b>${validResults.length}</b> / ${totalTrials}<br/>
+          ${t('results.predicted')}: <b>${predictedCount}</b> (${Math.round(predictedRatio*100)}%)
         </div>
       </div>
 
       <div class="stats-grid">
         <div class="stat-tile">
-          <div class="stat-tile-label">Średni czas</div>
+          <div class="stat-tile-label">${t('results.avg_time')}</div>
           <div class="stat-tile-value">${mean.toFixed(1)} ms</div>
         </div>
         <div class="stat-tile">
-          <div class="stat-tile-label">Powtarzalność (SD)</div>
+          <div class="stat-tile-label">${t('results.consistency')}</div>
           <div class="stat-tile-value" style="color:${consistencyColor}">±${stdDev.toFixed(1)} ms</div>
         </div>
         <div class="stat-tile">
-          <div class="stat-tile-label">Min</div>
+          <div class="stat-tile-label">${t('results.min')}</div>
           <div class="stat-tile-value">${min.toFixed(1)} ms</div>
         </div>
         <div class="stat-tile">
-          <div class="stat-tile-label">Max</div>
+          <div class="stat-tile-label">${t('results.max')}</div>
           <div class="stat-tile-value">${max.toFixed(1)} ms</div>
         </div>
       </div>
 
       <div class="stats-footer">
-        Im wyższy wynik i niższe SD przy zerowym przewidywaniu, tym lepsza kontrola reakcji.
+        ${t('results.stats_footer')}
       </div>
     </div>
   `;
@@ -2682,14 +2682,14 @@ function drawEmptyGauss(msg){
   ctx.font = '600 13px Inter, system-ui, sans-serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText('Brak danych', W/2, H/2 - 10);
+  ctx.fillText(t('chart.no_data'), W/2, H/2 - 10);
   
   if (msg){
     ctx.font = '500 11px Inter, system-ui, sans-serif';
     ctx.fillStyle = '#cbd5e1';
     ctx.fillText(msg, W/2, H/2 + 12);
   }
-  gaussInfo.textContent = msg || 'Wykres pojawi się po zakończeniu testu (min. 3 ważne próby).';
+  gaussInfo.textContent = msg || t('chart.empty_msg');
 }
 
 function drawGaussCurve(samples, mean, stdDev){
@@ -2745,9 +2745,9 @@ function drawGaussCurve(samples, mean, stdDev){
     ctx.fillText(`${mean.toFixed(1)} ms`, x, paddingTop + 16);
     ctx.font = '500 10px Inter, system-ui, sans-serif';
     ctx.fillStyle = '#64748b';
-    ctx.fillText('(idealnie powtarzalnie)', x, paddingTop + 30);
+    ctx.fillText(t('chart.ideal'), x, paddingTop + 30);
 
-    gaussInfo.textContent = `Średnia: ${mean.toFixed(1)} ms • SD ≈ 0 ms — prawie idealna powtarzalność.`;
+    gaussInfo.textContent = `${t('chart.mean')}: ${mean.toFixed(1)} ms • SD ≈ 0 ms`;
     return;
   }
 
@@ -2946,12 +2946,12 @@ function drawGaussCurve(samples, mean, stdDev){
     ctx.stroke();
   });
 
-  gaussInfo.textContent = `Średnia: ${mean.toFixed(1)} ms • SD: ±${stdDev.toFixed(1)} ms — im węższa krzywa, tym lepsza powtarzalność.`;
+  gaussInfo.textContent = `${t('chart.mean')}: ${mean.toFixed(1)} ms • SD: ±${stdDev.toFixed(1)} ms — ${t('chart.chart_footer')}`;
 }
 
 /* EXPORT CSV */
 exportCsvBtn.addEventListener('click', ()=>{
-  if (results.length === 0) { showToast('Brak wyników do eksportu', 'warning'); forceLayoutRecalc(); return; }
+  if (results.length === 0) { showToast(t('toast.no_results_export'), 'warning'); forceLayoutRecalc(); return; }
   const lines = [['trial','iso','ms','note','video']];
   results.forEach(r => lines.push([r.trial, r.iso, r.ms, r.note, r.videoName || '']));
   const csv = lines.map(l=>l.map(cell=> `"${String(cell).replace(/"/g,'""')}"`).join(',')).join('\n');
@@ -3040,42 +3040,42 @@ fullscreenOverlay.id = 'fullscreenOverlay';
 fullscreenOverlay.tabIndex = -1; // Allow focus for keyboard events
 fullscreenOverlay.innerHTML = `
   <div class="fs-video-container" id="fsVideoContainer"></div>
-  <div class="fs-trial-info" id="fsTrialInfo">Przygotuj się...</div>
+  <div class="fs-trial-info" id="fsTrialInfo">${t('test.prepare')}</div>
   <div class="fs-result-bubble" id="fsResultBubble">
     <div class="fs-result-ms" id="fsResultMs">0 ms</div>
     <div class="fs-result-rating" id="fsResultRating">—</div>
   </div>
   <div class="fs-summary-bubble" id="fsSummaryBubble">
-    <div class="fs-summary-title">Podsumowanie testu</div>
+    <div class="fs-summary-title">${t('fullscreen.summary_title')}</div>
     <div class="fs-summary-score">
-      <span class="fs-summary-score-label">Punkty:</span>
+      <span class="fs-summary-score-label">${t('fullscreen.score_label')}</span>
       <span class="fs-summary-score-value" id="fsSummaryScore">0</span>
     </div>
     <div class="fs-summary-label" id="fsSummaryLabel">—</div>
     <div class="fs-summary-stats">
       <div class="fs-summary-stat">
-        <span class="fs-summary-stat-label">Średni czas:</span>
+        <span class="fs-summary-stat-label">${t('fullscreen.mean_label')}</span>
         <span class="fs-summary-stat-value" id="fsSummaryMean">— ms</span>
       </div>
       <div class="fs-summary-stat">
-        <span class="fs-summary-stat-label">Powtarzalność (SD):</span>
+        <span class="fs-summary-stat-label">${t('fullscreen.sd_label')}</span>
         <span class="fs-summary-stat-value" id="fsSummarySD">— ms</span>
       </div>
       <div class="fs-summary-stat">
-        <span class="fs-summary-stat-label">Ważne próby:</span>
+        <span class="fs-summary-stat-label">${t('fullscreen.valid_label')}</span>
         <span class="fs-summary-stat-value" id="fsSummaryValid">0 / 0</span>
       </div>
     </div>
     <div class="fs-summary-buttons">
-      <button class="fs-summary-btn fs-summary-btn-primary" id="fsSummaryAgain" tabindex="-1">Jeszcze raz</button>
-      <button class="fs-summary-btn fs-summary-btn-secondary" id="fsSummaryExit" tabindex="-1">Zakończ</button>
+      <button class="fs-summary-btn fs-summary-btn-primary" id="fsSummaryAgain" tabindex="-1">${t('fullscreen.again')}</button>
+      <button class="fs-summary-btn fs-summary-btn-secondary" id="fsSummaryExit" tabindex="-1">${t('fullscreen.exit')}</button>
     </div>
   </div>
   <div class="fs-buttons-row">
-    <button class="fs-react-btn" id="fsReactBtn" tabindex="-1">Reaguj (Space)</button>
+    <button class="fs-react-btn" id="fsReactBtn" tabindex="-1">${t('test.react_btn')}</button>
     <button class="fs-stop-btn" id="fsStopBtn" tabindex="-1">
       <svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
-      Stop
+      ${t('test.stop')}
     </button>
   </div>
 `;
@@ -3870,7 +3870,7 @@ function showTestSummary() {
     // Not enough data, show simplified summary
     showSummaryBubble(
       '?',
-      'Za mało ważnych prób',
+      t('fullscreen.not_enough'),
       '#888',
       0,
       0,
@@ -3904,16 +3904,16 @@ function showTestSummary() {
   let finalLabel = '';
   let finalColor = '';
   if (finalScore >= 90) {
-    finalLabel = 'MISTRZ REAKCJI!';
+    finalLabel = t('ratings.master');
     finalColor = '#0b8a3e';
   } else if (finalScore >= 75) {
-    finalLabel = 'Bardzo dobry wynik';
+    finalLabel = t('ratings.very_good_score');
     finalColor = '#2e7d32';
   } else if (finalScore >= 60) {
-    finalLabel = 'Nie najgorzej';
+    finalLabel = t('ratings.not_bad');
     finalColor = '#d06b00';
   } else {
-    finalLabel = 'Słabo Ci to idzie';
+    finalLabel = t('ratings.poor');
     finalColor = '#b00020';
   }
   
@@ -4098,23 +4098,23 @@ function saveTrainingPlansToStorage(plans) {
     localStorage.setItem(TRAINING_PLANS_KEY, JSON.stringify(plans));
   } catch (e) {
     console.error('Error saving training plans:', e);
-    showToast('Nie udało się zapisać treningów. Sprawdź dostępne miejsce w przeglądarce.', 'error');
+    showToast(t('toast.save_error'), 'error');
   }
 }
 
 // Save current training
 async function saveCurrentTraining() {
   if (videoEntries.length === 0) {
-    showToast('Brak filmów do zapisania. Dodaj co najmniej jeden film.', 'warning');
+    showToast(t('toast.no_videos_to_save'), 'warning');
     return;
   }
   
-  const planName = await showPrompt('Podaj nazwę treningu:', `Trening ${new Date().toLocaleDateString('pl-PL')}`);
+  const planName = await showPrompt(t('training.save_name_prompt'), `${t('training.save_default_name')} ${new Date().toLocaleDateString('pl-PL')}`);
   if (!planName) return;
   
   // Show saving indicator
   saveTrainingBtn.disabled = true;
-  saveTrainingBtn.textContent = 'Zapisywanie...';
+  saveTrainingBtn.textContent = t('training.saving');
   
   try {
     const planId = Date.now();
@@ -4139,9 +4139,9 @@ async function saveCurrentTraining() {
           videoData.src = null; // Don't store blob URL
         } catch (err) {
           console.error('Error saving local video:', err);
-          showToast(`Błąd podczas zapisywania filmu "${v.name}". Film może być zbyt duży.`, 'error');
+          showToast(t('toast.video_too_large'), 'error');
           saveTrainingBtn.disabled = false;
-          saveTrainingBtn.textContent = 'Zapisz obecny trening';
+          saveTrainingBtn.textContent = t('training.save_current');
           return;
         }
       } else {
@@ -4165,13 +4165,13 @@ async function saveCurrentTraining() {
     saveTrainingPlansToStorage(plans);
     refreshTrainingPlansList();
     
-    showToast(`Trening "${planName}" został zapisany z ${videosToSave.length} filmami.`, 'success');
+    showToast(`${t('training.saved_msg')} "${planName}" ${t('training.with_videos')} ${videosToSave.length}.`, 'success');
   } catch (err) {
     console.error('Error saving training:', err);
-    showToast('Wystąpił błąd podczas zapisywania treningu.', 'error');
+    showToast(t('toast.save_training_error'), 'error');
   } finally {
     saveTrainingBtn.disabled = false;
-    saveTrainingBtn.textContent = 'Zapisz obecny trening';
+    saveTrainingBtn.textContent = t('training.save_current');
   }
 }
 
@@ -4180,7 +4180,7 @@ async function loadTrainingPlan(planId) {
   const plans = getSavedTrainingPlans();
   const plan = plans.find(p => p.id === planId);
   if (!plan) {
-    showToast('Nie znaleziono treningu.', 'error');
+    showToast(t('toast.training_not_found'), 'error');
     return;
   }
   
@@ -4188,14 +4188,14 @@ async function loadTrainingPlan(planId) {
   const hasExisting = videoEntries.length > 0;
   let shouldReplace = true;
   if (hasExisting) {
-    shouldReplace = await showConfirm('Czy chcesz zastąpić obecne filmy?', 'Zastąp', 'Dodaj do obecnych');
+    shouldReplace = await showConfirm(t('training.replace_confirm'), t('training.replace'), t('training.add_to_current'));
   }
   
   // Show loading indicator
   const loadBtn = document.querySelector(`[onclick="loadTrainingPlan(${planId})"]`);
   if (loadBtn) {
     loadBtn.disabled = true;
-    loadBtn.textContent = 'Ładowanie...';
+    loadBtn.textContent = t('training.loading');
   }
   
   try {
@@ -4222,7 +4222,7 @@ async function loadTrainingPlan(planId) {
             src = URL.createObjectURL(videoData.blob);
           } else {
             console.warn('Video not found in IndexedDB:', v.videoId);
-            showToast(`Film "${v.name}" nie został znaleziony w pamięci. Możliwe, że dane zostały usunięte.`, 'warning');
+            showToast(t('toast.video_not_found'), 'warning');
             continue;
           }
         } catch (err) {
@@ -4248,14 +4248,14 @@ async function loadTrainingPlan(planId) {
       refreshVideoList();
     }
     
-    showToast(`Wczytano trening "${plan.name}" z ${plan.videos.length} filmami.`, 'success');
+    showToast(`${t('training.loaded_msg')} "${plan.name}" ${t('training.with_videos')} ${plan.videos.length}.`, 'success');
   } catch (err) {
     console.error('Error loading training:', err);
-    showToast('Wystąpił błąd podczas wczytywania treningu.', 'error');
+    showToast(t('toast.load_error'), 'error');
   } finally {
     if (loadBtn) {
       loadBtn.disabled = false;
-      loadBtn.textContent = 'Wczytaj';
+      loadBtn.textContent = t('training.load');
     }
   }
 }
@@ -4266,7 +4266,7 @@ async function deleteTrainingPlan(planId) {
   const plan = plans.find(p => p.id === planId);
   if (!plan) return;
   
-  const confirmed = await showConfirm(`Czy na pewno chcesz usunąć trening "${plan.name}"?`, 'Usuń', 'Anuluj');
+  const confirmed = await showConfirm(`${t('training.delete_confirm')} "${plan.name}"?`, t('training.delete'), t('common.cancel'));
   if (!confirmed) return;
   
   // Delete associated videos from IndexedDB
@@ -4290,7 +4290,7 @@ function refreshTrainingPlansList() {
   const plans = getSavedTrainingPlans();
   
   if (plans.length === 0) {
-    trainingPlansList.innerHTML = '<div class="no-plans-message">Brak zapisanych treningów. Dodaj filmy, ustaw zdarzenia i kliknij "Zapisz".</div>';
+    trainingPlansList.innerHTML = `<div class="no-plans-message">${t('training.no_plans')}</div>`;
     return;
   }
   
@@ -4309,22 +4309,22 @@ function refreshTrainingPlansList() {
     
     let typeInfo = '';
     if (localCount > 0 && urlCount > 0) {
-      typeInfo = ` (${localCount} lok., ${urlCount} URL)`;
+      typeInfo = ` (${localCount} ${t('training.local')}, ${urlCount} ${t('training.url')})`;
     } else if (localCount > 0) {
-      typeInfo = ' (lokalne)';
+      typeInfo = ` (${t('training.local')})`;
     } else if (urlCount > 0) {
-      typeInfo = ' (URL)';
+      typeInfo = ` (${t('training.url')})`;
     }
     
     return `
       <div class="training-plan-item" data-plan-id="${plan.id}">
         <div class="training-plan-info">
           <div class="training-plan-name">${escapeHtml(plan.name)}</div>
-          <div class="training-plan-meta">${videoCount} film(ów)${typeInfo}, ${eventsCount} zdarzeń • ${date}</div>
+          <div class="training-plan-meta">${videoCount} ${t('training.videos')}${typeInfo}, ${eventsCount} ${t('training.events')} • ${date}</div>
         </div>
         <div class="training-plan-actions">
-          <button class="btn btn-accent" onclick="loadTrainingPlan(${plan.id})">Wczytaj</button>
-          <button class="btn btn-ghost" onclick="deleteTrainingPlan(${plan.id})">Usuń</button>
+          <button class="btn btn-accent" onclick="loadTrainingPlan(${plan.id})">${t('training.load')}</button>
+          <button class="btn btn-ghost" onclick="deleteTrainingPlan(${plan.id})">${t('training.delete')}</button>
         </div>
       </div>
     `;
@@ -4383,7 +4383,7 @@ const exampleTrainingsData = {
 
 function refreshExampleTrainingsList() {
   if (!exampleTrainingsData || !exampleTrainingsData.exampleTrainings || exampleTrainingsData.exampleTrainings.length === 0) {
-    exampleTrainingsList.innerHTML = '<div class="example-loading-message">Brak przykładowych treningów.</div>';
+    exampleTrainingsList.innerHTML = `<div class="example-loading-message">${t('examples.none')}</div>`;
     return;
   }
 
@@ -4399,7 +4399,7 @@ function refreshExampleTrainingsList() {
           <div class="example-training-meta">${videoCount} film(ów), ${eventsCount} zdarzeń${description ? ' • ' + escapeHtml(description) : ''}</div>
         </div>
         <div class="example-training-actions">
-          <button class="btn btn-accent" onclick="loadExampleTraining(${index})">Wczytaj</button>
+          <button class="btn btn-accent" onclick="loadExampleTraining(${index})">${t('training.load')}</button>
         </div>
       </div>
     `;
@@ -4408,7 +4408,7 @@ function refreshExampleTrainingsList() {
 
 async function loadExampleTraining(index) {
   if (!exampleTrainingsData || !exampleTrainingsData.exampleTrainings[index]) {
-    showToast('Nie znaleziono przykładowego treningu.', 'error');
+    showToast(t('toast.example_not_found'), 'error');
     return;
   }
 
@@ -4418,14 +4418,14 @@ async function loadExampleTraining(index) {
   const hasExisting = videoEntries.length > 0;
   let shouldReplace = true;
   if (hasExisting) {
-    shouldReplace = await showConfirm('Czy chcesz zastąpić obecne filmy?', 'Zastąp', 'Dodaj do obecnych');
+    shouldReplace = await showConfirm(t('training.replace_confirm'), t('training.replace'), t('training.add_to_current'));
   }
 
   // Show loading indicator
   const loadBtn = document.querySelector(`[onclick="loadExampleTraining(${index})"]`);
   if (loadBtn) {
     loadBtn.disabled = true;
-    loadBtn.textContent = 'Ładowanie...';
+    loadBtn.textContent = t('training.loading');
   }
 
   try {
@@ -4459,14 +4459,14 @@ async function loadExampleTraining(index) {
       refreshVideoList();
     }
 
-    showToast(`Wczytano przykładowy trening "${training.name}" z ${training.videos.length} filmami.`, 'success');
+    showToast(`${t('examples.loaded_msg')} "${training.name}" ${t('training.with_videos')} ${training.videos.length}.`, 'success');
   } catch (err) {
     console.error('Error loading example training:', err);
-    showToast('Wystąpił błąd podczas wczytywania przykładowego treningu.', 'error');
+    showToast(t('toast.load_error'), 'error');
   } finally {
     if (loadBtn) {
       loadBtn.disabled = false;
-      loadBtn.textContent = 'Wczytaj';
+      loadBtn.textContent = t('training.load');
     }
   }
 }
