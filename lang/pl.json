@@ -41,7 +41,8 @@
     "event_set": "Zdarzenie ustawione",
     "event_desc_prompt": "Opis zdarzenia (opcjonalnie):",
     "event_desc_title": "Opisz zdarzenie",
-    "zoom": "Zoom"
+    "zoom": "Zoom",
+    "fullscreen_preview": "Pełny ekran z kontrolkami"
   },
   
   "test": {
@@ -59,7 +60,8 @@
     "react": "Reaguj!",
     "react_btn": "Reaguj (Space)",
     "prepare": "Przygotuj się...",
-    "video_label": "wideo"
+    "video_label": "wideo",
+    "random_before": "losowo przed zdarzeniem"
   },
   
   "results": {
@@ -201,6 +203,7 @@
     "cancel": "Anuluj",
     "confirm": "Potwierdź",
     "close": "Zamknij",
-    "clear": "Wyczyść"
+    "clear": "Wyczyść",
+    "enter_value": "Wprowadź wartość"
   }
 }
