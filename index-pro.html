@@ -1260,7 +1260,7 @@
         </div>
       </div>
       <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
-        <span class="version-badge" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff">PRO</span>
+        <span class="version-badge" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff">PRO v4.01</span>
       </div>
     </header>
 
@@ -1458,6 +1458,37 @@ const PRO_CONFIG = {
   FACEBOOK_APP_ID: '1450344913471254'
 };
 
+// Lista dozwolonych użytkowników (ładowana z config.json)
+let allowedUserHashes = [];
+
+// Ładowanie konfiguracji z zewnętrznego pliku
+async function loadConfig() {
+  try {
+    const response = await fetch('./config.json?' + Date.now()); // cache-bust
+    if (!response.ok) throw new Error('Config not found');
+    const config = await response.json();
+    allowedUserHashes = config.allowedUserHashes || [];
+    return true;
+  } catch (e) {
+    console.error('Błąd ładowania config.json:', e);
+    return false;
+  }
+}
+
+// Funkcja hashująca SHA-256 (async)
+async function sha256(message) {
+  const msgBuffer = new TextEncoder().encode(message + '_flyball_pro_salt_2024');
+  const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+// Weryfikacja czy użytkownik jest na whitelist
+async function isUserAllowed(facebookUserId) {
+  const userHash = await sha256(facebookUserId);
+  return allowedUserHashes.includes(userHash);
+}
+
 // Security check - block local file access and unauthorized domains
 function checkSecurity() {
   const protocol = window.location.protocol;
@@ -1497,8 +1528,20 @@ window.fbAsyncInit = function() {
 function loginWithFacebook() {
   FB.login(function(response) {
     if (response.authResponse) {
-      FB.api('/me', {fields: 'name,picture'}, function(userData) {
+      FB.api('/me', {fields: 'id,name,picture'}, async function(userData) {
+        // Sprawdź czy użytkownik jest na liście dozwolonych
+        const allowed = await isUserAllowed(userData.id);
+        
+        if (!allowed) {
+          // Użytkownik nie ma uprawnień
+          showAccessDenied(userData.name, userData.id);
+          // Wyloguj z Facebooka
+          FB.logout();
+          return;
+        }
+        
         currentUser = {
+          id: userData.id,
           name: userData.name,
           picture: userData.picture?.data?.url || '',
           provider: 'Facebook',
@@ -1508,6 +1551,31 @@ function loginWithFacebook() {
       });
     }
   }, {scope: 'public_profile'});
+}
+
+// Pokazuje ekran "brak uprawnień"
+function showAccessDenied(userName, odzyskajHash) {
+  const loginScreen = document.getElementById('login-screen');
+  loginScreen.innerHTML = `
+    <div class="login-card" style="border: 2px solid #ef4444;">
+      <div style="width:60px;height:60px;margin:0 auto 20px;background:rgba(239,68,68,0.1);border-radius:50%;display:flex;align-items:center;justify-content:center;">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+      </div>
+      <h2 class="login-title" style="color:#ef4444">Brak uprawnień</h2>
+      <p class="login-subtitle" style="margin-bottom:20px">
+        Witaj <strong>${userName}</strong>!<br><br>
+        Twoje konto Facebook nie ma dostępu do wersji PRO.<br>
+        Skontaktuj się z administratorem, aby uzyskać dostęp.
+      </p>
+      <button class="social-btn" onclick="location.reload()" style="border-color:#ef4444;color:#ef4444">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path><path d="M21 3v5h-5"></path><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path><path d="M8 16H3v5"></path></svg>
+        Spróbuj ponownie
+      </button>
+      <p class="login-footer" style="margin-top:20px;font-size:11px;color:#94a3b8">
+        Kod dostępu: <code style="background:#f1f5f9;padding:2px 6px;border-radius:4px;font-family:monospace">${btoa(odzyskajHash).substring(0,12)}...</code>
+      </p>
+    </div>
+  `;
 }
 
 // On successful login
@@ -1553,11 +1621,20 @@ function proLogout() {
 }
 
 // Check for existing session
-function checkExistingSession() {
+async function checkExistingSession() {
   const saved = sessionStorage.getItem('flyball_pro_user');
   if (saved) {
     try {
-      currentUser = JSON.parse(saved);
+      const userData = JSON.parse(saved);
+      // Weryfikuj czy użytkownik nadal jest na liście
+      if (userData.id) {
+        const allowed = await isUserAllowed(userData.id);
+        if (!allowed) {
+          sessionStorage.removeItem('flyball_pro_user');
+          return false;
+        }
+      }
+      currentUser = userData;
       onLoginSuccess();
       return true;
     } catch(e) {
@@ -1568,9 +1645,12 @@ function checkExistingSession() {
 }
 
 // Initialize PRO version on DOMContentLoaded
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   // Security check first
   if (!checkSecurity()) return;
+  
+  // Load config with allowed users
+  await loadConfig();
   
   // Hide floating button initially
   const floatingBtn = document.getElementById('floatingStartBtn');
