@@ -267,10 +267,10 @@ window.fbAsyncInit = function() {
 function loginWithFacebook() {
   FB.login(function(response) {
     if (response.authResponse) {
-      FB.api('/me', {fields: 'name,email,picture'}, function(userData) {
+      FB.api('/me', {fields: 'name,picture'}, function(userData) {
         currentUser = {
           name: userData.name,
-          email: userData.email || 'Brak dostępu do email',
+          email: 'Facebook User',
           picture: userData.picture?.data?.url || '',
           provider: 'Facebook',
           token: response.authResponse.accessToken
@@ -278,7 +278,7 @@ function loginWithFacebook() {
         onLoginSuccess();
       });
     }
-  }, {scope: 'public_profile,email'});
+  }, {scope: 'public_profile'});
 }
 
 // On successful login
