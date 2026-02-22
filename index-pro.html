@@ -4,120 +4,1221 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" />
 <title>Flyball Reaction PRO - Unleashed Flyball Team</title>
-<meta name="description" content="PRO version - Web-based reaction time tester for Unleashed Flyball Team" />
+
+<!-- PWA Meta Tags -->
+<meta name="description" content="PRO version - Web-based reaction time tester synchronized with real video triggers for Unleashed Flyball Team" />
 <meta name="theme-color" content="#00AEEB" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="apple-mobile-web-app-title" content="Flyball PRO" />
 <link rel="apple-touch-icon" href="logo.png" />
+<link rel="manifest" href="manifest.json" />
 
 <!-- Facebook SDK -->
 <script async defer crossorigin="anonymous" src="https://connect.facebook.net/pl_PL/sdk.js"></script>
 
 <style>
-:root{--bg:#f0f4f8;--card:#fff;--accent:#0ea5e9;--accent-dark:#0284c7;--success:#10b981;--danger:#ef4444;--dark:#1e293b;--mid:#64748b;--light:#94a3b8;--border:#e2e8f0;--radius:16px;--radius-sm:10px;--shadow:0 4px 6px -1px rgba(15,23,42,0.05);--shadow-lg:0 20px 25px -5px rgba(15,23,42,0.1)}
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--dark);font-size:14px}
+  :root{
+    --bg: #f0f4f8;
+    --bg-subtle: #e8eef4;
+    --card: #FFFFFF;
+    --card-hover: #fafbfc;
+    --primary: #fbbf24;
+    --primary-dark: #d97706;
+    --accent: #0ea5e9;
+    --accent-light: #38bdf8;
+    --accent-dark: #0284c7;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --dark: #1e293b;
+    --mid: #64748b;
+    --light: #94a3b8;
+    --border: #e2e8f0;
+    --border-light: #f1f5f9;
+    --radius: 16px;
+    --radius-sm: 10px;
+    --radius-xs: 6px;
+    --gap: 16px;
+    --shadow-sm: 0 1px 2px rgba(15,23,42,0.04);
+    --shadow: 0 4px 6px -1px rgba(15,23,42,0.05), 0 2px 4px -2px rgba(15,23,42,0.05);
+    --shadow-md: 0 10px 15px -3px rgba(15,23,42,0.08), 0 4px 6px -4px rgba(15,23,42,0.05);
+    --shadow-lg: 0 20px 25px -5px rgba(15,23,42,0.1), 0 8px 10px -6px rgba(15,23,42,0.08);
+    --max-width: 1140px;
+    --tx: 0px;
+    --ty: 0px;
+    --scale: 1;
+    --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
 
-/* Security Block Screen */
-#security-block{position:fixed;inset:0;background:linear-gradient(135deg,#1e293b 0%,#0f172a 100%);z-index:99999;display:flex;align-items:center;justify-content:center;flex-direction:column;color:#fff;text-align:center;padding:40px}
-#security-block h1{font-size:28px;margin-bottom:16px;color:#ef4444}
-#security-block p{font-size:16px;color:#94a3b8;max-width:400px;line-height:1.6}
-#security-block.hidden{display:none}
+  /* ========== PRO VERSION: Security & Authentication Styles ========== */
+  #security-block{position:fixed;inset:0;background:linear-gradient(135deg,#1e293b 0%,#0f172a 100%);z-index:99999;display:flex;align-items:center;justify-content:center;flex-direction:column;color:#fff;text-align:center;padding:40px}
+  #security-block h1{font-size:28px;margin-bottom:16px;color:#ef4444}
+  #security-block p{font-size:16px;color:#94a3b8;max-width:400px;line-height:1.6}
+  #security-block.hidden{display:none}
 
-/* Login Screen */
-#login-screen{position:fixed;inset:0;background:linear-gradient(135deg,#0ea5e9 0%,#0284c7 50%,#0369a1 100%);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px}
-#login-screen.hidden{display:none}
-.login-card{background:#fff;border-radius:24px;padding:48px 40px;max-width:420px;width:100%;text-align:center;box-shadow:0 25px 50px -12px rgba(0,0,0,0.25)}
-.login-logo{width:80px;height:80px;margin:0 auto 24px;border-radius:16px}
-.login-title{font-size:24px;font-weight:700;color:var(--dark);margin-bottom:8px}
-.login-subtitle{font-size:14px;color:var(--mid);margin-bottom:32px}
-.login-pro-badge{display:inline-block;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;margin-bottom:24px}
-.login-divider{display:flex;align-items:center;gap:16px;margin:24px 0;color:var(--light);font-size:13px}
-.login-divider::before,.login-divider::after{content:'';flex:1;height:1px;background:var(--border)}
-.social-btn{width:100%;padding:14px 24px;border:2px solid var(--border);border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:12px;transition:all 0.2s;background:#fff;margin-bottom:12px}
-.social-btn:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,0.1)}
-.social-btn.facebook{color:#1877f2}
-.social-btn.facebook:hover{background:#1877f2;color:#fff;border-color:#1877f2}
-.social-btn svg{width:20px;height:20px}
-.login-footer{margin-top:24px;font-size:12px;color:var(--light)}
+  #login-screen{position:fixed;inset:0;background:linear-gradient(135deg,#0ea5e9 0%,#0284c7 50%,#0369a1 100%);z-index:9998;display:flex;align-items:center;justify-content:center;padding:20px}
+  #login-screen.hidden{display:none}
+  .login-card{background:#fff;border-radius:24px;padding:48px 40px;max-width:420px;width:100%;text-align:center;box-shadow:0 25px 50px -12px rgba(0,0,0,0.25)}
+  .login-logo{width:80px;height:80px;margin:0 auto 24px;border-radius:16px}
+  .login-title{font-size:24px;font-weight:700;color:var(--dark);margin-bottom:8px}
+  .login-subtitle{font-size:14px;color:var(--mid);margin-bottom:32px}
+  .login-pro-badge{display:inline-block;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;margin-bottom:24px}
+  .social-btn{width:100%;padding:14px 24px;border:2px solid var(--border);border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:12px;transition:all 0.2s;background:#fff;margin-bottom:12px}
+  .social-btn:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,0.1)}
+  .social-btn.facebook{color:#1877f2}
+  .social-btn.facebook:hover{background:#1877f2;color:#fff;border-color:#1877f2}
+  .login-footer{margin-top:24px;font-size:12px;color:var(--light)}
 
-/* User Bar */
-#user-bar{background:linear-gradient(135deg,#1e293b 0%,#334155 100%);color:#fff;padding:12px 20px;padding-top:calc(12px + env(safe-area-inset-top,0px));display:flex;align-items:center;justify-content:space-between;gap:16px;position:sticky;top:0;z-index:1000}
-#user-bar.hidden{display:none}
-.user-info{display:flex;align-items:center;gap:12px}
-.user-avatar{width:36px;height:36px;border-radius:50%;border:2px solid rgba(255,255,255,0.3);object-fit:cover}
-.user-name{font-weight:600;font-size:14px}
-.user-email{font-size:12px;color:#94a3b8}
-.user-provider{font-size:11px;padding:2px 8px;border-radius:10px;background:rgba(255,255,255,0.15);margin-left:8px}
-.logout-btn{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:#fff;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s}
-.logout-btn:hover{background:rgba(239,68,68,0.8);border-color:transparent}
+  #user-bar{background:linear-gradient(135deg,#1e293b 0%,#334155 100%);color:#fff;padding:12px 20px;padding-top:calc(12px + env(safe-area-inset-top,0px));display:flex;align-items:center;justify-content:space-between;gap:16px;position:sticky;top:0;z-index:1000}
+  #user-bar.hidden{display:none}
+  .user-info{display:flex;align-items:center;gap:12px}
+  .user-avatar{width:36px;height:36px;border-radius:50%;border:2px solid rgba(255,255,255,0.3);object-fit:cover}
+  .user-name{font-weight:600;font-size:14px}
+  .user-provider{font-size:11px;padding:2px 8px;border-radius:10px;background:rgba(255,255,255,0.15);margin-left:8px}
+  .logout-btn{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:#fff;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s}
+  .logout-btn:hover{background:rgba(239,68,68,0.8);border-color:transparent}
 
-/* Main App Container */
-#app-container{display:none}
-#app-container.active{display:block}
+  #app-container{display:none}
+  #app-container.active{display:block}
+  /* ========== END PRO VERSION STYLES ========== */
 
-/* Simplified styles from main app */
-.wrap{max-width:1140px;margin:0 auto;padding:20px 24px}
-header{display:flex;align-items:center;gap:16px;margin-bottom:20px;padding:16px 20px;background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow)}
-.brand{display:flex;align-items:center;gap:14px}
-.logo img{width:52px;height:52px;border-radius:var(--radius-sm)}
-.brand h1{font-size:17px;font-weight:700;color:var(--dark)}
-.brand h1 span{color:var(--accent)}
-.card{background:var(--card);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);margin-bottom:16px}
-.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
-.card-title{font-size:15px;font-weight:700;color:var(--dark)}
-.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s}
-.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent-dark));color:#fff}
-.btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(14,165,233,0.3)}
-.btn-success{background:linear-gradient(135deg,var(--success),#059669);color:#fff}
-.btn-danger{background:linear-gradient(135deg,var(--danger),#dc2626);color:#fff}
-.video-wrap{position:relative;background:#000;border-radius:var(--radius);overflow:hidden;max-height:50vh}
-video{width:100%;display:block;max-height:50vh;object-fit:contain}
-.controls{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
-input[type="file"],input[type="text"],input[type="number"],select{padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;background:var(--card);width:100%}
-input:focus,select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(14,165,233,0.1)}
-.form-group{margin-bottom:12px}
-.form-group label{display:block;font-size:12px;font-weight:600;color:var(--mid);margin-bottom:6px}
-table{width:100%;border-collapse:collapse;font-size:13px}
-th,td{padding:10px;text-align:left;border-bottom:1px solid var(--border)}
-th{font-weight:600;color:var(--mid);font-size:12px}
-.badge{display:inline-block;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:600}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{height:100%;overflow:hidden}
+  body{
+    height:100%;
+    margin:0;
+    overflow-x:hidden;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    background:var(--bg);
+    font-family:'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color:var(--dark);
+    font-size:14px;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+  }
+  
+  .wrap{
+    max-width:var(--max-width);
+    margin:0 auto;
+    padding:20px 24px;
+    padding-top: calc(20px + env(safe-area-inset-top, 0px));
+    padding-left: calc(24px + env(safe-area-inset-left, 0px));
+    padding-right: calc(24px + env(safe-area-inset-right, 0px));
+    overflow-x:hidden;
+  }
+  
+  /* Header */
+  header{
+    display:flex;
+    align-items:center;
+    gap:16px;
+    margin-bottom:20px;
+    padding:16px 20px;
+    background:var(--card);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+  }
+  .brand{display:flex;align-items:center;gap:14px}
+  .logo img{
+    width:52px;
+    height:52px;
+    border-radius:var(--radius-sm);
+    display:block;
+    object-fit:contain;
+    box-shadow:var(--shadow-sm);
+  }
+  .brand h1{
+    font-size:17px;
+    font-weight:700;
+    margin:0;
+    color:var(--dark);
+    letter-spacing:-0.01em;
+  }
+  .subtitle{
+    color:var(--mid);
+    font-size:13px;
+    margin-top:3px;
+    font-weight:500;
+  }
+  .version-badge{
+    padding:4px 10px;
+    background:var(--bg-subtle);
+    border-radius:var(--radius-xs);
+    font-size:12px;
+    font-weight:600;
+    color:var(--mid);
+  }
 
-/* Toast */
-.toast-container{position:fixed;top:calc(60px + env(safe-area-inset-top));right:20px;z-index:10000;max-width:380px;width:calc(100% - 40px)}
-.toast{background:var(--card);border-radius:var(--radius-sm);box-shadow:var(--shadow-lg);padding:14px 18px;display:flex;align-items:center;gap:12px;margin-bottom:10px;animation:toastIn 0.3s ease}
-@keyframes toastIn{from{opacity:0;transform:translateX(100%)}to{opacity:1;transform:translateX(0)}}
+  /* Grid Layout */
+  .grid{display:grid;grid-template-columns:1fr 380px;gap:20px}
+  @media (max-width:960px){ .grid{grid-template-columns:1fr} }
 
-/* Floating Button */
-.floating-btn{position:fixed;bottom:calc(24px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);z-index:1000;padding:14px 28px;background:linear-gradient(135deg,var(--accent),var(--accent-dark));color:#fff;font-size:16px;font-weight:700;border:none;border-radius:50px;cursor:pointer;box-shadow:0 4px 20px rgba(14,165,233,0.4);display:flex;align-items:center;gap:10px}
-.floating-btn:hover{transform:translateX(-50%) translateY(-2px)}
-.floating-btn.running{background:linear-gradient(135deg,var(--danger),#dc2626)}
-.floating-btn svg{width:20px;height:20px;fill:currentColor}
+  /* Cards */
+  .card{
+    background:var(--card);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:20px;
+    overflow:hidden;
+    max-width:100%;
+    transition:var(--transition);
+  }
+  .card:hover{
+    box-shadow:var(--shadow-md);
+  }
+  .card-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    margin-bottom:16px;
+  }
+  .card-title{
+    font-size:15px;
+    font-weight:700;
+    color:var(--dark);
+    margin-bottom:4px;
+  }
+  .card-subtitle{
+    font-size:12px;
+    color:var(--mid);
+    font-weight:500;
+  }
+  
+  main{overflow:hidden;max-width:100%}
+  
+  /* Video Container */
+  .video-wrap{
+    position:relative;
+    overflow:hidden;
+    border-radius:var(--radius-sm);
+    background:linear-gradient(145deg, #0f172a 0%, #1e293b 100%);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    max-height:58vh;
+    min-height:clamp(260px, 38vh, 380px);
+    touch-action:pan-x pan-y pinch-zoom;
+    width:100%;
+    box-sizing:border-box;
+    box-shadow:inset 0 2px 4px rgba(0,0,0,0.1);
+  }
+  .video-inner {
+    transform-origin:center center;
+    transform:translate(var(--tx), var(--ty)) scale(var(--scale));
+    transition:transform 0.12s linear;
+    will-change:transform;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    max-width:100%;
+    max-height:100%;
+    width:100%;
+    height:100%;
+  }
+  video {
+    display:block;
+    max-width:100%;
+    height:auto;
+    object-fit:contain;
+    max-height:58vh;
+    user-select:none;
+    -webkit-user-drag:none;
+    border-radius:4px;
+  }
+  video:fullscreen,
+  video:-webkit-full-screen {
+    position:fixed !important;
+    top:0 !important;
+    left:0 !important;
+    width:100vw !important;
+    height:100vh !important;
+    max-width:100vw !important;
+    max-height:100vh !important;
+    object-fit:contain !important;
+    transform:none !important;
+    z-index:2147483647 !important;
+  }
+  .video-inner:has(video:-webkit-full-screen),
+  .video-inner:has(video:fullscreen) {
+    transform:none !important;
+  }
 
-/* Responsive */
-@media(max-width:700px){
-  .wrap{padding:12px 16px}
-  header{padding:12px 16px;flex-wrap:wrap}
-  .logo img{width:44px;height:44px}
-  .brand h1{font-size:15px}
-  .video-wrap{max-height:42vh}
-  video{max-height:42vh}
-  .login-card{padding:32px 24px}
-  #user-bar{flex-wrap:wrap;gap:12px}
-  .user-info{flex:1}
-}
+  /* Controls */
+  .controls{
+    display:flex;
+    gap:10px;
+    align-items:center;
+    margin-top:16px;
+    flex-wrap:wrap;
+  }
+  
+  /* Buttons */
+  .btn{
+    padding:10px 16px;
+    border-radius:var(--radius-xs);
+    border:none;
+    cursor:pointer;
+    font-weight:600;
+    font-size:13px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    transition:var(--transition);
+    white-space:nowrap;
+  }
+  .btn:active{transform:scale(0.98)}
+  .btn-primary{
+    background:linear-gradient(135deg, #F4D00C 0%, #D4B00A 100%);
+    color:#1a1a1a;
+    box-shadow:0 2px 4px rgba(244,208,12,0.3);
+  }
+  .btn-primary:hover{
+    box-shadow:0 4px 12px rgba(244,208,12,0.4);
+    transform:translateY(-1px);
+  }
+  .btn-accent{
+    background:linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+    color:white;
+    box-shadow:0 2px 4px rgba(14,165,233,0.3);
+  }
+  .btn-accent:hover{
+    box-shadow:0 4px 12px rgba(14,165,233,0.4);
+    transform:translateY(-1px);
+  }
+  .btn-success{
+    background:linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color:white;
+    box-shadow:0 2px 4px rgba(16,185,129,0.3);
+  }
+  .btn-success:hover{
+    box-shadow:0 4px 12px rgba(16,185,129,0.4);
+    transform:translateY(-1px);
+  }
+  .btn-ghost{
+    background:var(--bg-subtle);
+    border:1px solid var(--border);
+    color:var(--dark);
+  }
+  .btn-ghost:hover{
+    background:var(--border-light);
+    border-color:var(--light);
+  }
+  .btn-sm{
+    padding:6px 12px;
+    font-size:12px;
+    border-radius:var(--radius-xs);
+  }
+
+  .react-row{display:flex;gap:14px;margin-top:16px;align-items:center;flex-wrap:wrap}
+
+  /* Sidebar */
+  aside .card{padding:16px}
+  .stat{font-size:13px;color:var(--mid)}
+
+  /* Results Table */
+  .results{
+    margin-top:12px;
+    max-height:240px;
+    overflow:auto;
+    border-radius:var(--radius-sm);
+    border:1px solid var(--border);
+    background:var(--bg-subtle);
+  }
+  .results::-webkit-scrollbar{width:6px;height:6px}
+  .results::-webkit-scrollbar-track{background:transparent}
+  .results::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+  .results::-webkit-scrollbar-thumb:hover{background:var(--light)}
+  
+  .results table{width:100%;border-collapse:separate;border-spacing:0}
+  .results thead th{
+    position:sticky;
+    top:0;
+    z-index:1;
+    background:linear-gradient(180deg, var(--bg-subtle) 0%, #e8ecf1 100%);
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    padding:10px 12px;
+    border-bottom:1px solid var(--border);
+    color:var(--mid);
+    font-weight:600;
+  }
+  .results tbody td{
+    padding:10px 12px;
+    font-size:13px;
+    border-bottom:1px solid var(--border-light);
+    background:var(--card);
+  }
+  .results tbody tr:last-child td{border-bottom:none}
+  .results tbody tr:nth-child(even) td{background:#fafbfc}
+  .results tbody tr:hover td{background:#f0f7ff}
+  .results td:nth-child(1){
+    width:36px;
+    text-align:center;
+    color:var(--light);
+    font-weight:700;
+    font-size:12px;
+  }
+  .results td:nth-child(2){font-size:11px;color:var(--light)}
+  .results td:nth-child(3){text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+  .results td:nth-child(4){width:130px}
+
+  /* Badges */
+  .badge{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    padding:4px 10px;
+    border-radius:20px;
+    font-size:11px;
+    font-weight:600;
+    white-space:nowrap;
+    transition:var(--transition);
+  }
+  .badge-success{background:rgba(16,185,129,0.12);color:#059669}
+  .badge-warning{background:rgba(245,158,11,0.12);color:#d97706}
+  .badge-danger{background:rgba(239,68,68,0.12);color:#dc2626}
+  .badge-neutral{background:var(--bg-subtle);color:var(--mid)}
+
+  /* Form Elements */
+  .small{font-size:13px}
+  .muted{color:var(--mid)}
+  .text-xs{font-size:11px}
+  .font-medium{font-weight:500}
+  .font-semibold{font-weight:600}
+  
+  input, select{
+    padding:10px 12px;
+    border-radius:var(--radius-xs);
+    border:1px solid var(--border);
+    font-size:13px;
+    background:var(--card);
+    color:var(--dark);
+    transition:var(--transition);
+  }
+  input:focus, select:focus{
+    outline:none;
+    border-color:var(--accent);
+    box-shadow:0 0 0 3px rgba(14,165,233,0.1);
+  }
+  input[type="number"]{width:100%}
+  .row{display:flex;gap:10px}
+
+  /* Zoom Panel */
+  .zoom-panel{
+    display:flex;
+    gap:10px;
+    align-items:center;
+    margin-top:12px;
+    padding:12px 14px;
+    background:var(--bg-subtle);
+    border-radius:var(--radius-sm);
+  }
+  .zoom-panel input[type="range"]{
+    flex:1;
+    height:8px;
+    -webkit-appearance:none;
+    appearance:none;
+    background:linear-gradient(90deg, #7F8081 0%, #7F8081 40%, #F4D00C 100%);
+    border-radius:4px;
+    cursor:pointer;
+    box-shadow:inset 0 1px 2px rgba(0,0,0,0.1);
+  }
+  .zoom-panel input[type="range"]::-webkit-slider-thumb{
+    -webkit-appearance:none;
+    width:20px;
+    height:20px;
+    background:linear-gradient(135deg, #F4D00C 0%, #D4B00A 100%);
+    border-radius:50%;
+    cursor:pointer;
+    box-shadow:0 2px 6px rgba(244,208,12,0.4), 0 0 0 3px rgba(255,255,255,0.9);
+    border:2px solid #fff;
+    transition:transform 0.15s ease;
+  }
+  .zoom-panel input[type="range"]::-webkit-slider-thumb:hover{
+    transform:scale(1.1);
+  }
+  .zoom-panel input[type="range"]::-moz-range-thumb{
+    width:20px;
+    height:20px;
+    background:linear-gradient(135deg, #F4D00C 0%, #D4B00A 100%);
+    border-radius:50%;
+    cursor:pointer;
+    box-shadow:0 2px 6px rgba(244,208,12,0.4), 0 0 0 3px rgba(255,255,255,0.9);
+    border:2px solid #fff;
+  }
+  .zoom-panel input[type="range"]::-moz-range-track{
+    height:8px;
+    background:linear-gradient(90deg, #7F8081 0%, #7F8081 40%, #F4D00C 100%);
+    border-radius:4px;
+  }
+
+  /* Responsive */
+  @media (max-width:700px){
+    .wrap{
+      padding:12px 16px;
+      padding-top: calc(12px + env(safe-area-inset-top, 0px));
+      padding-left: calc(16px + env(safe-area-inset-left, 0px));
+      padding-right: calc(16px + env(safe-area-inset-right, 0px));
+    }
+    header{padding:12px 16px;flex-wrap:wrap}
+    .logo img{width:44px;height:44px}
+    .brand h1{font-size:15px}
+    .video-wrap{max-height:42vh;max-width:100% !important;width:100% !important}
+    .video-inner{max-width:100% !important;width:100% !important}
+    video{max-height:42vh;max-width:100% !important;width:100% !important}
+    .card{padding:14px;max-width:100%;overflow:hidden !important}
+    main{max-width:100%;overflow:hidden !important}
+    .grid{max-width:100%;overflow:hidden}
+    .controls{max-width:100%;overflow-x:auto;padding-bottom:4px}
+  }
+
+  /* Event Marker */
+  .event-marker {
+    position:absolute;
+    top:12px;
+    right:12px;
+    background:rgba(255,255,255,0.95);
+    backdrop-filter:blur(8px);
+    color:var(--dark);
+    padding:8px 12px;
+    border-radius:var(--radius-xs);
+    font-weight:600;
+    font-size:12px;
+    box-shadow:var(--shadow-md);
+    border:1px solid rgba(255,255,255,0.2);
+  }
+
+  /* Saved Training Plans */
+  .training-plans-card{
+    background:linear-gradient(135deg, #fefce8 0%, #fef9c3 100%);
+    border:1px solid #fde047;
+  }
+  .training-plans-header{
+    font-weight:700;
+    font-size:14px;
+    color:var(--dark);
+    margin-bottom:14px;
+    padding-bottom:12px;
+    border-bottom:1px solid #fde047;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .training-plans-header::before{
+    content:'';
+    width:4px;
+    height:16px;
+    background:linear-gradient(180deg, #fbbf24 0%, #d97706 100%);
+    border-radius:2px;
+  }
+  .training-plans-actions{
+    display:flex;
+    gap:8px;
+    margin-bottom:12px;
+  }
+  .training-plans-list{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    max-height:200px;
+    overflow-y:auto;
+  }
+  .training-plan-item{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:10px 12px;
+    background:var(--card);
+    border-radius:var(--radius-sm);
+    border:1px solid var(--border-light);
+    transition:var(--transition);
+  }
+  .training-plan-item:hover{
+    border-color:var(--border);
+    box-shadow:var(--shadow-sm);
+  }
+  .training-plan-info{
+    flex:1;
+    min-width:0;
+  }
+  .training-plan-name{
+    font-weight:600;
+    font-size:13px;
+    color:var(--dark);
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .training-plan-meta{
+    font-size:11px;
+    color:var(--mid);
+    margin-top:2px;
+  }
+  .training-plan-actions{
+    display:flex;
+    gap:6px;
+    margin-left:8px;
+  }
+  .training-plan-actions .btn{
+    padding:4px 8px;
+    font-size:11px;
+  }
+  .no-plans-message{
+    font-size:12px;
+    color:var(--mid);
+    text-align:center;
+    padding:16px;
+  }
+
+  /* Example Trainings */
+  .example-trainings-card{
+    background:linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    border:1px solid #93c5fd;
+  }
+  .example-trainings-header{
+    font-weight:700;
+    font-size:14px;
+    color:var(--dark);
+    margin-bottom:14px;
+    padding-bottom:12px;
+    border-bottom:1px solid #93c5fd;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .example-trainings-header::before{
+    content:'';
+    width:4px;
+    height:16px;
+    background:linear-gradient(180deg, #3b82f6 0%, #2563eb 100%);
+    border-radius:2px;
+  }
+  .example-trainings-list{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    max-height:200px;
+    overflow-y:auto;
+  }
+  .example-training-item{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:10px 12px;
+    background:var(--card);
+    border-radius:var(--radius-sm);
+    border:1px solid var(--border-light);
+    transition:var(--transition);
+  }
+  .example-training-item:hover{
+    border-color:var(--border);
+    box-shadow:var(--shadow-sm);
+  }
+  .example-training-info{
+    flex:1;
+    min-width:0;
+  }
+  .example-training-name{
+    font-weight:600;
+    font-size:13px;
+    color:var(--dark);
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .example-training-meta{
+    font-size:11px;
+    color:var(--mid);
+    margin-top:2px;
+  }
+  .example-training-actions{
+    display:flex;
+    gap:6px;
+    margin-left:8px;
+  }
+  .example-training-actions .btn{
+    padding:4px 8px;
+    font-size:11px;
+  }
+  .example-loading-message{
+    font-size:12px;
+    color:var(--mid);
+    text-align:center;
+    padding:16px;
+  }
+
+  /* NOWOCZESNA SEKCJA UWAGI */
+  .notes-card{
+    background:linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border:1px solid var(--border);
+  }
+  .notes-header{
+    font-weight:700;
+    font-size:14px;
+    color:var(--dark);
+    margin-bottom:14px;
+    padding-bottom:12px;
+    border-bottom:1px solid var(--border);
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .notes-header::before{
+    content:'';
+    width:4px;
+    height:16px;
+    background:linear-gradient(180deg, var(--accent) 0%, var(--accent-dark) 100%);
+    border-radius:2px;
+  }
+  .notes-list{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .note-item{
+    padding:14px 16px;
+    background:var(--card);
+    border-radius:var(--radius-sm);
+    border:1px solid var(--border-light);
+    transition:var(--transition);
+  }
+  .note-item:hover{
+    border-color:var(--border);
+    box-shadow:var(--shadow-sm);
+    transform:translateY(-1px);
+  }
+  .note-label{
+    font-weight:600;
+    font-size:13px;
+    color:var(--dark);
+    margin-bottom:6px;
+  }
+  .note-text{
+    font-size:12px;
+    color:var(--mid);
+    line-height:1.6;
+  }
+  .note-item.highlight{
+    background:linear-gradient(135deg, rgba(14,165,233,0.06) 0%, rgba(14,165,233,0.02) 100%);
+    border-color:rgba(14,165,233,0.2);
+  }
+  .note-item.highlight .note-label{
+    color:var(--accent-dark);
+  }
+
+  /* Stats Section */
+  .stats-shell{
+    margin-top:8px;
+    padding:14px 16px;
+    border-radius:var(--radius-sm);
+    background:linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border:1px solid var(--border);
+  }
+  .stats-score{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:14px;
+    margin-bottom:10px;
+  }
+  .stats-score-main{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+  }
+  .stats-score-label{
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:0.1em;
+    color:var(--light);
+    font-weight:600;
+  }
+  .stats-score-value{
+    font-size:32px;
+    font-weight:800;
+    font-variant-numeric:tabular-nums;
+    letter-spacing:-0.02em;
+  }
+  .stats-score-desc{
+    font-size:12px;
+    font-weight:600;
+  }
+  .stats-score-meta{
+    font-size:11px;
+    color:var(--light);
+    text-align:right;
+  }
+
+  .stats-grid{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:10px;
+    margin-top:6px;
+  }
+  .stat-tile{
+    background:var(--card);
+    border-radius:var(--radius-xs);
+    padding:10px 12px;
+    box-shadow:var(--shadow-sm);
+    border:1px solid var(--border-light);
+  }
+  .stat-tile-label{
+    font-size:10px;
+    color:var(--light);
+    margin-bottom:4px;
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+    font-weight:600;
+  }
+  .stat-tile-value{
+    font-size:15px;
+    font-weight:700;
+    font-variant-numeric:tabular-nums;
+    color:var(--dark);
+  }
+
+  .stats-footer{
+    margin-top:10px;
+    font-size:11px;
+    color:var(--light);
+  }
+
+  .stats-panel{
+    margin-top:8px;
+    border-radius:var(--radius-xs);
+    padding:10px 12px;
+    font-size:12px;
+  }
+  .stats-panel-title{
+    font-weight:600;
+    margin-bottom:4px;
+  }
+  .stats-panel-warning{
+    background:rgba(239,68,68,0.06);
+    border:1px dashed rgba(239,68,68,0.3);
+    color:#dc2626;
+  }
+
+  /* Chart Container */
+  .chart-container{
+    margin-top:12px;
+    padding:16px;
+    background:linear-gradient(135deg, #fafbfc 0%, #f5f7fa 100%);
+    border-radius:var(--radius-sm);
+    border:1px solid var(--border);
+  }
+  .chart-canvas{
+    width:100%;
+    height:auto;
+    border-radius:var(--radius-xs);
+  }
+
+  /* Instruction overlay */
+  .instruction-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: clamp(12px, 3vw, 32px);
+    text-align: center;
+    z-index: 5;
+    border-radius: 10px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+  .instruction-overlay.hidden {
+    display: none;
+  }
+  /* Hide video inner content when instruction is visible */
+  .video-wrap:has(.instruction-overlay:not(.hidden)) .video-inner {
+    visibility: hidden;
+  }
+  .instruction-title {
+    font-size: clamp(16px, 3.5vw, 26px);
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: clamp(8px, 1.5vw, 20px);
+    margin-top: clamp(8px, 2vw, 20px);
+    flex-shrink: 0;
+  }
+  .instruction-title span {
+    color: var(--primary);
+  }
+  .instruction-steps {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(6px, 1.2vw, 14px);
+    width: 100%;
+    max-width: 420px;
+    flex-shrink: 0;
+  }
+  .instruction-step {
+    display: flex;
+    align-items: flex-start;
+    gap: clamp(8px, 1.5vw, 14px);
+    text-align: left;
+    background: rgba(255,255,255,0.06);
+    padding: clamp(8px, 1.5vw, 14px);
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .instruction-step-num {
+    flex-shrink: 0;
+    width: clamp(26px, 5vw, 32px);
+    height: clamp(26px, 5vw, 32px);
+    background: linear-gradient(135deg, var(--primary) 0%, #c9a900 100%);
+    color: #111;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: clamp(12px, 2.5vw, 15px);
+  }
+  .instruction-step-content {
+    flex: 1;
+    min-width: 0;
+  }
+  .instruction-step-title {
+    font-weight: 600;
+    color: #fff;
+    font-size: clamp(13px, 2.5vw, 15px);
+    margin-bottom: 2px;
+  }
+  .instruction-step-desc {
+    color: rgba(255,255,255,0.65);
+    font-size: clamp(11px, 2vw, 13px);
+    line-height: 1.4;
+  }
+  .instruction-step-key {
+    display: inline-block;
+    background: rgba(255,255,255,0.15);
+    color: #fff;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: clamp(10px, 1.8vw, 12px);
+    font-weight: 600;
+    font-family: monospace;
+    margin-left: 4px;
+  }
+  .instruction-footer {
+    margin-top: clamp(14px, 2.5vw, 20px);
+    color: rgba(255,255,255,0.5);
+    font-size: clamp(10px, 1.8vw, 12px);
+  }
+  @media (max-width: 500px) {
+    .instruction-step {
+      padding: 10px;
+    }
+    .instruction-step-num {
+      width: 24px;
+      height: 24px;
+      font-size: 11px;
+    }
+  }
+
+  /* Floating Start Button */
+  .floating-start-btn {
+    position: fixed;
+    bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 28px;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+    color: white;
+    font-size: 16px;
+    font-weight: 700;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(14,165,233,0.4), 0 2px 8px rgba(0,0,0,0.15);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .floating-start-btn:hover {
+    transform: translateX(-50%) translateY(-2px);
+    box-shadow: 0 6px 28px rgba(14,165,233,0.5), 0 4px 12px rgba(0,0,0,0.2);
+  }
+  .floating-start-btn:active {
+    transform: translateX(-50%) scale(0.97);
+  }
+  .floating-start-btn.hidden {
+    display: none !important;
+  }
+  .floating-start-btn.running {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    box-shadow: 0 4px 20px rgba(239,68,68,0.4), 0 2px 8px rgba(0,0,0,0.15);
+  }
+  .floating-start-btn.running:hover {
+    box-shadow: 0 6px 28px rgba(239,68,68,0.5), 0 4px 12px rgba(0,0,0,0.2);
+  }
+  .floating-start-btn svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+  }
+  .floating-start-btn .kbd {
+    background: rgba(255,255,255,0.25);
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  @media (max-width: 600px) {
+    .floating-start-btn {
+      bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+      padding: 12px 24px;
+      font-size: 15px;
+    }
+  }
+
+  /* Extra padding at bottom to prevent floating button from covering content */
+  body {
+    padding-bottom: calc(90px + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* Toast Notifications */
+  .toast-container {
+    position: fixed;
+    top: calc(20px + env(safe-area-inset-top, 0px));
+    right: calc(20px + env(safe-area-inset-right, 0px));
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 380px;
+    width: calc(100% - 40px - env(safe-area-inset-right, 0px));
+    pointer-events: none;
+  }
+  @media (max-width: 500px) {
+    .toast-container {
+      top: calc(10px + env(safe-area-inset-top, 0px));
+      right: calc(10px + env(safe-area-inset-right, 0px));
+      left: calc(10px + env(safe-area-inset-left, 0px));
+      width: auto;
+      max-width: none;
+    }
+  }
+  .toast {
+    background: var(--card);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-lg);
+    padding: 14px 18px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    pointer-events: auto;
+    animation: toastSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-left: 4px solid var(--accent);
+  }
+  .toast.toast-success {
+    border-left-color: var(--success);
+  }
+  .toast.toast-warning {
+    border-left-color: var(--warning);
+  }
+  .toast.toast-error {
+    border-left-color: var(--danger);
+  }
+  .toast.toast-info {
+    border-left-color: var(--accent);
+  }
+  .toast.toast-hide {
+    animation: toastSlideOut 0.25s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+  @keyframes toastSlideIn {
+    from {
+      opacity: 0;
+      transform: translateX(100%);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  @keyframes toastSlideOut {
+    from {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateX(100%);
+    }
+  }
+  .toast-icon {
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .toast-icon.toast-icon-success {
+    color: var(--success);
+  }
+  .toast-icon.toast-icon-warning {
+    color: var(--warning);
+  }
+  .toast-icon.toast-icon-error {
+    color: var(--danger);
+  }
+  .toast-icon.toast-icon-info {
+    color: var(--accent);
+  }
+  .toast-content {
+    flex: 1;
+    min-width: 0;
+  }
+  .toast-title {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--dark);
+    margin-bottom: 2px;
+  }
+  .toast-message {
+    font-size: 13px;
+    color: var(--mid);
+    line-height: 1.4;
+  }
+  .toast-close {
+    background: none;
+    border: none;
+    padding: 4px;
+    cursor: pointer;
+    color: var(--light);
+    transition: color 0.2s;
+    flex-shrink: 0;
+  }
+  .toast-close:hover {
+    color: var(--dark);
+  }
+  .toast-close svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  /* Modern Modal Dialogs */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: 10001;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: calc(20px + env(safe-area-inset-top, 0px)) calc(20px + env(safe-area-inset-right, 0px)) calc(20px + env(safe-area-inset-bottom, 0px)) calc(20px + env(safe-area-inset-left, 0px));
+    animation: modalFadeIn 0.2s ease;
+  }
+  @keyframes modalFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  .modal-dialog {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lg);
+    max-width: 400px;
+    width: 100%;
+    animation: modalSlideIn 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  @keyframes modalSlideIn {
+    from { opacity: 0; transform: scale(0.95) translateY(-10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  .modal-header {
+    padding: 20px 20px 0;
+  }
+  .modal-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--dark);
+    margin-bottom: 8px;
+  }
+  .modal-message {
+    font-size: 14px;
+    color: var(--mid);
+    line-height: 1.5;
+  }
+  .modal-body {
+    padding: 16px 20px;
+  }
+  .modal-input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    color: var(--dark);
+    background: var(--bg);
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .modal-input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15);
+  }
+  .modal-footer {
+    padding: 0 20px 20px;
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+  }
+  .modal-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .modal-btn-primary {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+    color: white;
+  }
+  .modal-btn-primary:hover {
+    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+  }
+  .modal-btn-secondary {
+    background: var(--bg-subtle);
+    color: var(--dark);
+    border: 1px solid var(--border);
+  }
+  .modal-btn-secondary:hover {
+    background: var(--border-light);
+  }
+  .modal-btn-danger {
+    background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%);
+    color: white;
+  }
 </style>
 </head>
 <body>
-
-<!-- Security Block (shown if running locally or from wrong domain) -->
+<!-- ========== PRO VERSION: Security Block ========== -->
 <div id="security-block" class="hidden">
   <h1>⛔ Dostęp zabroniony</h1>
   <p>Ta aplikacja może być uruchomiona wyłącznie z autoryzowanej domeny. Lokalne uruchomienie pliku HTML nie jest dozwolone.</p>
 </div>
 
-<!-- Login Screen -->
+<!-- ========== PRO VERSION: Login Screen ========== -->
 <div id="login-screen">
   <div class="login-card">
     <img src="logo.png" alt="Logo" class="login-logo" />
@@ -126,7 +1227,7 @@ th{font-weight:600;color:var(--mid);font-size:12px}
     <p class="login-subtitle">Zaloguj się, aby uzyskać dostęp do wersji PRO</p>
     
     <button class="social-btn facebook" id="facebook-login-btn">
-      <svg viewBox="0 0 24 24"><path fill="currentColor" d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+      <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
       Zaloguj przez Facebook
     </button>
     
@@ -134,96 +1235,225 @@ th{font-weight:600;color:var(--mid);font-size:12px}
   </div>
 </div>
 
-<!-- User Bar (shown after login) -->
+<!-- ========== PRO VERSION: User Bar ========== -->
 <div id="user-bar" class="hidden">
   <div class="user-info">
-    <img id="user-avatar" class="user-avatar" src="" alt="Avatar" />
+    <img id="user-avatar" class="user-avatar" src="logo.png" alt="Avatar" />
     <div>
       <div class="user-name"><span id="user-name">-</span><span id="user-provider" class="user-provider"></span></div>
-      <div class="user-email" id="user-email">-</div>
     </div>
   </div>
   <button class="logout-btn" id="logout-btn">Wyloguj</button>
 </div>
 
-<!-- Main App Container (shown after login) -->
+<!-- ========== PRO VERSION: App Container (shown after login) ========== -->
 <div id="app-container">
   <div class="wrap">
     <header>
       <div class="brand">
-        <div class="logo"><img src="logo.png" alt="Logo" /></div>
-        <h1>Unleashed Flyball Team<br><span>Flyball Reaction PRO</span></h1>
+        <div class="logo" aria-hidden="true">
+          <img src="logo.png" alt="Unleashed Flyball Team" />
+        </div>
+        <div>
+          <h1>Unleashed Flyball Team - <span style="color:var(--accent)">Flyball Reaction PRO</span></h1>
+          <div class="subtitle">Tester czasu reakcji</div>
+        </div>
+      </div>
+      <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
+        <span class="version-badge" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff">PRO</span>
       </div>
     </header>
-    
-    <main>
-      <!-- Video Player Card -->
-      <div class="card">
-        <div class="card-header">
-          <h3 class="card-title">📹 Odtwarzacz wideo</h3>
-        </div>
-        <div class="video-wrap">
-          <video id="video" playsinline controls></video>
-        </div>
-        <div class="controls">
-          <input type="file" id="localFile" accept="video/*" multiple />
-          <select id="videoList"><option value="">Brak wideo</option></select>
-        </div>
-      </div>
-      
-      <!-- Test Settings Card -->
-      <div class="card">
-        <div class="card-header">
-          <h3 class="card-title">⚙️ Ustawienia testu</h3>
-        </div>
-        <div class="form-group">
-          <label>Liczba prób</label>
-          <input type="number" id="trialsCount" value="5" min="1" max="20" />
-        </div>
-        <div class="form-group">
-          <label>Czas przed zdarzeniem (sekundy)</label>
-          <div style="display:flex;gap:8px">
-            <input type="number" id="randomFrom" value="1.5" step="0.1" placeholder="Od" />
-            <input type="number" id="randomTo" value="2.5" step="0.1" placeholder="Do" />
+
+    <div class="grid">
+      <!-- MAIN -->
+      <main>
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Test reakcji — wideo</div>
+              <div class="card-subtitle">Wczytaj wideo, ustaw zdarzenie (E) i mierz reakcje (Space)</div>
+            </div>
+            <span class="badge badge-neutral">Sprawdź swoją reakcję</span>
+          </div>
+
+          <div class="video-wrap" id="videoWrap">
+            <div id="transformer" class="video-inner" style="--tx:0px; --ty:0px; --scale:1;">
+              <video id="video" playsinline webkit-playsinline controls></video>
+            </div>
+            <div class="event-marker" id="eventMarker" style="display:none">Zdarzenie: <span id="eventTimeText">—</span></div>
+            
+            <!-- Instruction overlay -->
+            <div class="instruction-overlay" id="instructionOverlay">
+              <div class="instruction-steps">
+                <div class="instruction-step">
+                  <div class="instruction-step-num">1</div>
+                  <div class="instruction-step-content">
+                    <div class="instruction-step-title">Wczytaj wideo</div>
+                    <div class="instruction-step-desc">Wybierz plik(i) wideo z dysku lub wklej URL. Możesz dodać wiele filmów naraz.</div>
+                  </div>
+                </div>
+                <div class="instruction-step">
+                  <div class="instruction-step-num">2</div>
+                  <div class="instruction-step-content">
+                    <div class="instruction-step-title">Ustaw zdarzenie</div>
+                    <div class="instruction-step-desc">Przewiń do klatki, na którą chcesz reagować i naciśnij <span class="instruction-step-key">E</span></div>
+                  </div>
+                </div>
+                <div class="instruction-step">
+                  <div class="instruction-step-num">3</div>
+                  <div class="instruction-step-content">
+                    <div class="instruction-step-title">Rozpocznij test</div>
+                    <div class="instruction-step-desc">Naciśnij <span class="instruction-step-key">S</span> lub kliknij Start. Reaguj przyciskiem <span class="instruction-step-key">Space</span> gdy zobaczysz zdarzenie.</div>
+                  </div>
+                </div>
+              </div>
+              <div class="instruction-footer">Cel: reaguj szybko, ale nie przewiduj!</div>
+            </div>
+          </div>
+
+          <div class="controls" style="margin-top:12px">
+            <input id="fileInput" type="file" accept="video/*" multiple style="flex:1" />
+            <select id="videoList" class="small" style="min-width:180px">
+              <option value="">Brak wideo</option>
+            </select>
+            <button class="btn btn-ghost" id="loadUrlBtn">Wczytaj URL</button>
+            <button class="btn btn-primary" id="setEventBtn">Ustaw zdarzenie (E)</button>
+            <button class="btn btn-ghost" id="fsPreviewBtn" title="Pełny ekran z kontrolkami">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+            </button>
+          </div>
+
+          <div class="zoom-panel">
+            <label class="small muted" for="zoomSlider">Zoom</label>
+            <input id="zoomSlider" type="range" min="0.5" max="2.5" step="0.01" value="1" />
+            <div class="small muted" id="zoomLabel">100%</div>
+            <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
+              <label class="small muted">Pinch & drag</label>
+            </div>
+          </div>
+
+          <div class="react-row">
+            <div style="flex:1">
+              <div class="small muted">Ustawienia testu</div>
+              <div style="display:flex;gap:8px;margin-top:8px">
+                <input id="trialsCount" type="number" value="5" min="1" />
+                <input id="randomFrom" type="number" value="1.5" min="0" step="0.1" />
+                <input id="randomTo" type="number" value="4" min="0" step="0.1" />
+              </div>
+              <div class="small muted" style="margin-top:6px">
+                Powtórzeń • Losowo od (s) • do (s) przed zdarzeniem
+              </div>
+              <div style="margin-top:8px;display:flex;gap:8px">
+                <button class="btn btn-accent" id="startTestBtn">Start (S)</button>
+                <button class="btn btn-ghost" id="stopTestBtn">Stop</button>
+              </div>
+              <div id="trialInfo" class="small muted" style="margin-top:8px">Brak testu.</div>
+            </div>
           </div>
         </div>
-        <div class="controls">
-          <button class="btn btn-primary" id="setEventBtn">Ustaw zdarzenie (E)</button>
-          <button class="btn btn-success" id="startTestBtn">▶ Start testu</button>
-          <button class="btn btn-danger" id="stopTestBtn">⏹ Stop</button>
+      </main>
+
+      <!-- RIGHT COLUMN -->
+      <aside>
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Wyniki</div>
+              <div class="card-subtitle">Twoje pomiary</div>
+            </div>
+            <button class="btn btn-ghost btn-sm" id="exportCsvBtn">Eksport CSV</button>
+          </div>
+
+          <div class="results">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Data</th>
+                  <th>Reakcja (ms)</th>
+                  <th>Ocena</th>
+                </tr>
+              </thead>
+              <tbody id="resultsBody"></tbody>
+            </table>
+          </div>
+
+          <div style="margin-top:14px">
+            <div class="card-subtitle" style="margin-bottom:6px">Statystyki</div>
+            <div id="stats" class="stat">Brak wyników.</div>
+          </div>
         </div>
-      </div>
-      
-      <!-- Results Card -->
-      <div class="card">
-        <div class="card-header">
-          <h3 class="card-title">📊 Wyniki</h3>
-          <button class="btn" id="clearResultsBtn" style="background:var(--border);color:var(--dark)">Wyczyść</button>
+
+        <!-- KARTA: wykres Gaussa -->
+        <div class="card" style="margin-top:12px">
+          <div class="card-header" style="margin-bottom:12px">
+            <div>
+              <div class="card-title">Krzywa powtarzalności</div>
+              <div class="card-subtitle">Rozkład Twoich czasów reakcji</div>
+            </div>
+          </div>
+          <div class="chart-container">
+            <canvas id="gaussCanvas" width="320" height="200" class="chart-canvas"></canvas>
+          </div>
+          <div id="gaussInfo" class="small muted" style="margin-top:10px;text-align:center">
+            Wykres pojawi się po zakończeniu testu (min. 3 ważne próby).
+          </div>
         </div>
-        <div id="trialInfo" style="padding:10px;background:var(--bg);border-radius:8px;margin-bottom:12px;font-size:13px;color:var(--mid)">
-          Gotowy do testu...
+
+        <!-- KARTA: Zapisane treningi -->
+        <div class="card training-plans-card" style="margin-top:12px">
+          <div class="training-plans-header">Zapisane treningi</div>
+          <div class="training-plans-actions">
+            <button class="btn btn-primary btn-sm" id="saveTrainingBtn">Zapisz obecny trening</button>
+          </div>
+          <div id="trainingPlansList" class="training-plans-list">
+            <div class="no-plans-message">Brak zapisanych treningów. Dodaj filmy, ustaw zdarzenia i kliknij "Zapisz".</div>
+          </div>
         </div>
-        <table>
-          <thead><tr><th>#</th><th>Czas</th><th>Reakcja</th><th>Ocena</th></tr></thead>
-          <tbody id="resultsBody"></tbody>
-        </table>
-      </div>
-    </main>
+
+        <!-- KARTA: Przykładowe treningi -->
+        <div class="card example-trainings-card" style="margin-top:12px">
+          <div class="example-trainings-header">Przykładowe treningi</div>
+          <div id="exampleTrainingsList" class="example-trainings-list">
+            <div class="example-loading-message">Ładowanie przykładowych treningów...</div>
+          </div>
+        </div>
+
+        <div class="card notes-card" style="margin-top:12px">
+          <div class="notes-header">Uwagi</div>
+          <div class="notes-list">
+            <div class="note-item">
+              <div class="note-label">Zoom wideo</div>
+              <div class="note-text">Użyj suwaka lub gestu pinch, aby powiększyć fragment wideo. Przeciągnij widok, aby przesunąć kadr.</div>
+            </div>
+            <div class="note-item">
+              <div class="note-label">Cel treningu</div>
+              <div class="note-text">Dąż do jak najwęższej krzywej – oznacza to powtarzalne czasy reakcji. Unikaj przewidywania!</div>
+            </div>
+            <div class="note-item highlight">
+              <div class="note-label">Zainstaluj aplikację</div>
+              <div class="note-text">iOS: Udostępnij → Dodaj do ekranu głównego<br>Android/Desktop: Menu → Zainstaluj</div>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
   </div>
-</div>
+</div><!-- END #app-container -->
 
-<!-- Floating Start Button -->
-<button class="floating-btn hidden" id="floatingBtn">
-  <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-  <span>Start testu</span>
-</button>
+  <!-- Floating Start Button -->
+  <button class="floating-start-btn" id="floatingStartBtn">
+    <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+    <span>Start testu</span>
+    <span class="kbd">S</span>
+  </button>
 
-<!-- Toast Container -->
-<div class="toast-container" id="toastContainer"></div>
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
 
 <script>
-// ============ SECURITY & AUTHENTICATION ============
-const CONFIG = {
+/* ========== PRO VERSION: SECURITY & AUTHENTICATION ========== */
+const PRO_CONFIG = {
   ALLOWED_DOMAINS: ['hemelion.github.io', 'localhost', '127.0.0.1'],
   FACEBOOK_APP_ID: '1450344913471254'
 };
@@ -240,8 +1470,8 @@ function checkSecurity() {
     return false;
   }
   
-  // Check allowed domains (skip for localhost development)
-  if (!CONFIG.ALLOWED_DOMAINS.some(d => hostname.includes(d))) {
+  // Check allowed domains
+  if (!PRO_CONFIG.ALLOWED_DOMAINS.some(d => hostname.includes(d))) {
     document.getElementById('security-block').classList.remove('hidden');
     document.getElementById('login-screen').classList.add('hidden');
     return false;
@@ -256,7 +1486,7 @@ let currentUser = null;
 // Initialize Facebook SDK
 window.fbAsyncInit = function() {
   FB.init({
-    appId: CONFIG.FACEBOOK_APP_ID,
+    appId: PRO_CONFIG.FACEBOOK_APP_ID,
     cookie: true,
     xfbml: true,
     version: 'v18.0'
@@ -270,7 +1500,6 @@ function loginWithFacebook() {
       FB.api('/me', {fields: 'name,picture'}, function(userData) {
         currentUser = {
           name: userData.name,
-          email: 'Facebook User',
           picture: userData.picture?.data?.url || '',
           provider: 'Facebook',
           token: response.authResponse.accessToken
@@ -292,19 +1521,18 @@ function onLoginSuccess() {
   document.getElementById('login-screen').classList.add('hidden');
   document.getElementById('user-bar').classList.remove('hidden');
   document.getElementById('app-container').classList.add('active');
-  document.getElementById('floatingBtn').classList.remove('hidden');
+  document.getElementById('floatingStartBtn').classList.remove('hidden');
   
   // Update user info
   document.getElementById('user-avatar').src = currentUser.picture || 'logo.png';
   document.getElementById('user-name').textContent = currentUser.name;
-  document.getElementById('user-email').textContent = currentUser.email;
   document.getElementById('user-provider').textContent = currentUser.provider;
   
-  showToast(`Witaj, ${currentUser.name}!`, 'success');
+  showToast(`Witaj, ${currentUser.name}!`, 'success', 'Zalogowano');
 }
 
 // Logout
-function logout() {
+function proLogout() {
   currentUser = null;
   sessionStorage.removeItem('flyball_pro_user');
   
@@ -320,7 +1548,7 @@ function logout() {
   // Reset UI
   document.getElementById('user-bar').classList.add('hidden');
   document.getElementById('app-container').classList.remove('active');
-  document.getElementById('floatingBtn').classList.add('hidden');
+  document.getElementById('floatingStartBtn').classList.add('hidden');
   document.getElementById('login-screen').classList.remove('hidden');
 }
 
@@ -339,241 +1567,2717 @@ function checkExistingSession() {
   return false;
 }
 
-// Toast notification
-function showToast(message, type = 'info') {
-  const container = document.getElementById('toastContainer');
-  const toast = document.createElement('div');
-  toast.className = 'toast';
-  toast.style.borderLeft = `4px solid ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#0ea5e9'}`;
-  toast.innerHTML = `<span>${message}</span>`;
-  container.appendChild(toast);
-  setTimeout(() => toast.remove(), 4000);
-}
+// Initialize PRO version on DOMContentLoaded
+document.addEventListener('DOMContentLoaded', () => {
+  // Security check first
+  if (!checkSecurity()) return;
+  
+  // Hide floating button initially
+  const floatingBtn = document.getElementById('floatingStartBtn');
+  if (floatingBtn) floatingBtn.classList.add('hidden');
+  
+  // Bind login button
+  document.getElementById('facebook-login-btn').addEventListener('click', loginWithFacebook);
+  document.getElementById('logout-btn').addEventListener('click', proLogout);
+  
+  // Check existing session
+  checkExistingSession();
+});
+/* ========== END PRO VERSION: SECURITY & AUTHENTICATION ========== */
 
-// ============ MAIN APP LOGIC ============
+/* Uwaga: pomiary warto sprawdzić na realnym sprzęcie; przeglądarki różnie obsługują wideo. */
+
 const video = document.getElementById('video');
-const localFile = document.getElementById('localFile');
+const transformer = document.getElementById('transformer');
+const videoWrap = document.getElementById('videoWrap');
+const fileInput = document.getElementById('fileInput');
 const videoList = document.getElementById('videoList');
+const loadUrlBtn = document.getElementById('loadUrlBtn');
 const setEventBtn = document.getElementById('setEventBtn');
+const eventMarker = document.getElementById('eventMarker');
+const eventTimeText = document.getElementById('eventTimeText');
+const zoomSlider = document.getElementById('zoomSlider');
+const zoomLabel = document.getElementById('zoomLabel');
+const instructionOverlay = document.getElementById('instructionOverlay');
+
 const startTestBtn = document.getElementById('startTestBtn');
 const stopTestBtn = document.getElementById('stopTestBtn');
-const clearResultsBtn = document.getElementById('clearResultsBtn');
-const trialsCount = document.getElementById('trialsCount');
-const randomFrom = document.getElementById('randomFrom');
-const randomTo = document.getElementById('randomTo');
+const trialsCountInput = document.getElementById('trialsCount');
+const randomFromInput = document.getElementById('randomFrom');
+const randomToInput = document.getElementById('randomTo');
 const trialInfo = document.getElementById('trialInfo');
-const resultsBody = document.getElementById('resultsBody');
-const floatingBtn = document.getElementById('floatingBtn');
 
-let videoEntries = [];
-let currentVideoIndex = -1;
+const resultsBody = document.getElementById('resultsBody');
+const statsDiv = document.getElementById('stats');
+const exportCsvBtn = document.getElementById('exportCsvBtn');
+
+/* Wykres Gaussa */
+const gaussCanvas = document.getElementById('gaussCanvas');
+const gaussInfo = document.getElementById('gaussInfo');
+const gaussCtx = gaussCanvas.getContext('2d');
+
+/* Floating Start Button */
+const floatingStartBtn = document.getElementById('floatingStartBtn');
+const toastContainer = document.getElementById('toastContainer');
+
 let eventTime = null;
+let lastEventLabel = '';
 let ongoingTest = null;
 let results = [];
 
-// Load local video files
-localFile.addEventListener('change', (e) => {
-  Array.from(e.target.files).forEach(file => {
-    const url = URL.createObjectURL(file);
-    videoEntries.push({ name: file.name, src: url, isLocal: true, eventTime: null });
+/* ======== TOAST NOTIFICATION SYSTEM ======== */
+const toastIcons = {
+  success: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>',
+  error: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>',
+  warning: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>',
+  info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>'
+};
+
+function showToast(message, type = 'info', title = null, duration = 4000) {
+  const toast = document.createElement('div');
+  toast.className = `toast toast-${type}`;
+  
+  const iconClass = `toast-icon toast-icon-${type}`;
+  const defaultTitles = {
+    success: 'Sukces',
+    error: 'Błąd',
+    warning: 'Uwaga',
+    info: 'Informacja'
+  };
+  const displayTitle = title || defaultTitles[type] || 'Informacja';
+  
+  toast.innerHTML = `
+    <div class="${iconClass}">${toastIcons[type] || toastIcons.info}</div>
+    <div class="toast-content">
+      <div class="toast-title">${displayTitle}</div>
+      <div class="toast-message">${message}</div>
+    </div>
+    <button class="toast-close" onclick="this.parentElement.classList.add('toast-hide')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    </button>
+  `;
+  
+  toastContainer.appendChild(toast);
+  
+  // Auto remove after duration
+  const removeTimer = setTimeout(() => {
+    toast.classList.add('toast-hide');
+  }, duration);
+  
+  // Remove from DOM after animation
+  toast.addEventListener('animationend', (e) => {
+    if (e.animationName === 'toastSlideOut') {
+      clearTimeout(removeTimer);
+      toast.remove();
+    }
   });
-  refreshVideoList();
-  if (videoEntries.length > 0 && currentVideoIndex < 0) loadVideoByIndex(0);
+  
+  return toast;
+}
+
+/* ======== MODERN MODAL DIALOGS ======== */
+function showConfirm(message, confirmText = 'OK', cancelText = 'Anuluj', title = 'Potwierdź') {
+  return new Promise((resolve) => {
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = `
+      <div class="modal-dialog">
+        <div class="modal-header">
+          <div class="modal-title">${title}</div>
+          <div class="modal-message">${message}</div>
+        </div>
+        <div class="modal-footer">
+          <button class="modal-btn modal-btn-secondary" data-action="cancel">${cancelText}</button>
+          <button class="modal-btn modal-btn-primary" data-action="confirm">${confirmText}</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    
+    const handleClick = (e) => {
+      const action = e.target.dataset.action;
+      if (action === 'confirm') {
+        resolve(true);
+        overlay.remove();
+      } else if (action === 'cancel') {
+        resolve(false);
+        overlay.remove();
+      }
+    };
+    
+    overlay.addEventListener('click', handleClick);
+    
+    // Focus confirm button
+    setTimeout(() => overlay.querySelector('[data-action="confirm"]').focus(), 50);
+  });
+}
+
+function showPrompt(message, defaultValue = '', title = 'Wprowadź wartość') {
+  return new Promise((resolve) => {
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = `
+      <div class="modal-dialog">
+        <div class="modal-header">
+          <div class="modal-title">${title}</div>
+          <div class="modal-message">${message}</div>
+        </div>
+        <div class="modal-body">
+          <input type="text" class="modal-input" value="${defaultValue.replace(/"/g, '&quot;')}" />
+        </div>
+        <div class="modal-footer">
+          <button class="modal-btn modal-btn-secondary" data-action="cancel">Anuluj</button>
+          <button class="modal-btn modal-btn-primary" data-action="confirm">OK</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    
+    const input = overlay.querySelector('.modal-input');
+    const confirmBtn = overlay.querySelector('[data-action="confirm"]');
+    const cancelBtn = overlay.querySelector('[data-action="cancel"]');
+    
+    const handleConfirm = () => {
+      resolve(input.value);
+      overlay.remove();
+    };
+    
+    const handleCancel = () => {
+      resolve(null);
+      overlay.remove();
+    };
+    
+    confirmBtn.addEventListener('click', handleConfirm);
+    cancelBtn.addEventListener('click', handleCancel);
+    
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') handleConfirm();
+      if (e.key === 'Escape') handleCancel();
+    });
+    
+    // Focus and select input
+    setTimeout(() => {
+      input.focus();
+      input.select();
+    }, 50);
+  });
+}
+
+/* ======== FLOATING START BUTTON ======== */
+function updateFloatingButton() {
+  if (ongoingTest && ongoingTest.running) {
+    floatingStartBtn.classList.add('running');
+    floatingStartBtn.innerHTML = `
+      <svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+      <span>Stop</span>
+      <span class="kbd">ESC</span>
+    `;
+  } else {
+    floatingStartBtn.classList.remove('running');
+    floatingStartBtn.innerHTML = `
+      <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+      <span>Start testu</span>
+      <span class="kbd">S</span>
+    `;
+  }
+}
+
+floatingStartBtn.addEventListener('click', () => {
+  if (ongoingTest && ongoingTest.running) {
+    stopTest();
+  } else {
+    startTestBtn.click();
+  }
 });
 
-function refreshVideoList() {
+
+/* Wiele wideo */
+let videoEntries = []; // { name, src, isLocal, eventTime, eventLabel }
+let currentVideoIndex = -1;
+
+/* Transform state */
+let scale = parseFloat(localStorage.getItem('fly_zoom') || '1');
+let tx = 0, ty = 0;
+updateTransform();
+
+/* --- Instruction overlay --- */
+function hideInstructionOverlay() {
+  if (instructionOverlay) {
+    instructionOverlay.classList.add('hidden');
+  }
+}
+
+/* --- WIELE WIDEO: pomocnicze funkcje --- */
+function refreshVideoList(){
   videoList.innerHTML = '';
-  if (!videoEntries.length) {
-    videoList.innerHTML = '<option value="">Brak wideo</option>';
+  if (!videoEntries.length){
+    const opt = document.createElement('option');
+    opt.value = '';
+    opt.textContent = 'Brak wideo';
+    videoList.appendChild(opt);
     return;
   }
-  videoEntries.forEach((v, i) => {
+  videoEntries.forEach((v, i)=>{
     const opt = document.createElement('option');
-    opt.value = i;
-    opt.textContent = `${i+1}. ${v.name}${v.eventTime != null ? ` (E: ${v.eventTime.toFixed(2)}s)` : ''}`;
+    opt.value = String(i);
+    let label = `${i+1}. ${v.name}`;
+    if (v.eventTime != null) label += ` (E: ${v.eventTime.toFixed(2)}s)`;
+    opt.textContent = label;
     if (i === currentVideoIndex) opt.selected = true;
     videoList.appendChild(opt);
   });
 }
 
-function loadVideoByIndex(index, callback) {
+function loadVideoByIndex(index, onReady){
   const entry = videoEntries[index];
   if (!entry) return;
   currentVideoIndex = index;
-  video.src = entry.src;
+
+  // Hide instruction overlay when video is loaded
+  hideInstructionOverlay();
+
+  try { video.pause(); } catch(_){}
+  video.removeAttribute('src');
   video.load();
-  eventTime = entry.eventTime;
-  if (callback) video.addEventListener('loadedmetadata', callback, { once: true });
+  video.src = entry.src;
+
+  eventTime = entry.eventTime != null ? entry.eventTime : null;
+  lastEventLabel = entry.eventLabel || '';
+  updateEventUI();
   refreshVideoList();
+  
+  // Auto-fit: reset zoom/pan when loading video
+  scale = 1;
+  tx = 0;
+  ty = 0;
+  updateTransform();
+
+  const handler = () => {
+    video.removeEventListener('loadedmetadata', handler);
+    if (typeof onReady === 'function') onReady();
+  };
+  if (video.readyState >= 1) {
+    if (typeof onReady === 'function') onReady();
+  } else {
+    video.addEventListener('loadedmetadata', handler);
+  }
 }
 
-videoList.addEventListener('change', (e) => {
-  const idx = parseInt(e.target.value);
-  if (!isNaN(idx)) loadVideoByIndex(idx);
+/* Load file/url */
+fileInput.addEventListener('change', (e)=>{
+  const files = e.target.files;
+  if (!files || !files.length) return;
+  const URL_ = window.URL || window.webkitURL;
+  for (const f of files){
+    const url = URL_.createObjectURL(f);
+    videoEntries.push({
+      name: f.name,
+      src: url,
+      isLocal: true,
+      eventTime: null,
+      eventLabel: ''
+    });
+  }
+  if (currentVideoIndex === -1 && videoEntries.length > 0){
+    loadVideoByIndex(0);
+  } else {
+    refreshVideoList();
+  }
 });
 
-// Set event time
-setEventBtn.addEventListener('click', () => {
-  if (currentVideoIndex < 0) {
-    showToast('Wczytaj wideo przed ustawieniem zdarzenia', 'error');
+loadUrlBtn.addEventListener('click', async ()=>{
+  const url = await showPrompt('Wklej URL do pliku mp4/webm:', '', 'Wczytaj wideo z URL');
+  if (!url) return;
+  const name = url.split('/').pop() || 'Wideo z URL';
+  videoEntries.push({
+    name,
+    src: url,
+    isLocal: false,
+    eventTime: null,
+    eventLabel: ''
+  });
+  const idx = videoEntries.length - 1;
+  loadVideoByIndex(idx);
+});
+
+videoList.addEventListener('change', (e)=>{
+  const idx = parseInt(e.target.value, 10);
+  if (!isNaN(idx)) {
+    loadVideoByIndex(idx);
+  }
+});
+
+/* SET EVENT */
+setEventBtn.addEventListener('click', async () => { await setEventAtCurrent(); });
+document.addEventListener('keydown', async (e)=>{
+  if (e.code === 'KeyE') { 
+    e.preventDefault(); 
+    await setEventAtCurrent(); 
+    if (typeof updatePreviewEventInfo === 'function' && typeof isPreviewMode !== 'undefined' && isPreviewMode) {
+      updatePreviewEventInfo();
+    }
+  }
+  if (e.code === 'Space') {
+    // Always prevent default in fullscreen test mode to avoid button activation
+    if (typeof isFullscreenTestMode !== 'undefined' && isFullscreenTestMode) {
+      e.preventDefault();
+    }
+    if (ongoingTest && ongoingTest.running) { 
+      e.preventDefault(); 
+      reactNow(); 
+    }
+  }
+  if (e.code === 'KeyS') { e.preventDefault(); startTestBtn.click(); }
+});
+
+async function setEventAtCurrent(){
+  if (currentVideoIndex < 0 || !videoEntries[currentVideoIndex]) {
+    showToast('Wczytaj wideo i wybierz je z listy przed ustawieniem zdarzenia.', 'warning');
+    forceLayoutRecalc();
     return;
   }
   eventTime = video.currentTime;
+  const newLabel = await showPrompt('Opis zdarzenia (opcjonalnie):', lastEventLabel || '', 'Opisz zdarzenie');
+  if (newLabel !== null) {
+    lastEventLabel = newLabel || lastEventLabel;
+  }
   videoEntries[currentVideoIndex].eventTime = eventTime;
+  videoEntries[currentVideoIndex].eventLabel = lastEventLabel;
+  updateEventUI();
   refreshVideoList();
-  showToast(`Zdarzenie ustawione na ${eventTime.toFixed(3)}s`, 'success');
-});
-
-// Keyboard shortcuts
-document.addEventListener('keydown', (e) => {
-  if (e.code === 'KeyE') { e.preventDefault(); setEventBtn.click(); }
-  if (e.code === 'Space' && ongoingTest?.running) { e.preventDefault(); reactNow(); }
-  if (e.code === 'KeyS') { e.preventDefault(); startTestBtn.click(); }
-  if (e.code === 'Escape' && ongoingTest) { stopTest(); }
-});
-
-// Start test
-startTestBtn.addEventListener('click', startTest);
-stopTestBtn.addEventListener('click', stopTest);
-floatingBtn.addEventListener('click', () => {
-  if (ongoingTest?.running) stopTest();
-  else startTest();
-});
-
-function startTest() {
-  if (!videoEntries.length) { showToast('Wczytaj wideo przed testem', 'error'); return; }
-  
-  const videoIndices = videoEntries.map((v, i) => v.eventTime != null ? i : -1).filter(i => i >= 0);
-  if (!videoIndices.length) { showToast('Ustaw zdarzenie (E) na co najmniej jednym wideo', 'error'); return; }
-  
-  const trials = Math.max(1, parseInt(trialsCount.value) || 5);
-  let from = parseFloat(randomFrom.value) || 1.5;
-  let to = parseFloat(randomTo.value) || 2.5;
-  if (to < from) [from, to] = [to, from];
-  
-  results = [];
-  updateResultsUI();
-  ongoingTest = { running: true, trialsTotal: trials, currentTrial: 0, offsetMin: from, offsetMax: to, videoIndices };
-  updateFloatingButton();
-  runNextTrial();
+  showToast(`Ustawiono zdarzenie dla wideo "${videoEntries[currentVideoIndex].name}": ${eventTime.toFixed(3)} s ${lastEventLabel? '— ' + lastEventLabel : ''}`, 'success', 'Zdarzenie ustawione');
+  // Force layout recalculation after alert closes on mobile
+  forceLayoutRecalc();
 }
 
-function runNextTrial() {
-  if (!ongoingTest?.running || ongoingTest.currentTrial >= ongoingTest.trialsTotal) {
+// Helper function to force layout recalculation on mobile after alert/prompt
+function forceLayoutRecalc() {
+  setTimeout(() => {
+    // Force reflow by toggling display
+    window.scrollTo(0, 0);
+    
+    // Reset video container dimensions
+    const wrap = document.getElementById('videoWrap');
+    const vid = document.getElementById('video');
+    const trans = document.getElementById('transformer');
+    const mainEl = document.querySelector('main');
+    const cardEl = document.querySelector('.card');
+    
+    // Reset container widths
+    if (wrap) {
+      wrap.style.width = '100%';
+      wrap.style.maxWidth = '100%';
+    }
+    if (vid) {
+      vid.style.width = '';
+      vid.style.maxWidth = '100%';
+      vid.style.height = '';
+    }
+    if (trans) {
+      // Ensure transformer is within bounds and reset transform
+      trans.style.width = '';
+      trans.style.maxWidth = '100%';
+      // Reset CSS variables for transform
+      trans.style.setProperty('--tx', '0px');
+      trans.style.setProperty('--ty', '0px');
+      trans.style.setProperty('--scale', '1');
+    }
+    if (mainEl) {
+      mainEl.style.maxWidth = '100%';
+      mainEl.style.overflow = 'hidden';
+    }
+    if (cardEl) {
+      cardEl.style.maxWidth = '100%';
+      cardEl.style.overflow = 'hidden';
+    }
+    
+    // Reset JS transform variables
+    scale = 1;
+    tx = 0;
+    ty = 0;
+    
+    // Update zoom UI
+    if (typeof zoomLabel !== 'undefined' && zoomLabel) {
+      zoomLabel.textContent = '100%';
+    }
+    if (typeof zoomSlider !== 'undefined' && zoomSlider) {
+      zoomSlider.value = 1;
+    }
+    
+    // Force document reflow
+    document.body.style.display = 'none';
+    void document.body.offsetHeight; // trigger reflow
+    document.body.style.display = '';
+    
+    // Double-check scroll position
+    window.scrollTo(0, 0);
+    
+    // Reset visual viewport if zoomed (iOS Safari)
+    if (window.visualViewport && window.visualViewport.scale !== 1) {
+      // Can't directly set scale, but scrolling helps reset it
+      document.documentElement.scrollLeft = 0;
+      document.documentElement.scrollTop = 0;
+    }
+  }, 100);
+}
+function updateEventUI(){
+  if (eventTime == null){
+    eventMarker.style.display = 'none';
+    eventTimeText.textContent = '—';
+  } else {
+    eventMarker.style.display = 'block';
+    eventTimeText.textContent = eventTime.toFixed(3) + 's';
+  }
+}
+
+/* --- ZOOM & PAN --- */
+function updateTransform(){
+  transformer.style.setProperty('--tx', `${tx}px`);
+  transformer.style.setProperty('--ty', `${ty}px`);
+  transformer.style.setProperty('--scale', `${scale}`);
+  zoomLabel.textContent = `${Math.round(scale*100)}%`;
+  zoomSlider.value = scale;
+  localStorage.setItem('fly_zoom', String(scale));
+}
+zoomSlider.addEventListener('input', (e)=>{
+  scale = parseFloat(e.target.value);
+  updateTransform();
+});
+
+/* PAN with pointer events */
+let pointerActive = false;
+let lastPointer = {x:0,y:0};
+videoWrap.addEventListener('pointerdown', (e)=>{
+  if (scale === 1) return;
+  pointerActive = true;
+  lastPointer.x = e.clientX; lastPointer.y = e.clientY;
+  videoWrap.setPointerCapture(e.pointerId);
+});
+videoWrap.addEventListener('pointermove', (e)=>{
+  if (!pointerActive) return;
+  const dx = e.clientX - lastPointer.x;
+  const dy = e.clientY - lastPointer.y;
+  lastPointer.x = e.clientX; lastPointer.y = e.clientY;
+  tx += dx;
+  ty += dy;
+  updateTransform();
+});
+videoWrap.addEventListener('pointerup', (e)=>{
+  if (!pointerActive) return;
+  pointerActive = false;
+  try{ videoWrap.releasePointerCapture(e.pointerId); }catch(_){}
+});
+videoWrap.addEventListener('pointercancel', ()=>{ pointerActive=false; });
+
+/* TOUCH: pinch-to-zoom for two fingers */
+let lastPinchDist = null;
+videoWrap.addEventListener('touchstart', (e)=>{
+  if (e.touches && e.touches.length === 2){
+    lastPinchDist = distanceBetweenTouches(e.touches[0], e.touches[1]);
+  }
+}, {passive:false});
+videoWrap.addEventListener('touchmove', (e)=>{
+  if (e.touches && e.touches.length === 2){
+    e.preventDefault();
+    const dist = distanceBetweenTouches(e.touches[0], e.touches[1]);
+    if (lastPinchDist){
+      const delta = dist - lastPinchDist;
+      let factor = 1 + delta / 300;
+      scale = Math.max(0.5, Math.min(2.5, scale * factor));
+      updateTransform();
+    }
+    lastPinchDist = dist;
+  }
+}, {passive:false});
+videoWrap.addEventListener('touchend', (e)=>{
+  if (!e.touches || e.touches.length < 2) lastPinchDist = null;
+});
+
+function distanceBetweenTouches(a,b){
+  const dx = a.clientX - b.clientX;
+  const dy = a.clientY - b.clientY;
+  return Math.sqrt(dx*dx + dy*dy);
+}
+
+/* --- Test logic: losowy start przed zdarzeniem, losowy wybór wideo --- */
+startTestBtn.addEventListener('click', startTest);
+stopTestBtn.addEventListener('click', stopTest);
+
+function startTest(){
+  if (!videoEntries.length) {
+    showToast('Wczytaj co najmniej jedno wideo przed testem.', 'warning');
+    forceLayoutRecalc();
+    return;
+  }
+
+  const trials = Math.max(1, parseInt(trialsCountInput.value)||1);
+
+  let from = parseFloat(randomFromInput.value);
+  let to = parseFloat(randomToInput.value);
+  if (isNaN(from)) from = 1.5;
+  if (isNaN(to)) to = 2.5;
+  if (from < 0) from = 0;
+  if (to < 0) to = 0;
+  if (to < from) { const tmp = from; from = to; to = tmp; }
+
+  // lista indeksów filmów, które mają ustawione zdarzenie
+  const videoIndices = [];
+  videoEntries.forEach((v,i)=>{
+    if (v.eventTime != null) videoIndices.push(i);
+  });
+  if (!videoIndices.length){
+    showToast('Ustaw punkt zdarzenia (E) na co najmniej jednym wideo przed testem.', 'warning');
+    forceLayoutRecalc();
+    return;
+  }
+
+  // Hide keyboard on mobile by blurring active element
+  if (document.activeElement && document.activeElement !== document.body) {
+    document.activeElement.blur();
+  }
+  
+  // Small delay to let keyboard hide before entering fullscreen
+  setTimeout(() => {
+    results = [];
+    updateResultsUI();
+    ongoingTest = {
+      running:true,
+      trialsTotal:trials,
+      currentTrial:0,
+      offsetMin:from,
+      offsetMax:to,
+      videoIndices
+    };
+    updateFloatingButton();
+    
+    // Enter fullscreen test mode
+    enterFullscreenTestMode();
+    updateFsTrialInfo('Przygotuj się...');
+    
+    runNextTrial();
+  }, 150);
+}
+
+function runNextTrial(){
+  if (!ongoingTest || !ongoingTest.running) return;
+  if (ongoingTest.currentTrial >= ongoingTest.trialsTotal){
     ongoingTest.running = false;
     trialInfo.textContent = `Test zakończony. ${results.length} wyników.`;
-    updateFloatingButton();
+    updateResultsUI();
+    
+    // Show summary bubble instead of immediately exiting
+    showTestSummary();
+    
+    return;
+  }
+  const trialIndex = ongoingTest.currentTrial + 1;
+
+  // losujemy wideo z listy z ustawionym zdarzeniem
+  const videoIndices = ongoingTest.videoIndices;
+  const randomVideoIndex = videoIndices[Math.floor(Math.random() * videoIndices.length)];
+  const chosenEntry = videoEntries[randomVideoIndex];
+
+  function prepareTrial(){
+    const minOffset = Math.max(0, ongoingTest.offsetMin || 0);
+    const maxOffset = Math.max(minOffset, ongoingTest.offsetMax || minOffset);
+    const range = maxOffset - minOffset;
+    const randomBefore = range > 0 ? (minOffset + Math.random() * range) : minOffset;
+
+    let startTime = eventTime - randomBefore;
+    if (!isFinite(startTime) || startTime < 0) startTime = 0;
+    if (video.duration && startTime > video.duration) {
+      startTime = Math.max(0, video.duration - 0.1);
+    }
+
+    video.currentTime = startTime;
+    video.pause();
+
+    const infoText = `Próba ${trialIndex} / ${ongoingTest.trialsTotal} — ${chosenEntry.name}`;
+    trialInfo.textContent = infoText + `, losowo ~${randomBefore.toFixed(2)}s przed zdarzeniem...`;
+    updateFsTrialInfo(infoText);
+
+    setTimeout(()=>{
+      video.play().then(()=>{
+        const playingText = `Próba ${trialIndex} / ${ongoingTest.trialsTotal} — Reaguj!`;
+        trialInfo.textContent = `Próba ${trialIndex} / ${ongoingTest.trialsTotal} — wideo: ${chosenEntry.name}. Reaguj na zdarzenie.`;
+        updateFsTrialInfo(playingText);
+        // Ensure fullscreen overlay has focus for keyboard events
+        if (isFullscreenTestMode) {
+          fullscreenOverlay.focus();
+        }
+      }).catch(err=>{
+        console.warn('Play rejected:', err);
+        exitFullscreenTestMode();
+        showToast('Autoodtwarzanie zablokowane. Dotknij wideo, a potem kliknij Start ponownie.', 'warning');
+        forceLayoutRecalc();
+      });
+    }, 140);
+  }
+
+  loadVideoByIndex(randomVideoIndex, prepareTrial);
+}
+
+function reactNow(){
+  if (!ongoingTest || !ongoingTest.running){
+    showToast('Brak trwającego testu.', 'info');
+    forceLayoutRecalc();
+    return;
+  }
+
+  const pressVideoTime = video.currentTime; // s
+  const reactionMs = (pressVideoTime - eventTime) * 1000; // może być ujemne (za wcześnie)
+  const reactionRounded = Math.round(reactionMs * 10) / 10;
+
+  try { video.pause(); } catch(_){}
+
+  ongoingTest.currentTrial += 1;
+  const classification = classifyReaction(reactionMs);
+  const note = classification.valid ? 'OK' : 'Przewidziałeś';
+
+  const currentVideoName = videoEntries[currentVideoIndex]?.name || '';
+
+  results.push({
+    trial: ongoingTest.currentTrial,
+    ms: reactionRounded,
+    iso: new Date().toISOString(),
+    note,
+    rating: classification.label,
+    valid: classification.valid,
+    color: classification.color,
+    videoName: currentVideoName
+  });
+
+  updateResultsUI();
+  
+  // Update fullscreen info with result
+  const resultText = `${reactionRounded} ms — ${classification.label}`;
+  updateFsTrialInfo(resultText);
+  
+  // Show result bubble with rating
+  showResultBubble(reactionRounded, classification.label, classification.color);
+
+  setTimeout(()=>{
+    // Hide result bubble before next trial
+    hideResultBubble();
+    
+    if (ongoingTest.currentTrial < ongoingTest.trialsTotal) {
+      runNextTrial();
+    } else {
+      ongoingTest.running = false;
+      trialInfo.textContent = `Test zakończony. ${results.length} wyników.`;
+      updateResultsUI();
+      updateFloatingButton();
+      
+      // Show summary bubble instead of immediately exiting
+      showTestSummary();
+    }
+  }, 700);
+}
+
+function stopTest(){
+  if (!ongoingTest) return;
+  ongoingTest.running = false;
+  try { video.pause(); } catch(_){}
+  trialInfo.textContent = 'Test zatrzymany.';
+  updateFloatingButton();
+  
+  // Exit fullscreen test mode when test is stopped
+  exitFullscreenTestMode();
+}
+
+function classifyReaction(ms){
+  const m = Math.round(ms);
+  // m < 0 → PRZED zdarzeniem = przewidywanie
+  if (m < 0) return { label: 'Przewidziałeś', valid: false, color: 'danger' };
+  if (m < 120) return { label: 'Przewidziałeś', valid: false, color: 'danger' };
+  if (m <= 170) return { label: 'Rewelacja', valid: true, color: 'gold' };
+  if (m <= 240) return { label: 'Bardzo dobrze', valid: true, color: 'green' };
+  if (m <= 270) return { label: 'Dobrze', valid: true, color: 'orange' };
+  return { label: 'Do poprawy', valid: true, color: 'muted' };
+}
+
+/* RESULTS UI + STATYSTYKI + WYNIK KOŃCOWY + WYKRES GAUSSA */
+function updateResultsUI(){
+  resultsBody.innerHTML = '';
+  results.forEach((r, idx)=>{
+    const tr = document.createElement('tr');
+
+    const td1 = document.createElement('td'); td1.textContent = (idx+1);
+
+    const td2 = document.createElement('td');
+    td2.textContent = r.iso.replace('T',' ').slice(0,19);
+
+    const td3 = document.createElement('td');
+    td3.textContent = `${r.ms} ms`;
+    td3.style.fontWeight='700';
+
+    const td4 = document.createElement('td');
+    const badge = document.createElement('span');
+    badge.className = 'badge';
+    badge.textContent = r.rating || (r.note || '');
+
+    if (r.valid === false) {
+      badge.style.background = 'rgba(176,0,32,0.08)';
+      badge.style.color = '#b00020';
+      badge.style.border = '1px solid rgba(176,0,32,0.25)';
+    } else {
+      if (r.color === 'gold') {
+        badge.style.background = 'rgba(249,219,46,0.12)';
+        badge.style.color = '#b8860b';
+        badge.style.border = '1px solid rgba(249,219,46,0.35)';
+      }
+      if (r.color === 'green') {
+        badge.style.background = 'rgba(11,138,62,0.08)';
+        badge.style.color = '#0b8a3e';
+        badge.style.border = '1px solid rgba(11,138,62,0.25)';
+      }
+      if (r.color === 'orange') {
+        badge.style.background = 'rgba(208,107,0,0.08)';
+        badge.style.color = '#d06b00';
+        badge.style.border = '1px solid rgba(208,107,0,0.25)';
+      }
+    }
+    td4.appendChild(badge);
+
+    tr.appendChild(td1); 
+    tr.appendChild(td2); 
+    tr.appendChild(td3); 
+    tr.appendChild(td4);
+    resultsBody.appendChild(tr);
+  });
+
+  const validResults = results.filter(r => r.valid === true);
+  const predictedCount = results.length - validResults.length;
+  const totalTrials = results.length;
+
+  if (validResults.length < 3) {
+    statsDiv.innerHTML = `
+      <div class="stats-panel stats-panel-warning">
+        <div class="stats-panel-title">Za mało prób do oceny wyniku</div>
+        <div>
+          Prób ogółem: <b>${totalTrials}</b><br/>
+          Przewidzianych (za wcześnie): <b>${predictedCount}</b>
+        </div>
+      </div>
+    `;
+    drawEmptyGauss('Za mało danych do krzywej (min. 3 ważne próby).');
+    return;
+  }
+
+  const nums = validResults.map(r => r.ms);
+  const min = Math.min(...nums);
+  const max = Math.max(...nums);
+
+  const mean = nums.reduce((a,b)=>a+b,0) / nums.length;
+  const variance = nums.reduce((sum, v)=> sum + Math.pow(v - mean, 2), 0) / nums.length;
+  const stdDev = Math.sqrt(variance);
+
+  let consistencyLabel = '';
+  let consistencyColor = '';
+
+  if (stdDev < 15) {
+    consistencyLabel = 'ELITARNA POWTARZALNOŚĆ';
+    consistencyColor = '#0b8a3e';
+  } else if (stdDev < 30) {
+    consistencyLabel = 'BARDZO DOBRA POWTARZALNOŚĆ';
+    consistencyColor = '#2e7d32';
+  } else if (stdDev < 50) {
+    consistencyLabel = 'PRZECIĘTNA POWTARZALNOŚĆ';
+    consistencyColor = '#d06b00';
+  } else {
+    consistencyLabel = 'NISKA POWTARZALNOŚĆ';
+    consistencyColor = '#b00020';
+  }
+
+  const predictedRatio = totalTrials > 0 ? (predictedCount / totalTrials) : 0;
+
+  // mniejsza waga szybkości, większa powtarzalności/przewidywania
+  const speedScoreRaw = 100 - Math.max(0, (mean - 180) * 0.15);
+  const consistencyPenalty = Math.max(0, (stdDev - 10) * 1.5);
+  const predictionPenalty = predictedRatio * 200;
+
+  let finalScore = Math.round(speedScoreRaw - consistencyPenalty - predictionPenalty);
+  finalScore = Math.max(0, Math.min(100, finalScore));
+
+  let finalLabel = '';
+  let finalColor = '';
+
+  if (finalScore >= 90) {
+    finalLabel = 'MISTRZ REAKCJI (bez przewidywania)';
+    finalColor = '#0b8a3e';
+  } else if (finalScore >= 75) {
+    finalLabel = 'Bardzo dobry wynik';
+    finalColor = '#2e7d32';
+  } else if (finalScore >= 60) {
+    finalLabel = 'Nie najgorzej';
+    finalColor = '#d06b00';
+  } else {
+    finalLabel = 'Słabo Ci to idzie';
+    finalColor = '#b00020';
+  }
+
+  statsDiv.innerHTML = `
+    <div class="stats-shell">
+      <div class="stats-score">
+        <div class="stats-score-main">
+          <div class="stats-score-label">Ostateczny wynik</div>
+          <div class="stats-score-value" style="color:${finalColor}">${finalScore}</div>
+          <div class="stats-score-desc" style="color:${finalColor}">${finalLabel}</div>
+        </div>
+        <div class="stats-score-meta">
+          Próby ważne: <b>${validResults.length}</b> / ${totalTrials}<br/>
+          Przewidzianych: <b>${predictedCount}</b> (${Math.round(predictedRatio*100)}%)
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-tile">
+          <div class="stat-tile-label">Średni czas</div>
+          <div class="stat-tile-value">${mean.toFixed(1)} ms</div>
+        </div>
+        <div class="stat-tile">
+          <div class="stat-tile-label">Powtarzalność (SD)</div>
+          <div class="stat-tile-value" style="color:${consistencyColor}">±${stdDev.toFixed(1)} ms</div>
+        </div>
+        <div class="stat-tile">
+          <div class="stat-tile-label">Min</div>
+          <div class="stat-tile-value">${min.toFixed(1)} ms</div>
+        </div>
+        <div class="stat-tile">
+          <div class="stat-tile-label">Max</div>
+          <div class="stat-tile-value">${max.toFixed(1)} ms</div>
+        </div>
+      </div>
+
+      <div class="stats-footer">
+        Im wyższy wynik i niższe SD przy zerowym przewidywaniu, tym lepsza kontrola reakcji.
+      </div>
+    </div>
+  `;
+
+  drawGaussCurve(nums, mean, stdDev);
+}
+
+/* Rysowanie wykresu Gaussa - nowoczesny styl */
+function drawEmptyGauss(msg){
+  if (!gaussCtx) return;
+  const ctx = gaussCtx;
+  const W = gaussCanvas.width;
+  const H = gaussCanvas.height;
+  
+  // Tło z gradientem
+  const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
+  bgGrad.addColorStop(0, '#fafbfc');
+  bgGrad.addColorStop(1, '#f1f5f9');
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, 0, W, H);
+  
+  // Dekoracyjna siatka
+  ctx.strokeStyle = '#e2e8f0';
+  ctx.lineWidth = 1;
+  for (let i = 1; i < 4; i++) {
+    ctx.beginPath();
+    ctx.moveTo(0, H * i / 4);
+    ctx.lineTo(W, H * i / 4);
+    ctx.stroke();
+  }
+  
+  // Tekst
+  ctx.fillStyle = '#94a3b8';
+  ctx.font = '600 13px Inter, system-ui, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('Brak danych', W/2, H/2 - 10);
+  
+  if (msg){
+    ctx.font = '500 11px Inter, system-ui, sans-serif';
+    ctx.fillStyle = '#cbd5e1';
+    ctx.fillText(msg, W/2, H/2 + 12);
+  }
+  gaussInfo.textContent = msg || 'Wykres pojawi się po zakończeniu testu (min. 3 ważne próby).';
+}
+
+function drawGaussCurve(samples, mean, stdDev){
+  if (!gaussCtx) return;
+  const ctx = gaussCtx;
+  const W = gaussCanvas.width;
+  const H = gaussCanvas.height;
+
+  ctx.clearRect(0, 0, W, H);
+
+  const paddingLeft = 40;
+  const paddingRight = 15;
+  const paddingTop = 25;
+  const paddingBottom = 28;
+
+  const plotW = W - paddingLeft - paddingRight;
+  const plotH = H - paddingTop - paddingBottom;
+  const baseY = H - paddingBottom;
+
+  // Tło z gradientem
+  const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
+  bgGrad.addColorStop(0, '#fafbfc');
+  bgGrad.addColorStop(1, '#f1f5f9');
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, 0, W, H);
+
+  if (stdDev < 1e-3) {
+    // Linia bazowa
+    ctx.strokeStyle = '#e2e8f0';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(paddingLeft, baseY);
+    ctx.lineTo(W - paddingRight, baseY);
+    ctx.stroke();
+
+    const x = paddingLeft + plotW/2;
+    
+    // Linia średniej
+    ctx.strokeStyle = '#0ea5e9';
+    ctx.setLineDash([6, 4]);
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(x, baseY);
+    ctx.lineTo(x, paddingTop);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Etykieta
+    ctx.fillStyle = '#0284c7';
+    ctx.font = '600 12px Inter, system-ui, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'bottom';
+    ctx.fillText(`${mean.toFixed(1)} ms`, x, paddingTop + 16);
+    ctx.font = '500 10px Inter, system-ui, sans-serif';
+    ctx.fillStyle = '#64748b';
+    ctx.fillText('(idealnie powtarzalnie)', x, paddingTop + 30);
+
+    gaussInfo.textContent = `Średnia: ${mean.toFixed(1)} ms • SD ≈ 0 ms — prawie idealna powtarzalność.`;
+    return;
+  }
+
+  const minSample = Math.min(...samples);
+  const maxSample = Math.max(...samples);
+
+  const left = Math.min(minSample, mean - 3*stdDev);
+  const right = Math.max(maxSample, mean + 3*stdDev);
+  const range = right - left || 1;
+
+  function xToCanvas(val){
+    return paddingLeft + ((val - left) / range) * plotW;
+  }
+
+  function normalPDF(x, mu, sigma){
+    const z = (x - mu) / sigma;
+    return Math.exp(-0.5 * z * z) / (sigma * Math.sqrt(2*Math.PI));
+  }
+
+  const steps = 150;
+  const xs = [];
+  const ys = [];
+  let maxPdf = 0;
+  for (let i = 0; i <= steps; i++){
+    const x = left + (range * i / steps);
+    const pdf = normalPDF(x, mean, stdDev);
+    xs.push(x);
+    ys.push(pdf);
+    if (pdf > maxPdf) maxPdf = pdf;
+  }
+
+  // Siatka pozioma
+  ctx.strokeStyle = '#e2e8f0';
+  ctx.lineWidth = 1;
+  for (let i = 1; i <= 3; i++) {
+    const y = baseY - (plotH * i / 4);
+    ctx.beginPath();
+    ctx.moveTo(paddingLeft, y);
+    ctx.lineTo(W - paddingRight, y);
+    ctx.stroke();
+  }
+
+  // Linia bazowa (oś X)
+  ctx.strokeStyle = '#cbd5e1';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(paddingLeft, baseY);
+  ctx.lineTo(W - paddingRight, baseY);
+  ctx.stroke();
+
+  // Ticki na osi X
+  const approxStep = 20;
+  const startTick = Math.ceil(left / approxStep) * approxStep;
+  const endTick = Math.floor(right / approxStep) * approxStep;
+  ctx.fillStyle = '#94a3b8';
+  ctx.font = '500 10px Inter, system-ui, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+
+  for (let t = startTick; t <= endTick; t += approxStep){
+    const cx = xToCanvas(t);
+    // Pionowa linia siatki
+    ctx.strokeStyle = '#f1f5f9';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(cx, baseY - 4);
+    ctx.lineTo(cx, paddingTop);
+    ctx.stroke();
+    // Tick
+    ctx.strokeStyle = '#cbd5e1';
+    ctx.beginPath();
+    ctx.moveTo(cx, baseY);
+    ctx.lineTo(cx, baseY + 4);
+    ctx.stroke();
+    // Etykieta
+    ctx.fillStyle = '#94a3b8';
+    ctx.fillText(t.toFixed(0), cx, baseY + 7);
+  }
+
+  // Etykieta osi
+  ctx.fillStyle = '#94a3b8';
+  ctx.font = '500 9px Inter, system-ui, sans-serif';
+  ctx.textAlign = 'right';
+  ctx.fillText('ms', W - paddingRight + 8, baseY + 7);
+
+  // Wypełnienie pod krzywą z gradientem
+  const fillGrad = ctx.createLinearGradient(0, paddingTop, 0, baseY);
+  fillGrad.addColorStop(0, 'rgba(14, 165, 233, 0.25)');
+  fillGrad.addColorStop(1, 'rgba(14, 165, 233, 0.02)');
+  
+  ctx.beginPath();
+  ctx.moveTo(xToCanvas(xs[0]), baseY);
+  ys.forEach((pdf, i) => {
+    const cx = xToCanvas(xs[i]);
+    const norm = pdf / maxPdf;
+    const cy = baseY - norm * plotH;
+    ctx.lineTo(cx, cy);
+  });
+  ctx.lineTo(xToCanvas(xs[xs.length-1]), baseY);
+  ctx.closePath();
+  ctx.fillStyle = fillGrad;
+  ctx.fill();
+
+  // Krzywa Gaussa
+  ctx.strokeStyle = '#0ea5e9';
+  ctx.lineWidth = 3;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.beginPath();
+  ys.forEach((pdf, i) => {
+    const cx = xToCanvas(xs[i]);
+    const norm = pdf / maxPdf;
+    const cy = baseY - norm * plotH;
+    if (i === 0) ctx.moveTo(cx, cy);
+    else ctx.lineTo(cx, cy);
+  });
+  ctx.stroke();
+
+  // Linie sigma (±1σ)
+  const sigma1Left = xToCanvas(mean - stdDev);
+  const sigma1Right = xToCanvas(mean + stdDev);
+  
+  ctx.strokeStyle = 'rgba(14, 165, 233, 0.4)';
+  ctx.lineWidth = 1.5;
+  ctx.setLineDash([4, 4]);
+  ctx.beginPath();
+  ctx.moveTo(sigma1Left, baseY);
+  ctx.lineTo(sigma1Left, paddingTop + 10);
+  ctx.moveTo(sigma1Right, baseY);
+  ctx.lineTo(sigma1Right, paddingTop + 10);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Etykiety sigma
+  ctx.fillStyle = '#0284c7';
+  ctx.font = '600 9px Inter, system-ui, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+  ctx.fillText('−1σ', sigma1Left, paddingTop + 2);
+  ctx.fillText('+1σ', sigma1Right, paddingTop + 2);
+
+  // Linia średniej
+  const meanX = xToCanvas(mean);
+  ctx.strokeStyle = '#fbbf24';
+  ctx.lineWidth = 2.5;
+  ctx.setLineDash([6, 4]);
+  ctx.beginPath();
+  ctx.moveTo(meanX, baseY);
+  ctx.lineTo(meanX, paddingTop + 20);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Etykieta średniej (z tłem)
+  const meanLabel = `μ = ${mean.toFixed(1)} ms`;
+  ctx.font = '700 11px Inter, system-ui, sans-serif';
+  const labelWidth = ctx.measureText(meanLabel).width + 12;
+  
+  // Tło etykiety
+  ctx.fillStyle = '#fbbf24';
+  const labelX = meanX - labelWidth/2;
+  const labelY = paddingTop - 2;
+  ctx.beginPath();
+  ctx.roundRect(labelX, labelY, labelWidth, 18, 4);
+  ctx.fill();
+  
+  // Tekst etykiety
+  ctx.fillStyle = '#1a1a1a';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(meanLabel, meanX, labelY + 9);
+
+  // Punkty próbek
+  ctx.fillStyle = '#f97316';
+  ctx.shadowColor = 'rgba(249, 115, 22, 0.3)';
+  ctx.shadowBlur = 4;
+  ctx.shadowOffsetY = 2;
+  samples.forEach(v => {
+    const cx = xToCanvas(v);
+    const cy = baseY - 5;
+    ctx.beginPath();
+    ctx.arc(cx, cy, 4, 0, Math.PI * 2);
+    ctx.fill();
+  });
+  ctx.shadowColor = 'transparent';
+  ctx.shadowBlur = 0;
+  ctx.shadowOffsetY = 0;
+
+  // Biały kontur na punktach
+  ctx.strokeStyle = '#ffffff';
+  ctx.lineWidth = 1.5;
+  samples.forEach(v => {
+    const cx = xToCanvas(v);
+    const cy = baseY - 5;
+    ctx.beginPath();
+    ctx.arc(cx, cy, 4, 0, Math.PI * 2);
+    ctx.stroke();
+  });
+
+  gaussInfo.textContent = `Średnia: ${mean.toFixed(1)} ms • SD: ±${stdDev.toFixed(1)} ms — im węższa krzywa, tym lepsza powtarzalność.`;
+}
+
+/* EXPORT CSV */
+exportCsvBtn.addEventListener('click', ()=>{
+  if (results.length === 0) { showToast('Brak wyników do eksportu', 'warning'); forceLayoutRecalc(); return; }
+  const lines = [['trial','iso','ms','note','video']];
+  results.forEach(r => lines.push([r.trial, r.iso, r.ms, r.note, r.videoName || '']));
+  const csv = lines.map(l=>l.map(cell=> `"${String(cell).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'reaction_results.csv'; a.click();
+  URL.revokeObjectURL(url);
+});
+
+/* INITIALIZE on load */
+window.addEventListener('load', ()=>{
+  const stored = parseFloat(localStorage.getItem('fly_zoom') || '1');
+  if (!isNaN(stored)){ scale = stored; updateTransform(); }
+  updateResultsUI();
+  refreshVideoList();
+});
+
+/* reset transform on double-tap/click */
+transformer.addEventListener('dblclick', ()=>{
+  scale = 1; tx = 0; ty = 0; updateTransform();
+});
+
+// Safari detection and bootstrap
+const IS_SAFARI = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+let safariBootstrapped = false;
+
+video.addEventListener('loadedmetadata', async () => {
+  // Safari needs a user-initiated play to unlock video playback
+  // For local files, we try to bootstrap the video
+  const entry = videoEntries[currentVideoIndex];
+  const isLocalFile = entry && entry.isLocal;
+  
+  if (IS_SAFARI && isLocalFile && !safariBootstrapped) {
+    safariBootstrapped = true;
+    try {
+      video.muted = true;
+      video.currentTime = 0;
+      await video.play();
+      video.pause();
+      video.muted = false;
+      video.currentTime = 0;
+    } catch (e) {
+      console.warn('Safari bootstrap failed:', e);
+    }
+  }
+});
+
+video.addEventListener('dragstart', (e)=> e.preventDefault());
+
+// Handle native video fullscreen - reset transform when entering
+let preFullscreenScale = 1;
+let preFullscreenTx = 0;
+let preFullscreenTy = 0;
+
+function handleFullscreenChange() {
+  const isFullscreen = document.fullscreenElement === video || 
+                       document.webkitFullscreenElement === video ||
+                       video.webkitDisplayingFullscreen;
+  
+  if (isFullscreen) {
+    // Save current transform and reset
+    preFullscreenScale = scale;
+    preFullscreenTx = tx;
+    preFullscreenTy = ty;
+    scale = 1;
+    tx = 0;
+    ty = 0;
+    updateTransform();
+  } else {
+    // Restore transform after exiting fullscreen
+    scale = preFullscreenScale;
+    tx = preFullscreenTx;
+    ty = preFullscreenTy;
+    updateTransform();
+  }
+}
+
+document.addEventListener('fullscreenchange', handleFullscreenChange);
+document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+video.addEventListener('webkitbeginfullscreen', handleFullscreenChange);
+video.addEventListener('webkitendfullscreen', handleFullscreenChange);
+
+/* ======== FULLSCREEN TEST MODE ======== */
+const fullscreenOverlay = document.createElement('div');
+fullscreenOverlay.id = 'fullscreenOverlay';
+fullscreenOverlay.tabIndex = -1; // Allow focus for keyboard events
+fullscreenOverlay.innerHTML = `
+  <div class="fs-video-container" id="fsVideoContainer"></div>
+  <div class="fs-trial-info" id="fsTrialInfo">Przygotuj się...</div>
+  <div class="fs-result-bubble" id="fsResultBubble">
+    <div class="fs-result-ms" id="fsResultMs">0 ms</div>
+    <div class="fs-result-rating" id="fsResultRating">—</div>
+  </div>
+  <div class="fs-summary-bubble" id="fsSummaryBubble">
+    <div class="fs-summary-title">Podsumowanie testu</div>
+    <div class="fs-summary-score">
+      <span class="fs-summary-score-label">Punkty:</span>
+      <span class="fs-summary-score-value" id="fsSummaryScore">0</span>
+    </div>
+    <div class="fs-summary-label" id="fsSummaryLabel">—</div>
+    <div class="fs-summary-stats">
+      <div class="fs-summary-stat">
+        <span class="fs-summary-stat-label">Średni czas:</span>
+        <span class="fs-summary-stat-value" id="fsSummaryMean">— ms</span>
+      </div>
+      <div class="fs-summary-stat">
+        <span class="fs-summary-stat-label">Powtarzalność (SD):</span>
+        <span class="fs-summary-stat-value" id="fsSummarySD">— ms</span>
+      </div>
+      <div class="fs-summary-stat">
+        <span class="fs-summary-stat-label">Ważne próby:</span>
+        <span class="fs-summary-stat-value" id="fsSummaryValid">0 / 0</span>
+      </div>
+    </div>
+    <div class="fs-summary-buttons">
+      <button class="fs-summary-btn fs-summary-btn-primary" id="fsSummaryAgain" tabindex="-1">Jeszcze raz</button>
+      <button class="fs-summary-btn fs-summary-btn-secondary" id="fsSummaryExit" tabindex="-1">Zakończ</button>
+    </div>
+  </div>
+  <div class="fs-buttons-row">
+    <button class="fs-react-btn" id="fsReactBtn" tabindex="-1">Reaguj (Space)</button>
+    <button class="fs-stop-btn" id="fsStopBtn" tabindex="-1">
+      <svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+      Stop
+    </button>
+  </div>
+`;
+document.body.appendChild(fullscreenOverlay);
+
+// ======== FULLSCREEN PREVIEW MODE (for setting events) ========
+const previewOverlay = document.createElement('div');
+previewOverlay.id = 'previewOverlay';
+previewOverlay.innerHTML = `
+  <div class="preview-video-container" id="previewVideoContainer"></div>
+  <div class="preview-controls">
+    <button class="preview-btn preview-btn-primary" id="previewSetEventBtn">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+      Ustaw zdarzenie (E)
+    </button>
+    <button class="preview-btn preview-btn-secondary" id="previewCloseBtn">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      Zamknij
+    </button>
+  </div>
+  <div class="preview-event-info" id="previewEventInfo"></div>
+`;
+document.body.appendChild(previewOverlay);
+
+const fsStyle = document.createElement('style');
+fsStyle.textContent = `
+  #fullscreenOverlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    height: 100dvh; /* Dynamic viewport height for PWA/mobile */
+    height: -webkit-fill-available; /* iOS Safari fallback */
+    background: #000;
+    z-index: 9999;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    overflow: hidden;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    box-sizing: border-box;
+    outline: none; /* Prevent focus outline */
+  }
+  #fullscreenOverlay.active {
+    display: flex !important;
+  }
+  .fs-video-container {
+    flex: 1;
+    width: 100%;
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+  }
+  .fs-video-container video {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+    transform: none !important;
+  }
+  .fs-trial-info {
+    position: absolute;
+    top: calc(12px + env(safe-area-inset-top, 0px));
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.7);
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    z-index: 10001;
+    text-align: center;
+    max-width: 90%;
+  }
+  .fs-result-bubble {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.5);
+    background: rgba(0,0,0,0.85);
+    color: #fff;
+    padding: 24px 40px;
+    border-radius: 20px;
+    text-align: center;
+    z-index: 10002;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    border: 2px solid rgba(255,255,255,0.1);
+  }
+  .fs-result-bubble.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  .fs-result-ms {
+    font-size: 42px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    margin-bottom: 8px;
+  }
+  .fs-result-rating {
+    font-size: 20px;
+    font-weight: 700;
+    padding: 8px 20px;
+    border-radius: 999px;
+    display: inline-block;
+  }
+  .fs-result-bubble.rating-gold .fs-result-rating {
+    background: rgba(249,219,46,0.2);
+    color: #f9db2e;
+    border: 2px solid rgba(249,219,46,0.5);
+  }
+  .fs-result-bubble.rating-green .fs-result-rating {
+    background: rgba(11,138,62,0.2);
+    color: #4caf50;
+    border: 2px solid rgba(76,175,80,0.5);
+  }
+  .fs-result-bubble.rating-orange .fs-result-rating {
+    background: rgba(208,107,0,0.2);
+    color: #ff9800;
+    border: 2px solid rgba(255,152,0,0.5);
+  }
+  .fs-result-bubble.rating-danger .fs-result-rating {
+    background: rgba(176,0,32,0.2);
+    color: #f44336;
+    border: 2px solid rgba(244,67,54,0.5);
+  }
+  .fs-result-bubble.rating-muted .fs-result-rating {
+    background: rgba(150,150,150,0.2);
+    color: #aaa;
+    border: 2px solid rgba(150,150,150,0.5);
+  }
+  /* Summary bubble styles */
+  .fs-summary-bubble {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.8);
+    background: rgba(0,0,0,0.95);
+    border-radius: clamp(16px, 4vw, 24px);
+    padding: clamp(20px, 5vw, 40px);
+    text-align: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    z-index: 50;
+    min-width: clamp(280px, 80vw, 420px);
+    max-width: 90vw;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    border: 2px solid rgba(249,219,46,0.3);
+  }
+  .fs-summary-bubble.show {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  .fs-summary-title {
+    font-size: clamp(18px, 4vw, 24px);
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: clamp(15px, 4vw, 25px);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .fs-summary-score {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .fs-summary-score-label {
+    font-size: clamp(14px, 3vw, 18px);
+    color: #aaa;
+  }
+  .fs-summary-score-value {
+    font-size: clamp(48px, 12vw, 72px);
+    font-weight: 800;
+    color: var(--primary);
+    line-height: 1;
+  }
+  .fs-summary-label {
+    font-size: clamp(14px, 3.5vw, 18px);
+    font-weight: 600;
+    padding: 8px 20px;
+    border-radius: 20px;
+    display: inline-block;
+    margin-bottom: clamp(15px, 4vw, 25px);
+  }
+  .fs-summary-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: clamp(20px, 5vw, 30px);
+    padding: 15px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 12px;
+  }
+  .fs-summary-stat {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: clamp(13px, 3vw, 16px);
+  }
+  .fs-summary-stat-label {
+    color: #888;
+  }
+  .fs-summary-stat-value {
+    color: #fff;
+    font-weight: 600;
+  }
+  .fs-summary-buttons {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .fs-summary-btn {
+    flex: 1;
+    min-width: 120px;
+    padding: clamp(12px, 3vw, 16px) clamp(20px, 4vw, 30px);
+    border: none;
+    border-radius: 12px;
+    font-size: clamp(14px, 3.5vw, 18px);
+    font-weight: 700;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    transition: transform 0.15s, background 0.15s;
+  }
+  .fs-summary-btn:active {
+    transform: scale(0.97);
+  }
+  .fs-summary-btn-primary {
+    background: linear-gradient(90deg, #00AEEB, #00b8f5);
+    color: white;
+  }
+  .fs-summary-btn-primary:active {
+    background: linear-gradient(90deg, #0090c5, #009dd5);
+  }
+  .fs-summary-btn-secondary {
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+  .fs-summary-btn-secondary:active {
+    background: rgba(255,255,255,0.15);
+  }
+  .fs-react-btn {
+    width: calc(100% - 24px);
+    max-width: 600px;
+    margin: 12px auto;
+    margin-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+    background: linear-gradient(90deg, #00AEEB, #00b8f5);
+    color: white;
+    padding: 24px 20px;
+    border: none;
+    border-radius: 16px;
+    font-size: 22px;
+    font-weight: 700;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    -webkit-user-select: none;
+    user-select: none;
+    flex-shrink: 0;
+    box-shadow: 0 8px 24px rgba(0, 174, 235, 0.3);
+  }
+  .fs-react-btn:active {
+    background: linear-gradient(90deg, #0090c5, #009dd5);
+  }
+  .fs-buttons-row {
+    display: flex;
+    gap: 12px;
+    width: calc(100% - 24px);
+    max-width: 600px;
+    margin: 12px auto;
+    margin-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+    flex-shrink: 0;
+  }
+  .fs-buttons-row .fs-react-btn {
+    flex: 1;
+    margin: 0;
+    width: auto;
+  }
+  .fs-stop-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: linear-gradient(90deg, #b00020, #d32f2f);
+    color: white;
+    padding: 24px 28px;
+    border: none;
+    border-radius: 16px;
+    font-size: 20px;
+    font-weight: 700;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    -webkit-user-select: none;
+    user-select: none;
+    box-shadow: 0 8px 24px rgba(176, 0, 32, 0.3);
+    flex-shrink: 0;
+  }
+  .fs-stop-btn svg {
+    width: 24px;
+    height: 24px;
+    fill: currentColor;
+  }
+  .fs-stop-btn:active {
+    background: linear-gradient(90deg, #8e001a, #b71c1c);
+  }
+  @media (max-width: 700px) {
+    .fs-buttons-row {
+      width: calc(100% - 20px);
+      margin: 10px auto;
+      margin-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+      gap: 10px;
+    }
+    .fs-stop-btn {
+      padding: 22px 20px;
+      font-size: 18px;
+      border-radius: 14px;
+    }
+  }
+  @media (max-width: 700px) {
+    .fs-react-btn {
+      padding: 22px 20px;
+      font-size: 20px;
+      width: calc(100% - 20px);
+      margin: 10px auto;
+      margin-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+      border-radius: 14px;
+    }
+    .fs-trial-info {
+      font-size: 12px;
+      padding: 6px 12px;
+    }
+    .fs-result-bubble {
+      padding: 18px 30px;
+    }
+    .fs-result-ms {
+      font-size: 32px;
+    }
+    .fs-result-rating {
+      font-size: 16px;
+      padding: 6px 16px;
+    }
+    .fs-summary-bubble {
+      padding: 16px;
+    }
+    .fs-summary-buttons {
+      flex-direction: column;
+    }
+    .fs-summary-btn {
+      width: 100%;
+    }
+  }
+  /* Hide native video controls in fullscreen mode */
+  #fullscreenOverlay video::-webkit-media-controls {
+    display: none !important;
+  }
+  #fullscreenOverlay video::-webkit-media-controls-enclosure {
+    display: none !important;
+  }
+  #fullscreenOverlay video::-webkit-media-controls-panel {
+    display: none !important;
+  }
+
+  /* Preview Overlay Styles */
+  #previewOverlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    height: 100dvh;
+    background: #000;
+    z-index: 9998;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+  #previewOverlay.active {
+    display: flex !important;
+  }
+  .preview-video-container {
+    flex: 1;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .preview-video-container video {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+  }
+  .preview-controls {
+    position: absolute;
+    bottom: calc(30px + env(safe-area-inset-bottom, 0px));
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 12px;
+    z-index: 10;
+  }
+  .preview-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 24px;
+    border: none;
+    border-radius: 50px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  }
+  .preview-btn-primary {
+    background: linear-gradient(135deg, #F4D00C 0%, #D4B00A 100%);
+    color: #1a1a1a;
+  }
+  .preview-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(244,208,12,0.4);
+  }
+  .preview-btn-secondary {
+    background: rgba(255,255,255,0.15);
+    color: white;
+    backdrop-filter: blur(10px);
+  }
+  .preview-btn-secondary:hover {
+    background: rgba(255,255,255,0.25);
+  }
+  .preview-event-info {
+    position: absolute;
+    top: calc(20px + env(safe-area-inset-top, 0px));
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.7);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    backdrop-filter: blur(10px);
+    display: none;
+  }
+  .preview-event-info.visible {
+    display: block;
+  }
+  @media (max-width: 600px) {
+    .preview-controls {
+      flex-direction: column;
+      bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+      width: calc(100% - 40px);
+    }
+    .preview-btn {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+`;
+document.head.appendChild(fsStyle);
+
+// Preview mode elements
+const previewVideoContainer = document.getElementById('previewVideoContainer');
+const previewSetEventBtn = document.getElementById('previewSetEventBtn');
+const previewCloseBtn = document.getElementById('previewCloseBtn');
+const previewEventInfo = document.getElementById('previewEventInfo');
+const fsPreviewBtn = document.getElementById('fsPreviewBtn');
+
+let isPreviewMode = false;
+let previewOriginalParent = null;
+
+function enterPreviewMode() {
+  if (isPreviewMode || !video.src) return;
+  isPreviewMode = true;
+  
+  previewOriginalParent = video.parentElement;
+  
+  // Keep controls in preview mode
+  video.setAttribute('controls', '');
+  
+  // Move video to preview container
+  previewVideoContainer.appendChild(video);
+  
+  // Show preview overlay
+  previewOverlay.classList.add('active');
+  
+  // Hide floating button
+  floatingStartBtn.style.display = 'none';
+  
+  // Update event info display
+  updatePreviewEventInfo();
+  
+  // Prevent body scroll
+  document.body.style.overflow = 'hidden';
+  
+  // Try to enter fullscreen
+  if (document.documentElement.requestFullscreen) {
+    document.documentElement.requestFullscreen().catch(() => {});
+  } else if (document.documentElement.webkitRequestFullscreen) {
+    document.documentElement.webkitRequestFullscreen().catch(() => {});
+  }
+}
+
+function exitPreviewMode() {
+  if (!isPreviewMode) return;
+  isPreviewMode = false;
+  
+  // Exit browser fullscreen if active
+  if (document.fullscreenElement || document.webkitFullscreenElement) {
+    if (document.exitFullscreen) {
+      document.exitFullscreen().catch(() => {});
+    } else if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen().catch(() => {});
+    }
+  }
+  
+  // Hide preview overlay
+  previewOverlay.classList.remove('active');
+  
+  // Move video back
+  if (previewOriginalParent) {
+    previewOriginalParent.appendChild(video);
+  }
+  
+  // Show floating button
+  floatingStartBtn.style.display = '';
+  
+  // Restore body scroll
+  document.body.style.overflow = '';
+}
+
+function updatePreviewEventInfo() {
+  if (currentVideoIndex >= 0 && videoEntries[currentVideoIndex]) {
+    const entry = videoEntries[currentVideoIndex];
+    if (entry.eventTime != null) {
+      previewEventInfo.textContent = `Zdarzenie: ${entry.eventTime.toFixed(3)}s ${entry.eventLabel ? '— ' + entry.eventLabel : ''}`;
+      previewEventInfo.classList.add('visible');
+    } else {
+      previewEventInfo.textContent = 'Brak ustawionego zdarzenia';
+      previewEventInfo.classList.add('visible');
+    }
+  } else {
+    previewEventInfo.classList.remove('visible');
+  }
+}
+
+fsPreviewBtn.addEventListener('click', enterPreviewMode);
+previewCloseBtn.addEventListener('click', exitPreviewMode);
+previewSetEventBtn.addEventListener('click', async () => {
+  await setEventAtCurrent();
+  updatePreviewEventInfo();
+});
+
+// Handle ESC to exit preview mode
+document.addEventListener('keydown', (e) => {
+  if (e.code === 'Escape' && isPreviewMode) {
+    exitPreviewMode();
+  }
+});
+
+const fsVideoContainer = document.getElementById('fsVideoContainer');
+const fsTrialInfo = document.getElementById('fsTrialInfo');
+const fsReactBtn = document.getElementById('fsReactBtn');
+const fsResultBubble = document.getElementById('fsResultBubble');
+const fsResultMs = document.getElementById('fsResultMs');
+const fsResultRating = document.getElementById('fsResultRating');
+const fsSummaryBubble = document.getElementById('fsSummaryBubble');
+const fsSummaryScore = document.getElementById('fsSummaryScore');
+const fsSummaryLabel = document.getElementById('fsSummaryLabel');
+const fsSummaryMean = document.getElementById('fsSummaryMean');
+const fsSummarySD = document.getElementById('fsSummarySD');
+const fsSummaryValid = document.getElementById('fsSummaryValid');
+const fsSummaryAgain = document.getElementById('fsSummaryAgain');
+const fsSummaryExit = document.getElementById('fsSummaryExit');
+const fsStopBtn = document.getElementById('fsStopBtn');
+
+let originalVideoParent = null;
+let isFullscreenTestMode = false;
+
+// Store transform state for fullscreen
+let savedScale = 1;
+let savedTx = 0;
+let savedTy = 0;
+
+// Fix viewport height for PWA/iOS
+function updateFullscreenHeight() {
+  const vh = window.innerHeight;
+  fullscreenOverlay.style.height = vh + 'px';
+}
+
+function enterFullscreenTestMode() {
+  if (isFullscreenTestMode) return;
+  isFullscreenTestMode = true;
+  
+  // Store original parent
+  originalVideoParent = video.parentElement;
+  
+  // Save current transform state and reset it
+  savedScale = scale;
+  savedTx = tx;
+  savedTy = ty;
+  scale = 1;
+  tx = 0;
+  ty = 0;
+  updateTransform();
+  
+  // Remove controls attribute to hide native controls
+  video.removeAttribute('controls');
+  video.tabIndex = -1; // Prevent video from receiving focus
+  
+  // Move video to fullscreen container
+  fsVideoContainer.appendChild(video);
+  
+  // Fix height for PWA/mobile
+  updateFullscreenHeight();
+  window.addEventListener('resize', updateFullscreenHeight);
+  window.addEventListener('orientationchange', updateFullscreenHeight);
+  
+  // Show fullscreen overlay
+  fullscreenOverlay.classList.add('active');
+  
+  // Focus fullscreen overlay for keyboard events
+  setTimeout(() => fullscreenOverlay.focus(), 50);
+  
+  // Hide floating button during fullscreen test
+  floatingStartBtn.style.display = 'none';
+  
+  // Prevent body scroll and fix iOS bouncing
+  document.body.style.overflow = 'hidden';
+  document.body.style.position = 'fixed';
+  document.body.style.width = '100%';
+  document.body.style.height = '100%';
+  
+  // Try to request fullscreen on mobile (optional, may not work on all devices)
+  if (document.documentElement.requestFullscreen) {
+    document.documentElement.requestFullscreen().catch(() => {});
+  } else if (document.documentElement.webkitRequestFullscreen) {
+    document.documentElement.webkitRequestFullscreen().catch(() => {});
+  }
+}
+
+function exitFullscreenTestMode() {
+  if (!isFullscreenTestMode) return;
+  isFullscreenTestMode = false;
+  
+  // Show floating button again and update its state
+  floatingStartBtn.style.display = '';
+  updateFloatingButton();
+  
+  // Hide result bubble and summary bubble if visible
+  hideResultBubble();
+  hideSummaryBubble();
+  
+  // Remove resize listeners
+  window.removeEventListener('resize', updateFullscreenHeight);
+  window.removeEventListener('orientationchange', updateFullscreenHeight);
+  
+  // Exit browser fullscreen if active
+  if (document.fullscreenElement || document.webkitFullscreenElement) {
+    if (document.exitFullscreen) {
+      document.exitFullscreen().catch(() => {});
+    } else if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen().catch(() => {});
+    }
+  }
+  
+  // Hide fullscreen overlay
+  fullscreenOverlay.classList.remove('active');
+  fullscreenOverlay.style.height = ''; // Reset inline height
+  
+  // Reset transform to default before moving video back
+  scale = 1;
+  tx = 0;
+  ty = 0;
+  updateTransform();
+  
+  // Reset video element styles to prevent overflow
+  video.style.width = '';
+  video.style.height = '';
+  video.style.maxWidth = '100%';
+  video.style.transform = '';
+  
+  // Move video back to original container
+  if (originalVideoParent) {
+    originalVideoParent.appendChild(video);
+  }
+  
+  // Restore controls attribute and focusability
+  video.setAttribute('controls', '');
+  video.removeAttribute('tabindex');
+  
+  // Restore body styles
+  document.body.style.overflow = '';
+  document.body.style.position = '';
+  document.body.style.width = '';
+  document.body.style.height = '';
+  
+  // Force layout recalculation first, then restore transform
+  setTimeout(() => {
+    // Restore saved transform state after layout is stable
+    scale = savedScale;
+    tx = savedTx;
+    ty = savedTy;
+    updateTransform();
+    
+    // Force final layout recalculation on mobile
+    forceLayoutRecalc();
+  }, 50);
+}
+
+function updateFsTrialInfo(text) {
+  fsTrialInfo.textContent = text;
+}
+
+function showResultBubble(ms, rating, colorClass) {
+  // Remove all rating classes
+  fsResultBubble.classList.remove('rating-gold', 'rating-green', 'rating-orange', 'rating-danger', 'rating-muted');
+  
+  // Add appropriate color class
+  fsResultBubble.classList.add('rating-' + colorClass);
+  
+  // Update content
+  fsResultMs.textContent = ms + ' ms';
+  fsResultRating.textContent = rating;
+  
+  // Show bubble
+  fsResultBubble.classList.add('show');
+}
+
+function hideResultBubble() {
+  fsResultBubble.classList.remove('show');
+}
+
+function showSummaryBubble(score, scoreLabel, scoreColor, mean, stdDev, sdColor, validCount, totalCount) {
+  // Update score
+  fsSummaryScore.textContent = score;
+  fsSummaryScore.style.color = scoreColor;
+  
+  // Update label
+  fsSummaryLabel.textContent = scoreLabel;
+  fsSummaryLabel.style.background = scoreColor + '20';
+  fsSummaryLabel.style.color = scoreColor;
+  fsSummaryLabel.style.border = '2px solid ' + scoreColor + '50';
+  
+  // Update stats
+  fsSummaryMean.textContent = mean.toFixed(1) + ' ms';
+  fsSummarySD.textContent = '±' + stdDev.toFixed(1) + ' ms';
+  fsSummarySD.style.color = sdColor;
+  fsSummaryValid.textContent = validCount + ' / ' + totalCount;
+  
+  // Hide react button when showing summary
+  fsReactBtn.style.display = 'none';
+  
+  // Show bubble
+  fsSummaryBubble.classList.add('show');
+}
+
+function hideSummaryBubble() {
+  fsSummaryBubble.classList.remove('show');
+  fsReactBtn.style.display = '';
+}
+
+// Calculate and show summary after test
+function showTestSummary() {
+  const validResults = results.filter(r => r.valid === true);
+  const totalTrials = results.length;
+  
+  if (validResults.length < 3) {
+    // Not enough data, show simplified summary
+    showSummaryBubble(
+      '?',
+      'Za mało ważnych prób',
+      '#888',
+      0,
+      0,
+      '#888',
+      validResults.length,
+      totalTrials
+    );
     return;
   }
   
-  const { videoIndices, offsetMin, offsetMax, trialsTotal, currentTrial } = ongoingTest;
-  const randomIdx = videoIndices[Math.floor(Math.random() * videoIndices.length)];
-  const chosenEntry = videoEntries[randomIdx];
+  const nums = validResults.map(r => r.ms);
+  const mean = nums.reduce((a, b) => a + b, 0) / nums.length;
+  const variance = nums.reduce((sum, v) => sum + Math.pow(v - mean, 2), 0) / nums.length;
+  const stdDev = Math.sqrt(variance);
   
-  loadVideoByIndex(randomIdx, () => {
-    const randomBefore = offsetMin + Math.random() * (offsetMax - offsetMin);
-    let startTime = eventTime - randomBefore;
-    if (startTime < 0) startTime = 0;
-    
-    video.currentTime = startTime;
-    video.pause();
-    trialInfo.textContent = `Próba ${currentTrial + 1}/${trialsTotal} — ${chosenEntry.name}`;
-    
-    setTimeout(() => {
-      video.play().catch(() => showToast('Autoodtwarzanie zablokowane', 'error'));
-    }, 150);
-  });
-}
-
-function reactNow() {
-  if (!ongoingTest?.running) return;
+  // Calculate consistency color
+  let sdColor = '#b00020';
+  if (stdDev < 15) sdColor = '#0b8a3e';
+  else if (stdDev < 30) sdColor = '#2e7d32';
+  else if (stdDev < 50) sdColor = '#d06b00';
   
-  const reactionMs = (video.currentTime - eventTime) * 1000;
-  video.pause();
-  ongoingTest.currentTrial++;
+  // Calculate final score (same as in updateResultsUI)
+  const predictedCount = totalTrials - validResults.length;
+  const predictedRatio = totalTrials > 0 ? (predictedCount / totalTrials) : 0;
+  const speedScoreRaw = 100 - Math.max(0, (mean - 180) * 0.15);
+  const consistencyPenalty = Math.max(0, (stdDev - 10) * 1.5);
+  const predictionPenalty = predictedRatio * 200;
+  let finalScore = Math.round(speedScoreRaw - consistencyPenalty - predictionPenalty);
+  finalScore = Math.max(0, Math.min(100, finalScore));
   
-  const classification = classifyReaction(reactionMs);
-  results.push({
-    trial: ongoingTest.currentTrial,
-    ms: Math.round(reactionMs * 10) / 10,
-    rating: classification.label,
-    valid: classification.valid
-  });
-  
-  updateResultsUI();
-  setTimeout(() => runNextTrial(), 800);
-}
-
-function stopTest() {
-  if (ongoingTest) {
-    ongoingTest.running = false;
-    video.pause();
-    trialInfo.textContent = 'Test zatrzymany.';
-    updateFloatingButton();
-  }
-}
-
-function classifyReaction(ms) {
-  const m = Math.round(ms);
-  if (m < 120) return { label: 'Przewidziałeś', valid: false };
-  if (m <= 170) return { label: 'Rewelacja', valid: true };
-  if (m <= 240) return { label: 'Bardzo dobrze', valid: true };
-  if (m <= 270) return { label: 'Dobrze', valid: true };
-  return { label: 'Do poprawy', valid: true };
-}
-
-function updateResultsUI() {
-  resultsBody.innerHTML = results.map((r, i) => `
-    <tr>
-      <td>${i + 1}</td>
-      <td>${new Date().toLocaleTimeString()}</td>
-      <td style="font-weight:700">${r.ms} ms</td>
-      <td><span class="badge" style="background:${r.valid ? 'rgba(16,185,129,0.1);color:#059669' : 'rgba(239,68,68,0.1);color:#dc2626'}">${r.rating}</span></td>
-    </tr>
-  `).join('');
-}
-
-function updateFloatingButton() {
-  if (ongoingTest?.running) {
-    floatingBtn.classList.add('running');
-    floatingBtn.innerHTML = '<svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg><span>Stop</span>';
+  let finalLabel = '';
+  let finalColor = '';
+  if (finalScore >= 90) {
+    finalLabel = 'MISTRZ REAKCJI!';
+    finalColor = '#0b8a3e';
+  } else if (finalScore >= 75) {
+    finalLabel = 'Bardzo dobry wynik';
+    finalColor = '#2e7d32';
+  } else if (finalScore >= 60) {
+    finalLabel = 'Nie najgorzej';
+    finalColor = '#d06b00';
   } else {
-    floatingBtn.classList.remove('running');
-    floatingBtn.innerHTML = '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg><span>Start testu</span>';
+    finalLabel = 'Słabo Ci to idzie';
+    finalColor = '#b00020';
   }
+  
+  showSummaryBubble(finalScore, finalLabel, finalColor, mean, stdDev, sdColor, validResults.length, totalTrials);
 }
 
-clearResultsBtn.addEventListener('click', () => {
+// Fullscreen react button handler
+fsStopBtn.addEventListener('pointerdown', (e) => {
+  e.preventDefault();
+  stopTest();
+});
+
+fsReactBtn.addEventListener('pointerdown', (e) => {
+  e.preventDefault();
+  reactNow();
+});
+
+// Handle keyboard events in fullscreen mode (capture phase to catch before other handlers)
+fullscreenOverlay.addEventListener('keydown', (e) => {
+  if (e.code === 'Space') {
+    e.preventDefault();
+    e.stopPropagation();
+    if (ongoingTest && ongoingTest.running) {
+      reactNow();
+    }
+  }
+  if (e.code === 'Escape') {
+    e.preventDefault();
+    stopTest();
+  }
+}, true); // Use capture phase
+
+// Click on video container should refocus overlay for keyboard events
+fsVideoContainer.addEventListener('click', () => {
+  if (isFullscreenTestMode) {
+    fullscreenOverlay.focus();
+  }
+});
+
+// Summary button handlers
+fsSummaryAgain.addEventListener('pointerdown', (e) => {
+  e.preventDefault();
+  hideSummaryBubble();
+  // Reset and start new test directly (we're already in fullscreen mode)
   results = [];
   updateResultsUI();
-  showToast('Wyniki wyczyszczone', 'success');
-});
-
-// ============ INITIALIZATION ============
-document.addEventListener('DOMContentLoaded', () => {
-  // Security check first
-  if (!checkSecurity()) return;
   
-  // Check existing session
-  if (checkExistingSession()) return;
+  // Get settings from inputs
+  const trials = Math.max(1, parseInt(trialsCountInput.value)||1);
+  let from = parseFloat(randomFromInput.value);
+  let to = parseFloat(randomToInput.value);
+  if (isNaN(from)) from = 1.5;
+  if (isNaN(to)) to = 2.5;
+  if (from < 0) from = 0;
+  if (to < 0) to = 0;
+  if (to < from) { const tmp = from; from = to; to = tmp; }
   
-  // Bind login button
-  document.getElementById('facebook-login-btn').addEventListener('click', loginWithFacebook);
-  document.getElementById('logout-btn').addEventListener('click', logout);
-});
-
-// Anti-tampering: detect DevTools and warn
-(function() {
-  const threshold = 160;
-  const check = () => {
-    const widthThreshold = window.outerWidth - window.innerWidth > threshold;
-    const heightThreshold = window.outerHeight - window.innerHeight > threshold;
-    if (widthThreshold || heightThreshold) {
-      console.log('%c⚠️ Wykryto narzędzia deweloperskie', 'color:red;font-size:20px;font-weight:bold');
-    }
+  const videoIndices = [];
+  videoEntries.forEach((v,i)=>{
+    if (v.eventTime != null) videoIndices.push(i);
+  });
+  
+  // Start test immediately (no delay needed, already in fullscreen)
+  ongoingTest = {
+    running: true,
+    trialsTotal: trials,
+    currentTrial: 0,
+    offsetMin: from,
+    offsetMax: to,
+    videoIndices
   };
-  setInterval(check, 1000);
-})();
+  updateFloatingButton();
+  updateFsTrialInfo('Przygotuj się...');
+  
+  // Immediately focus and start - focus will be re-applied after video plays
+  fullscreenOverlay.focus();
+  runNextTrial();
+});
+
+fsSummaryExit.addEventListener('pointerdown', (e) => {
+  e.preventDefault();
+  exitFullscreenTestMode();
+});
+
+// Register Service Worker for PWA
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then((registration) => {
+        console.log('Service Worker registered:', registration.scope);
+      })
+      .catch((error) => {
+        console.log('Service Worker registration failed:', error);
+      });
+  });
+}
+
+/* ===================== TRAINING PLANS MANAGEMENT ===================== */
+const TRAINING_PLANS_KEY = 'flyball_training_plans';
+const VIDEO_DB_NAME = 'FlyballVideoDB';
+const VIDEO_STORE_NAME = 'videos';
+const saveTrainingBtn = document.getElementById('saveTrainingBtn');
+const trainingPlansList = document.getElementById('trainingPlansList');
+
+// IndexedDB for storing video files
+let videoDB = null;
+
+function openVideoDB() {
+  return new Promise((resolve, reject) => {
+    if (videoDB) {
+      resolve(videoDB);
+      return;
+    }
+    const request = indexedDB.open(VIDEO_DB_NAME, 1);
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => {
+      videoDB = request.result;
+      resolve(videoDB);
+    };
+    request.onupgradeneeded = (event) => {
+      const db = event.target.result;
+      if (!db.objectStoreNames.contains(VIDEO_STORE_NAME)) {
+        db.createObjectStore(VIDEO_STORE_NAME, { keyPath: 'id' });
+      }
+    };
+  });
+}
+
+async function saveVideoToIndexedDB(videoId, blob, fileName) {
+  const db = await openVideoDB();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction([VIDEO_STORE_NAME], 'readwrite');
+    const store = transaction.objectStore(VIDEO_STORE_NAME);
+    const request = store.put({ id: videoId, blob, fileName });
+    request.onsuccess = () => resolve();
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function getVideoFromIndexedDB(videoId) {
+  const db = await openVideoDB();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction([VIDEO_STORE_NAME], 'readonly');
+    const store = transaction.objectStore(VIDEO_STORE_NAME);
+    const request = store.get(videoId);
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function deleteVideoFromIndexedDB(videoId) {
+  const db = await openVideoDB();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction([VIDEO_STORE_NAME], 'readwrite');
+    const store = transaction.objectStore(VIDEO_STORE_NAME);
+    const request = store.delete(videoId);
+    request.onsuccess = () => resolve();
+    request.onerror = () => reject(request.error);
+  });
+}
+
+// Convert blob URL to actual blob
+async function fetchBlobFromObjectURL(blobUrl) {
+  const response = await fetch(blobUrl);
+  return await response.blob();
+}
+
+// Get saved training plans from localStorage
+function getSavedTrainingPlans() {
+  try {
+    const data = localStorage.getItem(TRAINING_PLANS_KEY);
+    return data ? JSON.parse(data) : [];
+  } catch (e) {
+    console.error('Error loading training plans:', e);
+    return [];
+  }
+}
+
+// Save training plans to localStorage
+function saveTrainingPlansToStorage(plans) {
+  try {
+    localStorage.setItem(TRAINING_PLANS_KEY, JSON.stringify(plans));
+  } catch (e) {
+    console.error('Error saving training plans:', e);
+    showToast('Nie udało się zapisać treningów. Sprawdź dostępne miejsce w przeglądarce.', 'error');
+  }
+}
+
+// Save current training
+async function saveCurrentTraining() {
+  if (videoEntries.length === 0) {
+    showToast('Brak filmów do zapisania. Dodaj co najmniej jeden film.', 'warning');
+    return;
+  }
+  
+  const planName = await showPrompt('Podaj nazwę treningu:', `Trening ${new Date().toLocaleDateString('pl-PL')}`);
+  if (!planName) return;
+  
+  // Show saving indicator
+  saveTrainingBtn.disabled = true;
+  saveTrainingBtn.textContent = 'Zapisywanie...';
+  
+  try {
+    const planId = Date.now();
+    const videosToSave = [];
+    
+    for (let i = 0; i < videoEntries.length; i++) {
+      const v = videoEntries[i];
+      const videoData = {
+        name: v.name,
+        eventTime: v.eventTime,
+        eventLabel: v.eventLabel || '',
+        isLocal: v.isLocal
+      };
+      
+      if (v.isLocal) {
+        // Save local video blob to IndexedDB
+        const videoId = `${planId}_video_${i}`;
+        try {
+          const blob = await fetchBlobFromObjectURL(v.src);
+          await saveVideoToIndexedDB(videoId, blob, v.name);
+          videoData.videoId = videoId;
+          videoData.src = null; // Don't store blob URL
+        } catch (err) {
+          console.error('Error saving local video:', err);
+          showToast(`Błąd podczas zapisywania filmu "${v.name}". Film może być zbyt duży.`, 'error');
+          saveTrainingBtn.disabled = false;
+          saveTrainingBtn.textContent = 'Zapisz obecny trening';
+          return;
+        }
+      } else {
+        // URL-based video - just store the URL
+        videoData.src = v.src;
+        videoData.videoId = null;
+      }
+      
+      videosToSave.push(videoData);
+    }
+    
+    const plan = {
+      id: planId,
+      name: planName,
+      createdAt: new Date().toISOString(),
+      videos: videosToSave
+    };
+    
+    const plans = getSavedTrainingPlans();
+    plans.push(plan);
+    saveTrainingPlansToStorage(plans);
+    refreshTrainingPlansList();
+    
+    showToast(`Trening "${planName}" został zapisany z ${videosToSave.length} filmami.`, 'success');
+  } catch (err) {
+    console.error('Error saving training:', err);
+    showToast('Wystąpił błąd podczas zapisywania treningu.', 'error');
+  } finally {
+    saveTrainingBtn.disabled = false;
+    saveTrainingBtn.textContent = 'Zapisz obecny trening';
+  }
+}
+
+// Load a training plan
+async function loadTrainingPlan(planId) {
+  const plans = getSavedTrainingPlans();
+  const plan = plans.find(p => p.id === planId);
+  if (!plan) {
+    showToast('Nie znaleziono treningu.', 'error');
+    return;
+  }
+  
+  // Ask user if they want to replace or add
+  const hasExisting = videoEntries.length > 0;
+  let shouldReplace = true;
+  if (hasExisting) {
+    shouldReplace = await showConfirm('Czy chcesz zastąpić obecne filmy?', 'Zastąp', 'Dodaj do obecnych');
+  }
+  
+  // Show loading indicator
+  const loadBtn = document.querySelector(`[onclick="loadTrainingPlan(${planId})"]`);
+  if (loadBtn) {
+    loadBtn.disabled = true;
+    loadBtn.textContent = 'Ładowanie...';
+  }
+  
+  try {
+    if (shouldReplace) {
+      // Clear existing videos (revoke blob URLs for local files)
+      videoEntries.forEach(v => {
+        if (v.isLocal && v.src) {
+          try { URL.revokeObjectURL(v.src); } catch(_){}
+        }
+      });
+      videoEntries = [];
+      currentVideoIndex = -1;
+    }
+    
+    // Add videos from the plan
+    for (const v of plan.videos) {
+      let src = v.src;
+      
+      if (v.isLocal && v.videoId) {
+        // Load video from IndexedDB
+        try {
+          const videoData = await getVideoFromIndexedDB(v.videoId);
+          if (videoData && videoData.blob) {
+            src = URL.createObjectURL(videoData.blob);
+          } else {
+            console.warn('Video not found in IndexedDB:', v.videoId);
+            showToast(`Film "${v.name}" nie został znaleziony w pamięci. Możliwe, że dane zostały usunięte.`, 'warning');
+            continue;
+          }
+        } catch (err) {
+          console.error('Error loading video from IndexedDB:', err);
+          continue;
+        }
+      }
+      
+      videoEntries.push({
+        name: v.name,
+        src: src,
+        isLocal: v.isLocal,
+        eventTime: v.eventTime,
+        eventLabel: v.eventLabel || ''
+      });
+    }
+    
+    // Load first video (or first new video)
+    if (videoEntries.length > 0) {
+      const indexToLoad = shouldReplace ? 0 : videoEntries.length - plan.videos.length;
+      loadVideoByIndex(Math.max(0, indexToLoad));
+    } else {
+      refreshVideoList();
+    }
+    
+    showToast(`Wczytano trening "${plan.name}" z ${plan.videos.length} filmami.`, 'success');
+  } catch (err) {
+    console.error('Error loading training:', err);
+    showToast('Wystąpił błąd podczas wczytywania treningu.', 'error');
+  } finally {
+    if (loadBtn) {
+      loadBtn.disabled = false;
+      loadBtn.textContent = 'Wczytaj';
+    }
+  }
+}
+
+// Delete a training plan
+async function deleteTrainingPlan(planId) {
+  const plans = getSavedTrainingPlans();
+  const plan = plans.find(p => p.id === planId);
+  if (!plan) return;
+  
+  const confirmed = await showConfirm(`Czy na pewno chcesz usunąć trening "${plan.name}"?`, 'Usuń', 'Anuluj');
+  if (!confirmed) return;
+  
+  // Delete associated videos from IndexedDB
+  for (const v of plan.videos) {
+    if (v.isLocal && v.videoId) {
+      try {
+        await deleteVideoFromIndexedDB(v.videoId);
+      } catch (err) {
+        console.warn('Error deleting video from IndexedDB:', err);
+      }
+    }
+  }
+  
+  const updatedPlans = plans.filter(p => p.id !== planId);
+  saveTrainingPlansToStorage(updatedPlans);
+  refreshTrainingPlansList();
+}
+
+// Refresh the training plans list UI
+function refreshTrainingPlansList() {
+  const plans = getSavedTrainingPlans();
+  
+  if (plans.length === 0) {
+    trainingPlansList.innerHTML = '<div class="no-plans-message">Brak zapisanych treningów. Dodaj filmy, ustaw zdarzenia i kliknij "Zapisz".</div>';
+    return;
+  }
+  
+  trainingPlansList.innerHTML = plans.map(plan => {
+    const date = new Date(plan.createdAt).toLocaleDateString('pl-PL', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+    const videoCount = plan.videos.length;
+    const eventsCount = plan.videos.filter(v => v.eventTime != null).length;
+    const localCount = plan.videos.filter(v => v.isLocal).length;
+    const urlCount = videoCount - localCount;
+    
+    let typeInfo = '';
+    if (localCount > 0 && urlCount > 0) {
+      typeInfo = ` (${localCount} lok., ${urlCount} URL)`;
+    } else if (localCount > 0) {
+      typeInfo = ' (lokalne)';
+    } else if (urlCount > 0) {
+      typeInfo = ' (URL)';
+    }
+    
+    return `
+      <div class="training-plan-item" data-plan-id="${plan.id}">
+        <div class="training-plan-info">
+          <div class="training-plan-name">${escapeHtml(plan.name)}</div>
+          <div class="training-plan-meta">${videoCount} film(ów)${typeInfo}, ${eventsCount} zdarzeń • ${date}</div>
+        </div>
+        <div class="training-plan-actions">
+          <button class="btn btn-accent" onclick="loadTrainingPlan(${plan.id})">Wczytaj</button>
+          <button class="btn btn-ghost" onclick="deleteTrainingPlan(${plan.id})">Usuń</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// Helper to escape HTML
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+// Initialize training plans on page load
+saveTrainingBtn.addEventListener('click', saveCurrentTraining);
+openVideoDB().then(() => {
+  refreshTrainingPlansList();
+}).catch(err => {
+  console.error('Error opening IndexedDB:', err);
+  refreshTrainingPlansList();
+});
+
+// ===================== EXAMPLE TRAININGS =====================
+const exampleTrainingsList = document.getElementById('exampleTrainingsList');
+
+// Przykładowe treningi osadzone bezpośrednio w kodzie
+const exampleTrainingsData = {
+  "exampleTrainings": [
+    {
+      "id": "przyklad_startu_1",
+      "name": "Przykładowy trening 1",
+      "description": "Trening z 3 filmami startowymi",
+      "videos": [
+        {
+          "name": "Test Swiatla 1",
+          "src": "./example/Test-Swiatla-1.MOV",
+          "eventTime": 1.655,
+          "eventLabel": "Pierwsze zolte swiatlo"
+        },
+        {
+          "name": "Test Swiatla 2",
+          "src": "./example/Test-Swiatla-2.MOV",
+          "eventTime": 5.265,
+          "eventLabel": "Pierwsze zolte swiatlo"
+        },
+        {
+          "name": "Test Swiatla 3",
+          "src": "./example/Test-Swiatla-3.MOV",
+          "eventTime": 2.507,
+          "eventLabel": "Pierwsze zolte swiatlo"
+        }
+      ]
+    }
+  ]
+};
+
+function refreshExampleTrainingsList() {
+  if (!exampleTrainingsData || !exampleTrainingsData.exampleTrainings || exampleTrainingsData.exampleTrainings.length === 0) {
+    exampleTrainingsList.innerHTML = '<div class="example-loading-message">Brak przykładowych treningów.</div>';
+    return;
+  }
+
+  exampleTrainingsList.innerHTML = exampleTrainingsData.exampleTrainings.map((training, index) => {
+    const videoCount = training.videos.length;
+    const eventsCount = training.videos.filter(v => v.eventTime != null).length;
+    const description = training.description || '';
+
+    return `
+      <div class="example-training-item" data-example-id="${training.id}">
+        <div class="example-training-info">
+          <div class="example-training-name">${escapeHtml(training.name)}</div>
+          <div class="example-training-meta">${videoCount} film(ów), ${eventsCount} zdarzeń${description ? ' • ' + escapeHtml(description) : ''}</div>
+        </div>
+        <div class="example-training-actions">
+          <button class="btn btn-accent" onclick="loadExampleTraining(${index})">Wczytaj</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+async function loadExampleTraining(index) {
+  if (!exampleTrainingsData || !exampleTrainingsData.exampleTrainings[index]) {
+    showToast('Nie znaleziono przykładowego treningu.', 'error');
+    return;
+  }
+
+  const training = exampleTrainingsData.exampleTrainings[index];
+
+  // Ask user if they want to replace or add
+  const hasExisting = videoEntries.length > 0;
+  let shouldReplace = true;
+  if (hasExisting) {
+    shouldReplace = await showConfirm('Czy chcesz zastąpić obecne filmy?', 'Zastąp', 'Dodaj do obecnych');
+  }
+
+  // Show loading indicator
+  const loadBtn = document.querySelector(`[onclick="loadExampleTraining(${index})"]`);
+  if (loadBtn) {
+    loadBtn.disabled = true;
+    loadBtn.textContent = 'Ładowanie...';
+  }
+
+  try {
+    if (shouldReplace) {
+      // Clear existing videos (revoke blob URLs for local files)
+      videoEntries.forEach(v => {
+        if (v.isLocal && v.src) {
+          try { URL.revokeObjectURL(v.src); } catch(_){}
+        }
+      });
+      videoEntries = [];
+      currentVideoIndex = -1;
+    }
+
+    // Add videos from the example training
+    for (const v of training.videos) {
+      videoEntries.push({
+        name: v.name,
+        src: v.src,
+        isLocal: false,
+        eventTime: v.eventTime,
+        eventLabel: v.eventLabel || ''
+      });
+    }
+
+    // Load first video (or first new video)
+    if (videoEntries.length > 0) {
+      const indexToLoad = shouldReplace ? 0 : videoEntries.length - training.videos.length;
+      loadVideoByIndex(Math.max(0, indexToLoad));
+    } else {
+      refreshVideoList();
+    }
+
+    showToast(`Wczytano przykładowy trening "${training.name}" z ${training.videos.length} filmami.`, 'success');
+  } catch (err) {
+    console.error('Error loading example training:', err);
+    showToast('Wystąpił błąd podczas wczytywania przykładowego treningu.', 'error');
+  } finally {
+    if (loadBtn) {
+      loadBtn.disabled = false;
+      loadBtn.textContent = 'Wczytaj';
+    }
+  }
+}
+
+// Load example trainings on page load
+refreshExampleTrainingsList();
 </script>
 </body>
 </html>
