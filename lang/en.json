@@ -41,7 +41,8 @@
     "event_set": "Event set",
     "event_desc_prompt": "Event description (optional):",
     "event_desc_title": "Describe event",
-    "zoom": "Zoom"
+    "zoom": "Zoom",
+    "fullscreen_preview": "Fullscreen with controls"
   },
   
   "test": {
@@ -59,7 +60,8 @@
     "react": "React!",
     "react_btn": "React (Space)",
     "prepare": "Prepare...",
-    "video_label": "video"
+    "video_label": "video",
+    "random_before": "random before event"
   },
   
   "results": {
@@ -201,6 +203,7 @@
     "cancel": "Cancel",
     "confirm": "Confirm",
     "close": "Close",
-    "clear": "Clear"
+    "clear": "Clear",
+    "enter_value": "Enter value"
   }
 }
