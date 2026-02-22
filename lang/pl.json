@@ -23,7 +23,8 @@
     "no_permission_title": "Brak uprawnień",
     "no_permission_desc": "Twoje konto Facebook nie ma dostępu do wersji PRO. Skontaktuj się z administratorem, aby uzyskać dostęp.",
     "try_again": "Spróbuj ponownie",
-    "access_code": "Kod dostępu"
+    "access_code": "Kod dostępu",
+    "click_to_copy": "Kliknij aby skopiować"
   },
   
   "video": {
@@ -32,6 +33,7 @@
     "badge": "Sprawdź swoją reakcję",
     "no_video": "Brak wideo",
     "load_url": "Wczytaj URL",
+    "url_name": "Wideo z URL",
     "load_url_prompt": "Wklej URL do pliku mp4/webm:",
     "load_url_title": "Wczytaj wideo z URL",
     "set_event": "Ustaw zdarzenie (E)",
@@ -56,7 +58,8 @@
     "trial": "Próba",
     "react": "Reaguj!",
     "react_btn": "Reaguj (Space)",
-    "prepare": "Przygotuj się..."
+    "prepare": "Przygotuj się...",
+    "video_label": "wideo"
   },
   
   "results": {
