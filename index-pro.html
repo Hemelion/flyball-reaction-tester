@@ -1527,6 +1527,9 @@ const I18N = {
       const key = el.getAttribute('data-i18n-title');
       el.title = this.t(key);
     });
+    // Refresh dynamic lists after translations change
+    if (typeof refreshTrainingPlansList === 'function') refreshTrainingPlansList();
+    if (typeof refreshExampleTrainingsList === 'function') refreshExampleTrainingsList();
   },
   
   updateLanguageSwitcher() {
@@ -1684,7 +1687,7 @@ function showAccessDenied(userName, odzyskajHash) {
       <div style="margin-top:20px;padding:12px;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0">
         <div style="font-size:11px;color:#64748b;margin-bottom:6px">${t('security.access_code')}:</div>
         <code id="accessCodeField" style="display:block;background:#fff;padding:8px;border-radius:4px;font-family:monospace;font-size:12px;word-break:break-all;border:1px solid #e2e8f0;cursor:pointer" onclick="navigator.clipboard.writeText('${accessCode}').then(()=>this.style.background='#d1fae5')">${accessCode}</code>
-        <div style="font-size:10px;color:#94a3b8;margin-top:4px;text-align:center">Kliknij aby skopiować</div>
+        <div style="font-size:10px;color:#94a3b8;margin-top:4px;text-align:center">${t('security.click_to_copy')}</div>
       </div>
     </div>
   `;
@@ -1834,12 +1837,12 @@ function showToast(message, type = 'info', title = null, duration = 4000) {
   
   const iconClass = `toast-icon toast-icon-${type}`;
   const defaultTitles = {
-    success: 'Sukces',
-    error: 'Błąd',
-    warning: 'Uwaga',
-    info: 'Informacja'
+    success: t('toast.success'),
+    error: t('toast.error'),
+    warning: t('toast.warning'),
+    info: t('toast.info')
   };
-  const displayTitle = title || defaultTitles[type] || 'Informacja';
+  const displayTitle = title || defaultTitles[type] || t('toast.info');
   
   toast.innerHTML = `
     <div class="${iconClass}">${toastIcons[type] || toastIcons.info}</div>
@@ -2083,7 +2086,7 @@ fileInput.addEventListener('change', (e)=>{
 loadUrlBtn.addEventListener('click', async ()=>{
   const url = await showPrompt(t('video.load_url_prompt'), '', t('video.load_url_title'));
   if (!url) return;
-  const name = url.split('/').pop() || 'Wideo z URL';
+  const name = url.split('/').pop() || t('video.url_name');
   videoEntries.push({
     name,
     src: url,
@@ -2394,7 +2397,7 @@ function runNextTrial(){
     setTimeout(()=>{
       video.play().then(()=>{
         const playingText = `${t('test.trial')} ${trialIndex} / ${ongoingTest.trialsTotal} — ${t('test.react')}`;
-        trialInfo.textContent = `${t('test.trial')} ${trialIndex} / ${ongoingTest.trialsTotal} — wideo: ${chosenEntry.name}. ${t('test.react')}`;
+        trialInfo.textContent = `${t('test.trial')} ${trialIndex} / ${ongoingTest.trialsTotal} — ${t('test.video_label')}: ${chosenEntry.name}. ${t('test.react')}`;
         updateFsTrialInfo(playingText);
         // Ensure fullscreen overlay has focus for keyboard events
         if (isFullscreenTestMode) {
@@ -4396,7 +4399,7 @@ function refreshExampleTrainingsList() {
       <div class="example-training-item" data-example-id="${training.id}">
         <div class="example-training-info">
           <div class="example-training-name">${escapeHtml(training.name)}</div>
-          <div class="example-training-meta">${videoCount} film(ów), ${eventsCount} zdarzeń${description ? ' • ' + escapeHtml(description) : ''}</div>
+          <div class="example-training-meta">${videoCount} ${t('training.videos')}, ${eventsCount} ${t('training.events')}${description ? ' • ' + escapeHtml(description) : ''}</div>
         </div>
         <div class="example-training-actions">
           <button class="btn btn-accent" onclick="loadExampleTraining(${index})">${t('training.load')}</button>
