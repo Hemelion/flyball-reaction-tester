@@ -1338,7 +1338,7 @@
             </select>
             <button class="btn btn-ghost" id="loadUrlBtn" data-i18n="video.load_url">Wczytaj URL</button>
             <button class="btn btn-primary" id="setEventBtn" data-i18n="video.set_event">Ustaw zdarzenie (E)</button>
-            <button class="btn btn-ghost" id="fsPreviewBtn" title="Pełny ekran z kontrolkami">
+            <button class="btn btn-ghost" id="fsPreviewBtn" data-i18n-title="video.fullscreen_preview" title="Fullscreen with controls">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
             </button>
           </div>
@@ -1530,6 +1530,7 @@ const I18N = {
     // Refresh dynamic lists after translations change
     if (typeof refreshTrainingPlansList === 'function') refreshTrainingPlansList();
     if (typeof refreshExampleTrainingsList === 'function') refreshExampleTrainingsList();
+    if (typeof updateFloatingButton === 'function') updateFloatingButton();
   },
   
   updateLanguageSwitcher() {
@@ -1874,7 +1875,10 @@ function showToast(message, type = 'info', title = null, duration = 4000) {
 }
 
 /* ======== MODERN MODAL DIALOGS ======== */
-function showConfirm(message, confirmText = 'OK', cancelText = 'Anuluj', title = 'Potwierdź') {
+function showConfirm(message, confirmText = null, cancelText = null, title = null) {
+  confirmText = confirmText || t('common.ok');
+  cancelText = cancelText || t('common.cancel');
+  title = title || t('common.confirm');
   return new Promise((resolve) => {
     const overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
@@ -1910,7 +1914,8 @@ function showConfirm(message, confirmText = 'OK', cancelText = 'Anuluj', title =
   });
 }
 
-function showPrompt(message, defaultValue = '', title = 'Wprowadź wartość') {
+function showPrompt(message, defaultValue = '', title = null) {
+  title = title || t('common.enter_value');
   return new Promise((resolve) => {
     const overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
@@ -1924,8 +1929,8 @@ function showPrompt(message, defaultValue = '', title = 'Wprowadź wartość') {
           <input type="text" class="modal-input" value="${defaultValue.replace(/"/g, '&quot;')}" />
         </div>
         <div class="modal-footer">
-          <button class="modal-btn modal-btn-secondary" data-action="cancel">Anuluj</button>
-          <button class="modal-btn modal-btn-primary" data-action="confirm">OK</button>
+          <button class="modal-btn modal-btn-secondary" data-action="cancel">${t('common.cancel')}</button>
+          <button class="modal-btn modal-btn-primary" data-action="confirm">${t('common.ok')}</button>
         </div>
       </div>
     `;
@@ -1967,14 +1972,14 @@ function updateFloatingButton() {
     floatingStartBtn.classList.add('running');
     floatingStartBtn.innerHTML = `
       <svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
-      <span>${t('test.stop')}</span>
+      <span data-i18n="test.stop">${t('test.stop')}</span>
       <span class="kbd">ESC</span>
     `;
   } else {
     floatingStartBtn.classList.remove('running');
     floatingStartBtn.innerHTML = `
       <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-      <span>${t('test.start')}</span>
+      <span data-i18n="test.start">${t('test.start')}</span>
       <span class="kbd">S</span>
     `;
   }
@@ -2350,7 +2355,7 @@ function startTest(){
     
     // Enter fullscreen test mode
     enterFullscreenTestMode();
-    updateFsTrialInfo('Przygotuj się...');
+    updateFsTrialInfo(t('test.prepare'));
     
     runNextTrial();
   }, 150);
@@ -2391,7 +2396,7 @@ function runNextTrial(){
     video.pause();
 
     const infoText = `${t('test.trial')} ${trialIndex} / ${ongoingTest.trialsTotal} — ${chosenEntry.name}`;
-    trialInfo.textContent = infoText + `, losowo ~${randomBefore.toFixed(2)}s przed zdarzeniem...`;
+    trialInfo.textContent = `${infoText}, ${t('test.random_before')} ~${randomBefore.toFixed(2)}s...`;
     updateFsTrialInfo(infoText);
 
     setTimeout(()=>{
@@ -3043,42 +3048,42 @@ fullscreenOverlay.id = 'fullscreenOverlay';
 fullscreenOverlay.tabIndex = -1; // Allow focus for keyboard events
 fullscreenOverlay.innerHTML = `
   <div class="fs-video-container" id="fsVideoContainer"></div>
-  <div class="fs-trial-info" id="fsTrialInfo">${t('test.prepare')}</div>
+  <div class="fs-trial-info" id="fsTrialInfo" data-i18n="test.prepare">Przygotuj się...</div>
   <div class="fs-result-bubble" id="fsResultBubble">
     <div class="fs-result-ms" id="fsResultMs">0 ms</div>
     <div class="fs-result-rating" id="fsResultRating">—</div>
   </div>
   <div class="fs-summary-bubble" id="fsSummaryBubble">
-    <div class="fs-summary-title">${t('fullscreen.summary_title')}</div>
+    <div class="fs-summary-title" data-i18n="fullscreen.summary_title">Podsumowanie testu</div>
     <div class="fs-summary-score">
-      <span class="fs-summary-score-label">${t('fullscreen.score_label')}</span>
+      <span class="fs-summary-score-label" data-i18n="fullscreen.score_label">Punkty:</span>
       <span class="fs-summary-score-value" id="fsSummaryScore">0</span>
     </div>
     <div class="fs-summary-label" id="fsSummaryLabel">—</div>
     <div class="fs-summary-stats">
       <div class="fs-summary-stat">
-        <span class="fs-summary-stat-label">${t('fullscreen.mean_label')}</span>
+        <span class="fs-summary-stat-label" data-i18n="fullscreen.mean_label">Średni czas:</span>
         <span class="fs-summary-stat-value" id="fsSummaryMean">— ms</span>
       </div>
       <div class="fs-summary-stat">
-        <span class="fs-summary-stat-label">${t('fullscreen.sd_label')}</span>
+        <span class="fs-summary-stat-label" data-i18n="fullscreen.sd_label">Powtarzalność (SD):</span>
         <span class="fs-summary-stat-value" id="fsSummarySD">— ms</span>
       </div>
       <div class="fs-summary-stat">
-        <span class="fs-summary-stat-label">${t('fullscreen.valid_label')}</span>
+        <span class="fs-summary-stat-label" data-i18n="fullscreen.valid_label">Ważne próby:</span>
         <span class="fs-summary-stat-value" id="fsSummaryValid">0 / 0</span>
       </div>
     </div>
     <div class="fs-summary-buttons">
-      <button class="fs-summary-btn fs-summary-btn-primary" id="fsSummaryAgain" tabindex="-1">${t('fullscreen.again')}</button>
-      <button class="fs-summary-btn fs-summary-btn-secondary" id="fsSummaryExit" tabindex="-1">${t('fullscreen.exit')}</button>
+      <button class="fs-summary-btn fs-summary-btn-primary" id="fsSummaryAgain" tabindex="-1" data-i18n="fullscreen.again">Jeszcze raz</button>
+      <button class="fs-summary-btn fs-summary-btn-secondary" id="fsSummaryExit" tabindex="-1" data-i18n="fullscreen.exit">Zakończ</button>
     </div>
   </div>
   <div class="fs-buttons-row">
-    <button class="fs-react-btn" id="fsReactBtn" tabindex="-1">${t('test.react_btn')}</button>
+    <button class="fs-react-btn" id="fsReactBtn" tabindex="-1" data-i18n="test.react_btn">Reaguj (Space)</button>
     <button class="fs-stop-btn" id="fsStopBtn" tabindex="-1">
       <svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
-      ${t('test.stop')}
+      <span data-i18n="test.stop">Stop</span>
     </button>
   </div>
 `;
@@ -3092,11 +3097,11 @@ previewOverlay.innerHTML = `
   <div class="preview-controls">
     <button class="preview-btn preview-btn-primary" id="previewSetEventBtn">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-      Ustaw zdarzenie (E)
+      <span data-i18n="video.set_event">Ustaw zdarzenie (E)</span>
     </button>
     <button class="preview-btn preview-btn-secondary" id="previewCloseBtn">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-      Zamknij
+      <span data-i18n="common.close">Zamknij</span>
     </button>
   </div>
   <div class="preview-event-info" id="previewEventInfo"></div>
@@ -3989,7 +3994,7 @@ fsSummaryAgain.addEventListener('pointerdown', (e) => {
     videoIndices
   };
   updateFloatingButton();
-  updateFsTrialInfo('Przygotuj się...');
+  updateFsTrialInfo(t('test.prepare'));
   
   // Immediately focus and start - focus will be re-applied after video plays
   fullscreenOverlay.focus();
@@ -4112,7 +4117,7 @@ async function saveCurrentTraining() {
     return;
   }
   
-  const planName = await showPrompt(t('training.save_name_prompt'), `${t('training.save_default_name')} ${new Date().toLocaleDateString('pl-PL')}`);
+  const planName = await showPrompt(t('training.save_name_prompt'), `${t('training.save_default_name')} ${new Date().toLocaleDateString(I18N.currentLang === 'pl' ? 'pl-PL' : 'en-US')}`);
   if (!planName) return;
   
   // Show saving indicator
@@ -4298,7 +4303,7 @@ function refreshTrainingPlansList() {
   }
   
   trainingPlansList.innerHTML = plans.map(plan => {
-    const date = new Date(plan.createdAt).toLocaleDateString('pl-PL', {
+    const date = new Date(plan.createdAt).toLocaleDateString(I18N.currentLang === 'pl' ? 'pl-PL' : 'en-US', {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
