@@ -79,6 +79,16 @@
   .logout-btn{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:#fff;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:all 0.2s}
   .logout-btn:hover{background:rgba(239,68,68,0.8);border-color:transparent}
 
+  /* Language Switcher */
+  .lang-switcher{display:flex;gap:4px;margin-right:12px}
+  .lang-switcher-btn{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.7);padding:6px 10px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s;text-transform:uppercase}
+  .lang-switcher-btn:hover{background:rgba(255,255,255,0.2);color:#fff}
+  .lang-switcher-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+  .login-lang-switcher{position:absolute;top:20px;right:20px;display:flex;gap:4px}
+  .login-lang-switcher .lang-switcher-btn{background:rgba(0,0,0,0.1);border:1px solid rgba(255,255,255,0.3);color:rgba(255,255,255,0.8)}
+  .login-lang-switcher .lang-switcher-btn:hover{background:rgba(0,0,0,0.2);color:#fff}
+  .login-lang-switcher .lang-switcher-btn.active{background:#fff;border-color:#fff;color:var(--accent-dark)}
+
   #app-container{display:none}
   #app-container.active{display:block}
   /* ========== END PRO VERSION STYLES ========== */
@@ -1214,24 +1224,28 @@
 <body>
 <!-- ========== PRO VERSION: Security Block ========== -->
 <div id="security-block" class="hidden">
-  <h1>⛔ Dostęp zabroniony</h1>
-  <p>Ta aplikacja może być uruchomiona wyłącznie z autoryzowanej domeny. Lokalne uruchomienie pliku HTML nie jest dozwolone.</p>
+  <h1 data-i18n="security.access_denied_title">⛔ Dostęp zabroniony</h1>
+  <p data-i18n="security.access_denied_desc">Ta aplikacja może być uruchomiona wyłącznie z autoryzowanej domeny. Lokalne uruchomienie pliku HTML nie jest dozwolone.</p>
 </div>
 
 <!-- ========== PRO VERSION: Login Screen ========== -->
 <div id="login-screen">
+  <div class="login-lang-switcher">
+    <button class="lang-switcher-btn" data-lang="pl" onclick="switchLanguage('pl')">PL</button>
+    <button class="lang-switcher-btn" data-lang="en" onclick="switchLanguage('en')">EN</button>
+  </div>
   <div class="login-card">
     <img src="logo.png" alt="Logo" class="login-logo" />
-    <div class="login-pro-badge">✨ WERSJA PRO</div>
-    <h2 class="login-title">Flyball Reaction</h2>
-    <p class="login-subtitle">Zaloguj się, aby uzyskać dostęp do wersji PRO</p>
+    <div class="login-pro-badge" data-i18n="login.pro_badge">✨ WERSJA PRO</div>
+    <h2 class="login-title" data-i18n="login.title">Flyball Reaction</h2>
+    <p class="login-subtitle" data-i18n="login.subtitle">Zaloguj się, aby uzyskać dostęp do wersji PRO</p>
     
     <button class="social-btn facebook" id="facebook-login-btn">
       <svg viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-      Zaloguj przez Facebook
+      <span data-i18n="login.facebook_btn">Zaloguj przez Facebook</span>
     </button>
     
-    <p class="login-footer">Logując się, akceptujesz regulamin aplikacji PRO</p>
+    <p class="login-footer" data-i18n="login.footer">Logując się, akceptujesz regulamin aplikacji PRO</p>
   </div>
 </div>
 
@@ -1243,7 +1257,13 @@
       <div class="user-name"><span id="user-name">-</span><span id="user-provider" class="user-provider"></span></div>
     </div>
   </div>
-  <button class="logout-btn" id="logout-btn">Wyloguj</button>
+  <div style="display:flex;align-items:center;gap:8px">
+    <div class="lang-switcher">
+      <button class="lang-switcher-btn" data-lang="pl" onclick="switchLanguage('pl')">PL</button>
+      <button class="lang-switcher-btn" data-lang="en" onclick="switchLanguage('en')">EN</button>
+    </div>
+    <button class="logout-btn" id="logout-btn" data-i18n="login.logout">Wyloguj</button>
+  </div>
 </div>
 
 <!-- ========== PRO VERSION: App Container (shown after login) ========== -->
@@ -1255,8 +1275,8 @@
           <img src="logo.png" alt="Unleashed Flyball Team" />
         </div>
         <div>
-          <h1>Unleashed Flyball Team - <span style="color:var(--accent)">Flyball Reaction PRO</span></h1>
-          <div class="subtitle">Tester czasu reakcji</div>
+          <h1><span data-i18n="app.brand">Unleashed Flyball Team</span> - <span style="color:var(--accent)" data-i18n="app.title">Flyball Reaction PRO</span></h1>
+          <div class="subtitle" data-i18n="app.subtitle">Tester czasu reakcji</div>
         </div>
       </div>
       <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
@@ -1270,17 +1290,17 @@
         <div class="card">
           <div class="card-header">
             <div>
-              <div class="card-title">Test reakcji — wideo</div>
-              <div class="card-subtitle">Wczytaj wideo, ustaw zdarzenie (E) i mierz reakcje (Space)</div>
+              <div class="card-title" data-i18n="video.card_title">Test reakcji — wideo</div>
+              <div class="card-subtitle" data-i18n="video.card_subtitle">Wczytaj wideo, ustaw zdarzenie (E) i mierz reakcje (Space)</div>
             </div>
-            <span class="badge badge-neutral">Sprawdź swoją reakcję</span>
+            <span class="badge badge-neutral" data-i18n="video.badge">Sprawdź swoją reakcję</span>
           </div>
 
           <div class="video-wrap" id="videoWrap">
             <div id="transformer" class="video-inner" style="--tx:0px; --ty:0px; --scale:1;">
               <video id="video" playsinline webkit-playsinline controls></video>
             </div>
-            <div class="event-marker" id="eventMarker" style="display:none">Zdarzenie: <span id="eventTimeText">—</span></div>
+            <div class="event-marker" id="eventMarker" style="display:none"><span data-i18n="video.event_label">Zdarzenie</span>: <span id="eventTimeText">—</span></div>
             
             <!-- Instruction overlay -->
             <div class="instruction-overlay" id="instructionOverlay">
@@ -1288,43 +1308,43 @@
                 <div class="instruction-step">
                   <div class="instruction-step-num">1</div>
                   <div class="instruction-step-content">
-                    <div class="instruction-step-title">Wczytaj wideo</div>
-                    <div class="instruction-step-desc">Wybierz plik(i) wideo z dysku lub wklej URL. Możesz dodać wiele filmów naraz.</div>
+                    <div class="instruction-step-title" data-i18n="instructions.step1_title">Wczytaj wideo</div>
+                    <div class="instruction-step-desc" data-i18n="instructions.step1_desc">Wybierz plik(i) wideo z dysku lub wklej URL. Możesz dodać wiele filmów naraz.</div>
                   </div>
                 </div>
                 <div class="instruction-step">
                   <div class="instruction-step-num">2</div>
                   <div class="instruction-step-content">
-                    <div class="instruction-step-title">Ustaw zdarzenie</div>
-                    <div class="instruction-step-desc">Przewiń do klatki, na którą chcesz reagować i naciśnij <span class="instruction-step-key">E</span></div>
+                    <div class="instruction-step-title" data-i18n="instructions.step2_title">Ustaw zdarzenie</div>
+                    <div class="instruction-step-desc"><span data-i18n="instructions.step2_desc">Przewiń do klatki, na którą chcesz reagować i naciśnij</span> <span class="instruction-step-key">E</span></div>
                   </div>
                 </div>
                 <div class="instruction-step">
                   <div class="instruction-step-num">3</div>
                   <div class="instruction-step-content">
-                    <div class="instruction-step-title">Rozpocznij test</div>
-                    <div class="instruction-step-desc">Naciśnij <span class="instruction-step-key">S</span> lub kliknij Start. Reaguj przyciskiem <span class="instruction-step-key">Space</span> gdy zobaczysz zdarzenie.</div>
+                    <div class="instruction-step-title" data-i18n="instructions.step3_title">Rozpocznij test</div>
+                    <div class="instruction-step-desc"><span data-i18n="instructions.step3_desc">Naciśnij lub kliknij Start. Reaguj przyciskiem gdy zobaczysz zdarzenie.</span></div>
                   </div>
                 </div>
               </div>
-              <div class="instruction-footer">Cel: reaguj szybko, ale nie przewiduj!</div>
+              <div class="instruction-footer" data-i18n="instructions.footer">Cel: reaguj szybko, ale nie przewiduj!</div>
             </div>
           </div>
 
           <div class="controls" style="margin-top:12px">
             <input id="fileInput" type="file" accept="video/*" multiple style="flex:1" />
             <select id="videoList" class="small" style="min-width:180px">
-              <option value="">Brak wideo</option>
+              <option value="" data-i18n="video.no_video">Brak wideo</option>
             </select>
-            <button class="btn btn-ghost" id="loadUrlBtn">Wczytaj URL</button>
-            <button class="btn btn-primary" id="setEventBtn">Ustaw zdarzenie (E)</button>
+            <button class="btn btn-ghost" id="loadUrlBtn" data-i18n="video.load_url">Wczytaj URL</button>
+            <button class="btn btn-primary" id="setEventBtn" data-i18n="video.set_event">Ustaw zdarzenie (E)</button>
             <button class="btn btn-ghost" id="fsPreviewBtn" title="Pełny ekran z kontrolkami">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
             </button>
           </div>
 
           <div class="zoom-panel">
-            <label class="small muted" for="zoomSlider">Zoom</label>
+            <label class="small muted" for="zoomSlider" data-i18n="video.zoom">Zoom</label>
             <input id="zoomSlider" type="range" min="0.5" max="2.5" step="0.01" value="1" />
             <div class="small muted" id="zoomLabel">100%</div>
             <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
@@ -1341,13 +1361,13 @@
                 <input id="randomTo" type="number" value="4" min="0" step="0.1" />
               </div>
               <div class="small muted" style="margin-top:6px">
-                Powtórzeń • Losowo od (s) • do (s) przed zdarzeniem
+                <span data-i18n="test.trials">Powtórzeń</span> • <span data-i18n="test.random_from">Losowo od (s)</span> • <span data-i18n="test.random_to">do (s) przed zdarzeniem</span>
               </div>
               <div style="margin-top:8px;display:flex;gap:8px">
-                <button class="btn btn-accent" id="startTestBtn">Start (S)</button>
-                <button class="btn btn-ghost" id="stopTestBtn">Stop</button>
+                <button class="btn btn-accent" id="startTestBtn"><span data-i18n="test.start">Start</span> (S)</button>
+                <button class="btn btn-ghost" id="stopTestBtn" data-i18n="test.stop">Stop</button>
               </div>
-              <div id="trialInfo" class="small muted" style="margin-top:8px">Brak testu.</div>
+              <div id="trialInfo" class="small muted" style="margin-top:8px" data-i18n="test.no_test">Brak testu.</div>
             </div>
           </div>
         </div>
@@ -1358,20 +1378,20 @@
         <div class="card">
           <div class="card-header">
             <div>
-              <div class="card-title">Wyniki</div>
-              <div class="card-subtitle">Twoje pomiary</div>
+              <div class="card-title" data-i18n="results.title">Wyniki</div>
+              <div class="card-subtitle" data-i18n="results.subtitle">Twoje pomiary</div>
             </div>
-            <button class="btn btn-ghost btn-sm" id="exportCsvBtn">Eksport CSV</button>
+            <button class="btn btn-ghost btn-sm" id="exportCsvBtn" data-i18n="results.export_csv">Eksport CSV</button>
           </div>
 
           <div class="results">
             <table>
               <thead>
                 <tr>
-                  <th>#</th>
-                  <th>Data</th>
-                  <th>Reakcja (ms)</th>
-                  <th>Ocena</th>
+                  <th data-i18n="results.col_num">#</th>
+                  <th data-i18n="results.col_date">Data</th>
+                  <th data-i18n="results.col_reaction">Reakcja (ms)</th>
+                  <th data-i18n="results.col_rating">Ocena</th>
                 </tr>
               </thead>
               <tbody id="resultsBody"></tbody>
@@ -1379,8 +1399,8 @@
           </div>
 
           <div style="margin-top:14px">
-            <div class="card-subtitle" style="margin-bottom:6px">Statystyki</div>
-            <div id="stats" class="stat">Brak wyników.</div>
+            <div class="card-subtitle" style="margin-bottom:6px" data-i18n="results.stats_title">Statystyki</div>
+            <div id="stats" class="stat" data-i18n="results.no_results">Brak wyników.</div>
           </div>
         </div>
 
@@ -1388,51 +1408,51 @@
         <div class="card" style="margin-top:12px">
           <div class="card-header" style="margin-bottom:12px">
             <div>
-              <div class="card-title">Krzywa powtarzalności</div>
-              <div class="card-subtitle">Rozkład Twoich czasów reakcji</div>
+              <div class="card-title" data-i18n="chart.title">Krzywa powtarzalności</div>
+              <div class="card-subtitle" data-i18n="chart.subtitle">Rozkład Twoich czasów reakcji</div>
             </div>
           </div>
           <div class="chart-container">
             <canvas id="gaussCanvas" width="320" height="200" class="chart-canvas"></canvas>
           </div>
-          <div id="gaussInfo" class="small muted" style="margin-top:10px;text-align:center">
+          <div id="gaussInfo" class="small muted" style="margin-top:10px;text-align:center" data-i18n="chart.empty_msg">
             Wykres pojawi się po zakończeniu testu (min. 3 ważne próby).
           </div>
         </div>
 
         <!-- KARTA: Zapisane treningi -->
         <div class="card training-plans-card" style="margin-top:12px">
-          <div class="training-plans-header">Zapisane treningi</div>
+          <div class="training-plans-header" data-i18n="training.saved_title">Zapisane treningi</div>
           <div class="training-plans-actions">
-            <button class="btn btn-primary btn-sm" id="saveTrainingBtn">Zapisz obecny trening</button>
+            <button class="btn btn-primary btn-sm" id="saveTrainingBtn" data-i18n="training.save_current">Zapisz obecny trening</button>
           </div>
           <div id="trainingPlansList" class="training-plans-list">
-            <div class="no-plans-message">Brak zapisanych treningów. Dodaj filmy, ustaw zdarzenia i kliknij "Zapisz".</div>
+            <div class="no-plans-message" data-i18n="training.no_plans">Brak zapisanych treningów. Dodaj filmy, ustaw zdarzenia i kliknij "Zapisz".</div>
           </div>
         </div>
 
         <!-- KARTA: Przykładowe treningi -->
         <div class="card example-trainings-card" style="margin-top:12px">
-          <div class="example-trainings-header">Przykładowe treningi</div>
+          <div class="example-trainings-header" data-i18n="examples.title">Przykładowe treningi</div>
           <div id="exampleTrainingsList" class="example-trainings-list">
-            <div class="example-loading-message">Ładowanie przykładowych treningów...</div>
+            <div class="example-loading-message" data-i18n="examples.loading">Ładowanie przykładowych treningów...</div>
           </div>
         </div>
 
         <div class="card notes-card" style="margin-top:12px">
-          <div class="notes-header">Uwagi</div>
+          <div class="notes-header" data-i18n="notes.title">Uwagi</div>
           <div class="notes-list">
             <div class="note-item">
-              <div class="note-label">Zoom wideo</div>
-              <div class="note-text">Użyj suwaka lub gestu pinch, aby powiększyć fragment wideo. Przeciągnij widok, aby przesunąć kadr.</div>
+              <div class="note-label" data-i18n="notes.zoom_title">Zoom wideo</div>
+              <div class="note-text" data-i18n="notes.zoom_desc">Użyj suwaka lub gestu pinch, aby powiększyć fragment wideo. Przeciągnij widok, aby przesunąć kadr.</div>
             </div>
             <div class="note-item">
-              <div class="note-label">Cel treningu</div>
-              <div class="note-text">Dąż do jak najwęższej krzywej – oznacza to powtarzalne czasy reakcji. Unikaj przewidywania!</div>
+              <div class="note-label" data-i18n="notes.goal_title">Cel treningu</div>
+              <div class="note-text" data-i18n="notes.goal_desc">Dąż do jak najwęższej krzywej – oznacza to powtarzalne czasy reakcji. Unikaj przewidywania!</div>
             </div>
             <div class="note-item highlight">
-              <div class="note-label">Zainstaluj aplikację</div>
-              <div class="note-text">iOS: Udostępnij → Dodaj do ekranu głównego<br>Android/Desktop: Menu → Zainstaluj</div>
+              <div class="note-label" data-i18n="notes.install_title">Zainstaluj aplikację</div>
+              <div class="note-text" data-i18n="notes.install_desc" data-i18n-html>iOS: Udostępnij → Dodaj do ekranu głównego<br>Android/Desktop: Menu → Zainstaluj</div>
             </div>
           </div>
         </div>
@@ -1444,7 +1464,7 @@
   <!-- Floating Start Button -->
   <button class="floating-start-btn" id="floatingStartBtn">
     <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-    <span>Start testu</span>
+    <span data-i18n="test.start">Start</span>
     <span class="kbd">S</span>
   </button>
 
@@ -1452,6 +1472,78 @@
   <div class="toast-container" id="toastContainer"></div>
 
 <script>
+/* ========== PRO VERSION: INTERNATIONALIZATION (i18n) SYSTEM ========== */
+const I18N = {
+  currentLang: localStorage.getItem('flyball_lang') || 'pl',
+  translations: {},
+  
+  async load(lang) {
+    try {
+      const response = await fetch(`./lang/${lang}.json?${Date.now()}`);
+      if (!response.ok) throw new Error(`Language ${lang} not found`);
+      this.translations = await response.json();
+      this.currentLang = lang;
+      localStorage.setItem('flyball_lang', lang);
+      this.applyTranslations();
+      this.updateLanguageSwitcher();
+      return true;
+    } catch (e) {
+      console.error('Language load error:', e);
+      if (lang !== 'pl') return this.load('pl');
+      return false;
+    }
+  },
+  
+  t(key, fallback = key) {
+    const keys = key.split('.');
+    let value = this.translations;
+    for (const k of keys) {
+      if (value && typeof value === 'object' && k in value) {
+        value = value[k];
+      } else {
+        return fallback;
+      }
+    }
+    return typeof value === 'string' ? value : fallback;
+  },
+  
+  applyTranslations() {
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      const translation = this.t(key);
+      if (translation !== key) {
+        if (el.hasAttribute('data-i18n-html')) {
+          el.innerHTML = translation;
+        } else {
+          el.textContent = translation;
+        }
+      }
+    });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+      const key = el.getAttribute('data-i18n-placeholder');
+      el.placeholder = this.t(key);
+    });
+    document.querySelectorAll('[data-i18n-title]').forEach(el => {
+      const key = el.getAttribute('data-i18n-title');
+      el.title = this.t(key);
+    });
+  },
+  
+  updateLanguageSwitcher() {
+    document.querySelectorAll('.lang-switcher-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.lang === this.currentLang);
+    });
+  }
+};
+
+// Global translate function
+function t(key, fallback) { return I18N.t(key, fallback); }
+
+// Language switcher handler
+function switchLanguage(lang) {
+  I18N.load(lang);
+}
+
 /* ========== PRO VERSION: SECURITY & AUTHENTICATION ========== */
 const PRO_CONFIG = {
   ALLOWED_DOMAINS: ['hemelion.github.io', 'localhost', '127.0.0.1'],
@@ -1557,22 +1649,25 @@ function loginWithFacebook() {
 function showAccessDenied(userName, odzyskajHash) {
   const loginScreen = document.getElementById('login-screen');
   loginScreen.innerHTML = `
+    <div class="login-lang-switcher">
+      <button class="lang-switcher-btn ${I18N.currentLang === 'pl' ? 'active' : ''}" data-lang="pl" onclick="switchLanguage('pl')">PL</button>
+      <button class="lang-switcher-btn ${I18N.currentLang === 'en' ? 'active' : ''}" data-lang="en" onclick="switchLanguage('en')">EN</button>
+    </div>
     <div class="login-card" style="border: 2px solid #ef4444;">
       <div style="width:60px;height:60px;margin:0 auto 20px;background:rgba(239,68,68,0.1);border-radius:50%;display:flex;align-items:center;justify-content:center;">
         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
       </div>
-      <h2 class="login-title" style="color:#ef4444">Brak uprawnień</h2>
+      <h2 class="login-title" style="color:#ef4444">${t('security.no_permission_title')}</h2>
       <p class="login-subtitle" style="margin-bottom:20px">
-        Witaj <strong>${userName}</strong>!<br><br>
-        Twoje konto Facebook nie ma dostępu do wersji PRO.<br>
-        Skontaktuj się z administratorem, aby uzyskać dostęp.
+        ${t('toast.welcome')} <strong>${userName}</strong>!<br><br>
+        ${t('security.no_permission_desc')}
       </p>
       <button class="social-btn" onclick="location.reload()" style="border-color:#ef4444;color:#ef4444">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path><path d="M21 3v5h-5"></path><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path><path d="M8 16H3v5"></path></svg>
-        Spróbuj ponownie
+        ${t('security.try_again')}
       </button>
       <p class="login-footer" style="margin-top:20px;font-size:11px;color:#94a3b8">
-        Kod dostępu: <code style="background:#f1f5f9;padding:2px 6px;border-radius:4px;font-family:monospace">${btoa(odzyskajHash).substring(0,12)}...</code>
+        ${t('security.access_code')}: <code style="background:#f1f5f9;padding:2px 6px;border-radius:4px;font-family:monospace">${btoa(odzyskajHash).substring(0,12)}...</code>
       </p>
     </div>
   `;
@@ -1646,7 +1741,10 @@ async function checkExistingSession() {
 
 // Initialize PRO version on DOMContentLoaded
 document.addEventListener('DOMContentLoaded', async () => {
-  // Security check first
+  // Load language first
+  await I18N.load(I18N.currentLang);
+  
+  // Security check
   if (!checkSecurity()) return;
   
   // Load config with allowed users
