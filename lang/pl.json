@@ -1,0 +1,203 @@
+{
+  "lang_code": "pl",
+  "lang_name": "Polski",
+  
+  "app": {
+    "title": "Flyball Reaction PRO",
+    "subtitle": "Tester czasu reakcji",
+    "brand": "Unleashed Flyball Team"
+  },
+  
+  "login": {
+    "pro_badge": "✨ WERSJA PRO",
+    "title": "Flyball Reaction",
+    "subtitle": "Zaloguj się, aby uzyskać dostęp do wersji PRO",
+    "facebook_btn": "Zaloguj przez Facebook",
+    "footer": "Logując się, akceptujesz regulamin aplikacji PRO",
+    "logout": "Wyloguj"
+  },
+  
+  "security": {
+    "access_denied_title": "⛔ Dostęp zabroniony",
+    "access_denied_desc": "Ta aplikacja może być uruchomiona wyłącznie z autoryzowanej domeny. Lokalne uruchomienie pliku HTML nie jest dozwolone.",
+    "no_permission_title": "Brak uprawnień",
+    "no_permission_desc": "Twoje konto Facebook nie ma dostępu do wersji PRO. Skontaktuj się z administratorem, aby uzyskać dostęp.",
+    "try_again": "Spróbuj ponownie",
+    "access_code": "Kod dostępu"
+  },
+  
+  "video": {
+    "card_title": "Test reakcji — wideo",
+    "card_subtitle": "Wczytaj wideo, ustaw zdarzenie (E) i mierz reakcje (Space)",
+    "badge": "Sprawdź swoją reakcję",
+    "no_video": "Brak wideo",
+    "load_url": "Wczytaj URL",
+    "load_url_prompt": "Wklej URL do pliku mp4/webm:",
+    "load_url_title": "Wczytaj wideo z URL",
+    "set_event": "Ustaw zdarzenie (E)",
+    "event_label": "Zdarzenie",
+    "event_set": "Zdarzenie ustawione",
+    "event_desc_prompt": "Opis zdarzenia (opcjonalnie):",
+    "event_desc_title": "Opisz zdarzenie",
+    "zoom": "Zoom"
+  },
+  
+  "test": {
+    "settings_label": "Ustawienia testu",
+    "trials": "Powtórzeń",
+    "random_from": "Losowo od (s)",
+    "random_to": "do (s) przed zdarzeniem",
+    "start": "Start",
+    "stop": "Stop",
+    "no_test": "Brak testu.",
+    "test_stopped": "Test zatrzymany.",
+    "test_finished": "Test zakończony.",
+    "results_count": "wyników",
+    "trial": "Próba",
+    "react": "Reaguj!",
+    "react_btn": "Reaguj (Space)",
+    "prepare": "Przygotuj się..."
+  },
+  
+  "results": {
+    "title": "Wyniki",
+    "subtitle": "Twoje pomiary",
+    "export_csv": "Eksport CSV",
+    "no_results": "Brak wyników.",
+    "col_num": "#",
+    "col_date": "Data",
+    "col_reaction": "Reakcja (ms)",
+    "col_rating": "Ocena",
+    "stats_title": "Statystyki",
+    "final_score": "Ostateczny wynik",
+    "valid_trials": "Próby ważne",
+    "predicted": "Przewidzianych",
+    "avg_time": "Średni czas",
+    "consistency": "Powtarzalność (SD)",
+    "min": "Min",
+    "max": "Max",
+    "stats_footer": "Im wyższy wynik i niższe SD przy zerowym przewidywaniu, tym lepsza kontrola reakcji.",
+    "not_enough_trials": "Za mało prób do oceny wyniku",
+    "trials_total": "Prób ogółem",
+    "predicted_early": "Przewidzianych (za wcześnie)"
+  },
+  
+  "ratings": {
+    "predicted": "Przewidziałeś",
+    "excellent": "Rewelacja",
+    "very_good": "Bardzo dobrze",
+    "good": "Dobrze",
+    "needs_work": "Do poprawy",
+    "master": "MISTRZ REAKCJI!",
+    "very_good_score": "Bardzo dobry wynik",
+    "not_bad": "Nie najgorzej",
+    "poor": "Słabo Ci to idzie",
+    "elite_consistency": "ELITARNA POWTARZALNOŚĆ",
+    "very_good_consistency": "BARDZO DOBRA POWTARZALNOŚĆ",
+    "average_consistency": "PRZECIĘTNA POWTARZALNOŚĆ",
+    "low_consistency": "NISKA POWTARZALNOŚĆ"
+  },
+  
+  "chart": {
+    "title": "Krzywa powtarzalności",
+    "subtitle": "Rozkład Twoich czasów reakcji",
+    "empty_msg": "Wykres pojawi się po zakończeniu testu (min. 3 ważne próby).",
+    "no_data": "Brak danych",
+    "mean": "Średnia",
+    "ideal": "(idealnie powtarzalnie)",
+    "chart_footer": "im węższa krzywa, tym lepsza powtarzalność."
+  },
+  
+  "training": {
+    "saved_title": "Zapisane treningi",
+    "save_current": "Zapisz obecny trening",
+    "no_plans": "Brak zapisanych treningów. Dodaj filmy, ustaw zdarzenia i kliknij \"Zapisz\".",
+    "save_name_prompt": "Podaj nazwę treningu:",
+    "save_default_name": "Trening",
+    "saving": "Zapisywanie...",
+    "saved_msg": "Trening został zapisany",
+    "load": "Wczytaj",
+    "delete": "Usuń",
+    "delete_confirm": "Czy na pewno chcesz usunąć trening",
+    "replace_confirm": "Czy chcesz zastąpić obecne filmy?",
+    "replace": "Zastąp",
+    "add_to_current": "Dodaj do obecnych",
+    "loading": "Ładowanie...",
+    "loaded_msg": "Wczytano trening",
+    "with_videos": "z filmami",
+    "videos": "film(ów)",
+    "events": "zdarzeń",
+    "local": "lokalne",
+    "url": "URL"
+  },
+  
+  "examples": {
+    "title": "Przykładowe treningi",
+    "loading": "Ładowanie przykładowych treningów...",
+    "none": "Brak przykładowych treningów.",
+    "loaded_msg": "Wczytano przykładowy trening"
+  },
+  
+  "notes": {
+    "title": "Uwagi",
+    "zoom_title": "Zoom wideo",
+    "zoom_desc": "Użyj suwaka lub gestu pinch, aby powiększyć fragment wideo. Przeciągnij widok, aby przesunąć kadr.",
+    "goal_title": "Cel treningu",
+    "goal_desc": "Dąż do jak najwęższej krzywej – oznacza to powtarzalne czasy reakcji. Unikaj przewidywania!",
+    "install_title": "Zainstaluj aplikację",
+    "install_desc": "iOS: Udostępnij → Dodaj do ekranu głównego<br>Android/Desktop: Menu → Zainstaluj"
+  },
+  
+  "fullscreen": {
+    "summary_title": "Podsumowanie testu",
+    "score_label": "Punkty:",
+    "mean_label": "Średni czas:",
+    "sd_label": "Powtarzalność (SD):",
+    "valid_label": "Ważne próby:",
+    "again": "Jeszcze raz",
+    "exit": "Zakończ",
+    "not_enough": "Za mało ważnych prób"
+  },
+  
+  "instructions": {
+    "step1_title": "Wczytaj wideo",
+    "step1_desc": "Wybierz plik(i) wideo z dysku lub wklej URL. Możesz dodać wiele filmów naraz.",
+    "step2_title": "Ustaw zdarzenie",
+    "step2_desc": "Przewiń do klatki, na którą chcesz reagować i naciśnij",
+    "step3_title": "Rozpocznij test",
+    "step3_desc": "Naciśnij lub kliknij Start. Reaguj przyciskiem gdy zobaczysz zdarzenie.",
+    "footer": "Cel: reaguj szybko, ale nie przewiduj!"
+  },
+  
+  "toast": {
+    "success": "Sukces",
+    "error": "Błąd",
+    "warning": "Uwaga",
+    "info": "Informacja",
+    "welcome": "Witaj",
+    "logged_in": "Zalogowano",
+    "results_cleared": "Wyniki wyczyszczone",
+    "load_video_first": "Wczytaj wideo przed ustawieniem zdarzenia.",
+    "load_video_test": "Wczytaj co najmniej jedno wideo przed testem.",
+    "set_event_first": "Ustaw punkt zdarzenia (E) na co najmniej jednym wideo przed testem.",
+    "no_results_export": "Brak wyników do eksportu",
+    "autoplay_blocked": "Autoodtwarzanie zablokowane. Dotknij wideo, a potem kliknij Start ponownie.",
+    "no_test_running": "Brak trwającego testu.",
+    "video_not_found": "Film nie został znaleziony w pamięci. Możliwe, że dane zostały usunięte.",
+    "save_error": "Nie udało się zapisać treningów. Sprawdź dostępne miejsce w przeglądarce.",
+    "training_not_found": "Nie znaleziono treningu.",
+    "example_not_found": "Nie znaleziono przykładowego treningu.",
+    "no_videos_to_save": "Brak filmów do zapisania. Dodaj co najmniej jeden film.",
+    "video_too_large": "Błąd podczas zapisywania filmu. Film może być zbyt duży.",
+    "load_error": "Wystąpił błąd podczas wczytywania treningu.",
+    "save_training_error": "Wystąpił błąd podczas zapisywania treningu."
+  },
+  
+  "common": {
+    "ok": "OK",
+    "cancel": "Anuluj",
+    "confirm": "Potwierdź",
+    "close": "Zamknij",
+    "clear": "Wyczyść"
+  }
+}

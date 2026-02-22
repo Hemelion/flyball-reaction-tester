@@ -1,0 +1,203 @@
+{
+  "lang_code": "en",
+  "lang_name": "English",
+  
+  "app": {
+    "title": "Flyball Reaction PRO",
+    "subtitle": "Reaction Time Tester",
+    "brand": "Unleashed Flyball Team"
+  },
+  
+  "login": {
+    "pro_badge": "✨ PRO VERSION",
+    "title": "Flyball Reaction",
+    "subtitle": "Sign in to access PRO version",
+    "facebook_btn": "Login with Facebook",
+    "footer": "By signing in, you accept the PRO app terms of service",
+    "logout": "Logout"
+  },
+  
+  "security": {
+    "access_denied_title": "⛔ Access Denied",
+    "access_denied_desc": "This application can only be run from an authorized domain. Running the local HTML file is not allowed.",
+    "no_permission_title": "No Permission",
+    "no_permission_desc": "Your Facebook account does not have access to the PRO version. Contact the administrator for access.",
+    "try_again": "Try Again",
+    "access_code": "Access Code"
+  },
+  
+  "video": {
+    "card_title": "Reaction Test — Video",
+    "card_subtitle": "Load video, set event (E) and measure reactions (Space)",
+    "badge": "Test your reaction",
+    "no_video": "No video",
+    "load_url": "Load URL",
+    "load_url_prompt": "Paste URL to mp4/webm file:",
+    "load_url_title": "Load video from URL",
+    "set_event": "Set Event (E)",
+    "event_label": "Event",
+    "event_set": "Event set",
+    "event_desc_prompt": "Event description (optional):",
+    "event_desc_title": "Describe event",
+    "zoom": "Zoom"
+  },
+  
+  "test": {
+    "settings_label": "Test settings",
+    "trials": "Trials",
+    "random_from": "Random from (s)",
+    "random_to": "to (s) before event",
+    "start": "Start",
+    "stop": "Stop",
+    "no_test": "No test.",
+    "test_stopped": "Test stopped.",
+    "test_finished": "Test finished.",
+    "results_count": "results",
+    "trial": "Trial",
+    "react": "React!",
+    "react_btn": "React (Space)",
+    "prepare": "Prepare..."
+  },
+  
+  "results": {
+    "title": "Results",
+    "subtitle": "Your measurements",
+    "export_csv": "Export CSV",
+    "no_results": "No results.",
+    "col_num": "#",
+    "col_date": "Date",
+    "col_reaction": "Reaction (ms)",
+    "col_rating": "Rating",
+    "stats_title": "Statistics",
+    "final_score": "Final Score",
+    "valid_trials": "Valid trials",
+    "predicted": "Predicted",
+    "avg_time": "Average time",
+    "consistency": "Consistency (SD)",
+    "min": "Min",
+    "max": "Max",
+    "stats_footer": "Higher score and lower SD with zero predictions means better reaction control.",
+    "not_enough_trials": "Not enough trials to evaluate score",
+    "trials_total": "Total trials",
+    "predicted_early": "Predicted (too early)"
+  },
+  
+  "ratings": {
+    "predicted": "You predicted",
+    "excellent": "Excellent",
+    "very_good": "Very Good",
+    "good": "Good",
+    "needs_work": "Needs Work",
+    "master": "REACTION MASTER!",
+    "very_good_score": "Very good score",
+    "not_bad": "Not bad",
+    "poor": "Poor performance",
+    "elite_consistency": "ELITE CONSISTENCY",
+    "very_good_consistency": "VERY GOOD CONSISTENCY",
+    "average_consistency": "AVERAGE CONSISTENCY",
+    "low_consistency": "LOW CONSISTENCY"
+  },
+  
+  "chart": {
+    "title": "Consistency Curve",
+    "subtitle": "Distribution of your reaction times",
+    "empty_msg": "Chart will appear after test completion (min. 3 valid trials).",
+    "no_data": "No data",
+    "mean": "Mean",
+    "ideal": "(ideally consistent)",
+    "chart_footer": "the narrower the curve, the better the consistency."
+  },
+  
+  "training": {
+    "saved_title": "Saved Trainings",
+    "save_current": "Save Current Training",
+    "no_plans": "No saved trainings. Add videos, set events and click \"Save\".",
+    "save_name_prompt": "Enter training name:",
+    "save_default_name": "Training",
+    "saving": "Saving...",
+    "saved_msg": "Training saved",
+    "load": "Load",
+    "delete": "Delete",
+    "delete_confirm": "Are you sure you want to delete training",
+    "replace_confirm": "Do you want to replace current videos?",
+    "replace": "Replace",
+    "add_to_current": "Add to current",
+    "loading": "Loading...",
+    "loaded_msg": "Training loaded",
+    "with_videos": "with videos",
+    "videos": "video(s)",
+    "events": "events",
+    "local": "local",
+    "url": "URL"
+  },
+  
+  "examples": {
+    "title": "Example Trainings",
+    "loading": "Loading example trainings...",
+    "none": "No example trainings.",
+    "loaded_msg": "Example training loaded"
+  },
+  
+  "notes": {
+    "title": "Notes",
+    "zoom_title": "Video Zoom",
+    "zoom_desc": "Use the slider or pinch gesture to zoom in on a video fragment. Drag the view to pan.",
+    "goal_title": "Training Goal",
+    "goal_desc": "Aim for the narrowest curve possible – this means consistent reaction times. Avoid predicting!",
+    "install_title": "Install App",
+    "install_desc": "iOS: Share → Add to Home Screen<br>Android/Desktop: Menu → Install"
+  },
+  
+  "fullscreen": {
+    "summary_title": "Test Summary",
+    "score_label": "Score:",
+    "mean_label": "Average time:",
+    "sd_label": "Consistency (SD):",
+    "valid_label": "Valid trials:",
+    "again": "Again",
+    "exit": "Exit",
+    "not_enough": "Not enough valid trials"
+  },
+  
+  "instructions": {
+    "step1_title": "Load Video",
+    "step1_desc": "Select video file(s) from disk or paste a URL. You can add multiple videos at once.",
+    "step2_title": "Set Event",
+    "step2_desc": "Scroll to the frame you want to react to and press",
+    "step3_title": "Start Test",
+    "step3_desc": "Press or click Start. React with the button when you see the event.",
+    "footer": "Goal: react quickly, but don't predict!"
+  },
+  
+  "toast": {
+    "success": "Success",
+    "error": "Error",
+    "warning": "Warning",
+    "info": "Information",
+    "welcome": "Welcome",
+    "logged_in": "Logged in",
+    "results_cleared": "Results cleared",
+    "load_video_first": "Load video before setting event.",
+    "load_video_test": "Load at least one video before testing.",
+    "set_event_first": "Set event point (E) on at least one video before testing.",
+    "no_results_export": "No results to export",
+    "autoplay_blocked": "Autoplay blocked. Touch the video, then click Start again.",
+    "no_test_running": "No test running.",
+    "video_not_found": "Video not found in storage. Data may have been deleted.",
+    "save_error": "Failed to save trainings. Check available browser storage.",
+    "training_not_found": "Training not found.",
+    "example_not_found": "Example training not found.",
+    "no_videos_to_save": "No videos to save. Add at least one video.",
+    "video_too_large": "Error saving video. Video may be too large.",
+    "load_error": "Error occurred while loading training.",
+    "save_training_error": "Error occurred while saving training."
+  },
+  
+  "common": {
+    "ok": "OK",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "close": "Close",
+    "clear": "Clear"
+  }
+}
