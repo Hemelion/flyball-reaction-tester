@@ -1552,6 +1552,7 @@ const PRO_CONFIG = {
 
 // Lista dozwolonych użytkowników (ładowana z config.json)
 let allowedUserHashes = [];
+let proSalt = '';
 
 // Ładowanie konfiguracji z zewnętrznego pliku
 async function loadConfig() {
@@ -1560,6 +1561,8 @@ async function loadConfig() {
     if (!response.ok) throw new Error('Config not found');
     const config = await response.json();
     allowedUserHashes = config.allowedUserHashes || [];
+    // Dekoduj salt z base64
+    proSalt = config.salt ? atob(config.salt) : '';
     return true;
   } catch (e) {
     console.error('Błąd ładowania config.json:', e);
@@ -1569,7 +1572,7 @@ async function loadConfig() {
 
 // Funkcja hashująca SHA-256 (async)
 async function sha256(message) {
-  const msgBuffer = new TextEncoder().encode(message + '_flyball_pro_salt_2024');
+  const msgBuffer = new TextEncoder().encode(message + proSalt);
   const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
   const hashArray = Array.from(new Uint8Array(hashBuffer));
   return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
