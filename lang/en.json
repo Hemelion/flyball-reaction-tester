@@ -23,7 +23,8 @@
     "no_permission_title": "No Permission",
     "no_permission_desc": "Your Facebook account does not have access to the PRO version. Contact the administrator for access.",
     "try_again": "Try Again",
-    "access_code": "Access Code"
+    "access_code": "Access Code",
+    "click_to_copy": "Click to copy"
   },
   
   "video": {
@@ -32,6 +33,7 @@
     "badge": "Test your reaction",
     "no_video": "No video",
     "load_url": "Load URL",
+    "url_name": "Video from URL",
     "load_url_prompt": "Paste URL to mp4/webm file:",
     "load_url_title": "Load video from URL",
     "set_event": "Set Event (E)",
@@ -56,7 +58,8 @@
     "trial": "Trial",
     "react": "React!",
     "react_btn": "React (Space)",
-    "prepare": "Prepare..."
+    "prepare": "Prepare...",
+    "video_label": "video"
   },
   
   "results": {
