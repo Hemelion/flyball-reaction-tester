@@ -880,6 +880,284 @@
       font-size: 11px;
     }
   }
+
+  /* Floating Start Button */
+  .floating-start-btn {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 28px;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+    color: white;
+    font-size: 16px;
+    font-weight: 700;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(14,165,233,0.4), 0 2px 8px rgba(0,0,0,0.15);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .floating-start-btn:hover {
+    transform: translateX(-50%) translateY(-2px);
+    box-shadow: 0 6px 28px rgba(14,165,233,0.5), 0 4px 12px rgba(0,0,0,0.2);
+  }
+  .floating-start-btn:active {
+    transform: translateX(-50%) scale(0.97);
+  }
+  .floating-start-btn.running {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    box-shadow: 0 4px 20px rgba(239,68,68,0.4), 0 2px 8px rgba(0,0,0,0.15);
+  }
+  .floating-start-btn.running:hover {
+    box-shadow: 0 6px 28px rgba(239,68,68,0.5), 0 4px 12px rgba(0,0,0,0.2);
+  }
+  .floating-start-btn svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+  }
+  .floating-start-btn .kbd {
+    background: rgba(255,255,255,0.25);
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  @media (max-width: 600px) {
+    .floating-start-btn {
+      bottom: 16px;
+      padding: 12px 24px;
+      font-size: 15px;
+    }
+  }
+
+  /* Extra padding at bottom to prevent floating button from covering content */
+  body {
+    padding-bottom: 90px;
+  }
+
+  /* Toast Notifications */
+  .toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 380px;
+    width: calc(100% - 40px);
+    pointer-events: none;
+  }
+  @media (max-width: 500px) {
+    .toast-container {
+      top: 10px;
+      right: 10px;
+      left: 10px;
+      width: auto;
+      max-width: none;
+    }
+  }
+  .toast {
+    background: var(--card);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-lg);
+    padding: 14px 18px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    pointer-events: auto;
+    animation: toastSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-left: 4px solid var(--accent);
+  }
+  .toast.toast-success {
+    border-left-color: var(--success);
+  }
+  .toast.toast-warning {
+    border-left-color: var(--warning);
+  }
+  .toast.toast-error {
+    border-left-color: var(--danger);
+  }
+  .toast.toast-info {
+    border-left-color: var(--accent);
+  }
+  .toast.toast-hide {
+    animation: toastSlideOut 0.25s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+  @keyframes toastSlideIn {
+    from {
+      opacity: 0;
+      transform: translateX(100%);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  @keyframes toastSlideOut {
+    from {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    to {
+      opacity: 0;
+      transform: translateX(100%);
+    }
+  }
+  .toast-icon {
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .toast-icon.toast-icon-success {
+    color: var(--success);
+  }
+  .toast-icon.toast-icon-warning {
+    color: var(--warning);
+  }
+  .toast-icon.toast-icon-error {
+    color: var(--danger);
+  }
+  .toast-icon.toast-icon-info {
+    color: var(--accent);
+  }
+  .toast-content {
+    flex: 1;
+    min-width: 0;
+  }
+  .toast-title {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--dark);
+    margin-bottom: 2px;
+  }
+  .toast-message {
+    font-size: 13px;
+    color: var(--mid);
+    line-height: 1.4;
+  }
+  .toast-close {
+    background: none;
+    border: none;
+    padding: 4px;
+    cursor: pointer;
+    color: var(--light);
+    transition: color 0.2s;
+    flex-shrink: 0;
+  }
+  .toast-close:hover {
+    color: var(--dark);
+  }
+  .toast-close svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  /* Modern Modal Dialogs */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: 10001;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    animation: modalFadeIn 0.2s ease;
+  }
+  @keyframes modalFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  .modal-dialog {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lg);
+    max-width: 400px;
+    width: 100%;
+    animation: modalSlideIn 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  @keyframes modalSlideIn {
+    from { opacity: 0; transform: scale(0.95) translateY(-10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  .modal-header {
+    padding: 20px 20px 0;
+  }
+  .modal-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--dark);
+    margin-bottom: 8px;
+  }
+  .modal-message {
+    font-size: 14px;
+    color: var(--mid);
+    line-height: 1.5;
+  }
+  .modal-body {
+    padding: 16px 20px;
+  }
+  .modal-input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    color: var(--dark);
+    background: var(--bg);
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .modal-input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15);
+  }
+  .modal-footer {
+    padding: 0 20px 20px;
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+  }
+  .modal-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .modal-btn-primary {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+    color: white;
+  }
+  .modal-btn-primary:hover {
+    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+  }
+  .modal-btn-secondary {
+    background: var(--bg-subtle);
+    color: var(--dark);
+    border: 1px solid var(--border);
+  }
+  .modal-btn-secondary:hover {
+    background: var(--border-light);
+  }
+  .modal-btn-danger {
+    background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%);
+    color: white;
+  }
 </style>
 </head>
 <body>
@@ -895,7 +1173,7 @@
         </div>
       </div>
       <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
-        <span class="version-badge">v3.13</span>
+        <span class="version-badge">v3.14</span>
       </div>
     </header>
 
@@ -953,6 +1231,9 @@
             </select>
             <button class="btn btn-ghost" id="loadUrlBtn">Wczytaj URL</button>
             <button class="btn btn-primary" id="setEventBtn">Ustaw zdarzenie (E)</button>
+            <button class="btn btn-ghost" id="fsPreviewBtn" title="Pełny ekran z kontrolkami">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+            </button>
           </div>
 
           <div class="zoom-panel">
@@ -970,7 +1251,7 @@
               <div style="display:flex;gap:8px;margin-top:8px">
                 <input id="trialsCount" type="number" value="5" min="1" />
                 <input id="randomFrom" type="number" value="1.5" min="0" step="0.1" />
-                <input id="randomTo" type="number" value="2.5" min="0" step="0.1" />
+                <input id="randomTo" type="number" value="4" min="0" step="0.1" />
               </div>
               <div class="small muted" style="margin-top:6px">
                 Powtórzeń • Losowo od (s) • do (s) przed zdarzeniem
@@ -1072,6 +1353,16 @@
     </div>
   </div>
 
+  <!-- Floating Start Button -->
+  <button class="floating-start-btn" id="floatingStartBtn">
+    <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+    <span>Start testu</span>
+    <span class="kbd">S</span>
+  </button>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
 <script>
 /* Uwaga: pomiary warto sprawdzić na realnym sprzęcie; przeglądarki różnie obsługują wideo. */
 
@@ -1104,10 +1395,180 @@ const gaussCanvas = document.getElementById('gaussCanvas');
 const gaussInfo = document.getElementById('gaussInfo');
 const gaussCtx = gaussCanvas.getContext('2d');
 
+/* Floating Start Button */
+const floatingStartBtn = document.getElementById('floatingStartBtn');
+const toastContainer = document.getElementById('toastContainer');
+
 let eventTime = null;
 let lastEventLabel = '';
 let ongoingTest = null;
 let results = [];
+
+/* ======== TOAST NOTIFICATION SYSTEM ======== */
+const toastIcons = {
+  success: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>',
+  error: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>',
+  warning: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>',
+  info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>'
+};
+
+function showToast(message, type = 'info', title = null, duration = 4000) {
+  const toast = document.createElement('div');
+  toast.className = `toast toast-${type}`;
+  
+  const iconClass = `toast-icon toast-icon-${type}`;
+  const defaultTitles = {
+    success: 'Sukces',
+    error: 'Błąd',
+    warning: 'Uwaga',
+    info: 'Informacja'
+  };
+  const displayTitle = title || defaultTitles[type] || 'Informacja';
+  
+  toast.innerHTML = `
+    <div class="${iconClass}">${toastIcons[type] || toastIcons.info}</div>
+    <div class="toast-content">
+      <div class="toast-title">${displayTitle}</div>
+      <div class="toast-message">${message}</div>
+    </div>
+    <button class="toast-close" onclick="this.parentElement.classList.add('toast-hide')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    </button>
+  `;
+  
+  toastContainer.appendChild(toast);
+  
+  // Auto remove after duration
+  const removeTimer = setTimeout(() => {
+    toast.classList.add('toast-hide');
+  }, duration);
+  
+  // Remove from DOM after animation
+  toast.addEventListener('animationend', (e) => {
+    if (e.animationName === 'toastSlideOut') {
+      clearTimeout(removeTimer);
+      toast.remove();
+    }
+  });
+  
+  return toast;
+}
+
+/* ======== MODERN MODAL DIALOGS ======== */
+function showConfirm(message, confirmText = 'OK', cancelText = 'Anuluj', title = 'Potwierdź') {
+  return new Promise((resolve) => {
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = `
+      <div class="modal-dialog">
+        <div class="modal-header">
+          <div class="modal-title">${title}</div>
+          <div class="modal-message">${message}</div>
+        </div>
+        <div class="modal-footer">
+          <button class="modal-btn modal-btn-secondary" data-action="cancel">${cancelText}</button>
+          <button class="modal-btn modal-btn-primary" data-action="confirm">${confirmText}</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    
+    const handleClick = (e) => {
+      const action = e.target.dataset.action;
+      if (action === 'confirm') {
+        resolve(true);
+        overlay.remove();
+      } else if (action === 'cancel') {
+        resolve(false);
+        overlay.remove();
+      }
+    };
+    
+    overlay.addEventListener('click', handleClick);
+    
+    // Focus confirm button
+    setTimeout(() => overlay.querySelector('[data-action="confirm"]').focus(), 50);
+  });
+}
+
+function showPrompt(message, defaultValue = '', title = 'Wprowadź wartość') {
+  return new Promise((resolve) => {
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = `
+      <div class="modal-dialog">
+        <div class="modal-header">
+          <div class="modal-title">${title}</div>
+          <div class="modal-message">${message}</div>
+        </div>
+        <div class="modal-body">
+          <input type="text" class="modal-input" value="${defaultValue.replace(/"/g, '&quot;')}" />
+        </div>
+        <div class="modal-footer">
+          <button class="modal-btn modal-btn-secondary" data-action="cancel">Anuluj</button>
+          <button class="modal-btn modal-btn-primary" data-action="confirm">OK</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    
+    const input = overlay.querySelector('.modal-input');
+    const confirmBtn = overlay.querySelector('[data-action="confirm"]');
+    const cancelBtn = overlay.querySelector('[data-action="cancel"]');
+    
+    const handleConfirm = () => {
+      resolve(input.value);
+      overlay.remove();
+    };
+    
+    const handleCancel = () => {
+      resolve(null);
+      overlay.remove();
+    };
+    
+    confirmBtn.addEventListener('click', handleConfirm);
+    cancelBtn.addEventListener('click', handleCancel);
+    
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') handleConfirm();
+      if (e.key === 'Escape') handleCancel();
+    });
+    
+    // Focus and select input
+    setTimeout(() => {
+      input.focus();
+      input.select();
+    }, 50);
+  });
+}
+
+/* ======== FLOATING START BUTTON ======== */
+function updateFloatingButton() {
+  if (ongoingTest && ongoingTest.running) {
+    floatingStartBtn.classList.add('running');
+    floatingStartBtn.innerHTML = `
+      <svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+      <span>Stop</span>
+      <span class="kbd">ESC</span>
+    `;
+  } else {
+    floatingStartBtn.classList.remove('running');
+    floatingStartBtn.innerHTML = `
+      <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+      <span>Start testu</span>
+      <span class="kbd">S</span>
+    `;
+  }
+}
+
+floatingStartBtn.addEventListener('click', () => {
+  if (ongoingTest && ongoingTest.running) {
+    stopTest();
+  } else {
+    startTestBtn.click();
+  }
+});
+
 
 /* Wiele wideo */
 let videoEntries = []; // { name, src, isLocal, eventTime, eventLabel }
@@ -1203,8 +1664,8 @@ fileInput.addEventListener('change', (e)=>{
   }
 });
 
-loadUrlBtn.addEventListener('click', ()=>{
-  const url = prompt('Wklej URL do pliku mp4/webm:');
+loadUrlBtn.addEventListener('click', async ()=>{
+  const url = await showPrompt('Wklej URL do pliku mp4/webm:', '', 'Wczytaj wideo z URL');
   if (!url) return;
   const name = url.split('/').pop() || 'Wideo z URL';
   videoEntries.push({
@@ -1226,26 +1687,44 @@ videoList.addEventListener('change', (e)=>{
 });
 
 /* SET EVENT */
-setEventBtn.addEventListener('click', setEventAtCurrent);
-document.addEventListener('keydown', (e)=>{
-  if (e.code === 'KeyE') { e.preventDefault(); setEventAtCurrent(); }
-  if (e.code === 'Space') { if (ongoingTest && ongoingTest.running) { e.preventDefault(); reactNow(); } }
+setEventBtn.addEventListener('click', async () => { await setEventAtCurrent(); });
+document.addEventListener('keydown', async (e)=>{
+  if (e.code === 'KeyE') { 
+    e.preventDefault(); 
+    await setEventAtCurrent(); 
+    if (typeof updatePreviewEventInfo === 'function' && typeof isPreviewMode !== 'undefined' && isPreviewMode) {
+      updatePreviewEventInfo();
+    }
+  }
+  if (e.code === 'Space') {
+    // Always prevent default in fullscreen test mode to avoid button activation
+    if (typeof isFullscreenTestMode !== 'undefined' && isFullscreenTestMode) {
+      e.preventDefault();
+    }
+    if (ongoingTest && ongoingTest.running) { 
+      e.preventDefault(); 
+      reactNow(); 
+    }
+  }
   if (e.code === 'KeyS') { e.preventDefault(); startTestBtn.click(); }
 });
 
-function setEventAtCurrent(){
+async function setEventAtCurrent(){
   if (currentVideoIndex < 0 || !videoEntries[currentVideoIndex]) {
-    alert('Wczytaj wideo i wybierz je z listy przed ustawieniem zdarzenia.');
+    showToast('Wczytaj wideo i wybierz je z listy przed ustawieniem zdarzenia.', 'warning');
     forceLayoutRecalc();
     return;
   }
   eventTime = video.currentTime;
-  lastEventLabel = prompt('Opis zdarzenia (opcjonalnie):', lastEventLabel || '') || lastEventLabel;
+  const newLabel = await showPrompt('Opis zdarzenia (opcjonalnie):', lastEventLabel || '', 'Opisz zdarzenie');
+  if (newLabel !== null) {
+    lastEventLabel = newLabel || lastEventLabel;
+  }
   videoEntries[currentVideoIndex].eventTime = eventTime;
   videoEntries[currentVideoIndex].eventLabel = lastEventLabel;
   updateEventUI();
   refreshVideoList();
-  alert(`Ustawiono zdarzenie dla wideo "${videoEntries[currentVideoIndex].name}": ${eventTime.toFixed(3)} s ${lastEventLabel? '— ' + lastEventLabel : ''}`);
+  showToast(`Ustawiono zdarzenie dla wideo "${videoEntries[currentVideoIndex].name}": ${eventTime.toFixed(3)} s ${lastEventLabel? '— ' + lastEventLabel : ''}`, 'success', 'Zdarzenie ustawione');
   // Force layout recalculation after alert closes on mobile
   forceLayoutRecalc();
 }
@@ -1405,7 +1884,7 @@ stopTestBtn.addEventListener('click', stopTest);
 
 function startTest(){
   if (!videoEntries.length) {
-    alert('Wczytaj co najmniej jedno wideo przed testem.');
+    showToast('Wczytaj co najmniej jedno wideo przed testem.', 'warning');
     forceLayoutRecalc();
     return;
   }
@@ -1426,7 +1905,7 @@ function startTest(){
     if (v.eventTime != null) videoIndices.push(i);
   });
   if (!videoIndices.length){
-    alert('Ustaw punkt zdarzenia (E) na co najmniej jednym wideo przed testem.');
+    showToast('Ustaw punkt zdarzenia (E) na co najmniej jednym wideo przed testem.', 'warning');
     forceLayoutRecalc();
     return;
   }
@@ -1448,6 +1927,7 @@ function startTest(){
       offsetMax:to,
       videoIndices
     };
+    updateFloatingButton();
     
     // Enter fullscreen test mode
     enterFullscreenTestMode();
@@ -1500,10 +1980,14 @@ function runNextTrial(){
         const playingText = `Próba ${trialIndex} / ${ongoingTest.trialsTotal} — Reaguj!`;
         trialInfo.textContent = `Próba ${trialIndex} / ${ongoingTest.trialsTotal} — wideo: ${chosenEntry.name}. Reaguj na zdarzenie.`;
         updateFsTrialInfo(playingText);
+        // Ensure fullscreen overlay has focus for keyboard events
+        if (isFullscreenTestMode) {
+          fullscreenOverlay.focus();
+        }
       }).catch(err=>{
         console.warn('Play rejected:', err);
         exitFullscreenTestMode();
-        alert('Autoodtwarzanie zablokowane. Dotknij wideo, a potem kliknij Start ponownie.');
+        showToast('Autoodtwarzanie zablokowane. Dotknij wideo, a potem kliknij Start ponownie.', 'warning');
         forceLayoutRecalc();
       });
     }, 140);
@@ -1514,7 +1998,7 @@ function runNextTrial(){
 
 function reactNow(){
   if (!ongoingTest || !ongoingTest.running){
-    alert('Brak trwającego testu.');
+    showToast('Brak trwającego testu.', 'info');
     forceLayoutRecalc();
     return;
   }
@@ -1561,6 +2045,7 @@ function reactNow(){
       ongoingTest.running = false;
       trialInfo.textContent = `Test zakończony. ${results.length} wyników.`;
       updateResultsUI();
+      updateFloatingButton();
       
       // Show summary bubble instead of immediately exiting
       showTestSummary();
@@ -1573,6 +2058,7 @@ function stopTest(){
   ongoingTest.running = false;
   try { video.pause(); } catch(_){}
   trialInfo.textContent = 'Test zatrzymany.';
+  updateFloatingButton();
   
   // Exit fullscreen test mode when test is stopped
   exitFullscreenTestMode();
@@ -2049,7 +2535,7 @@ function drawGaussCurve(samples, mean, stdDev){
 
 /* EXPORT CSV */
 exportCsvBtn.addEventListener('click', ()=>{
-  if (results.length === 0) { alert('Brak wyników do eksportu'); forceLayoutRecalc(); return; }
+  if (results.length === 0) { showToast('Brak wyników do eksportu', 'warning'); forceLayoutRecalc(); return; }
   const lines = [['trial','iso','ms','note','video']];
   results.forEach(r => lines.push([r.trial, r.iso, r.ms, r.note, r.videoName || '']));
   const csv = lines.map(l=>l.map(cell=> `"${String(cell).replace(/"/g,'""')}"`).join(',')).join('\n');
@@ -2135,6 +2621,7 @@ video.addEventListener('webkitendfullscreen', handleFullscreenChange);
 /* ======== FULLSCREEN TEST MODE ======== */
 const fullscreenOverlay = document.createElement('div');
 fullscreenOverlay.id = 'fullscreenOverlay';
+fullscreenOverlay.tabIndex = -1; // Allow focus for keyboard events
 fullscreenOverlay.innerHTML = `
   <div class="fs-video-container" id="fsVideoContainer"></div>
   <div class="fs-trial-info" id="fsTrialInfo">Przygotuj się...</div>
@@ -2164,13 +2651,38 @@ fullscreenOverlay.innerHTML = `
       </div>
     </div>
     <div class="fs-summary-buttons">
-      <button class="fs-summary-btn fs-summary-btn-primary" id="fsSummaryAgain">Jeszcze raz</button>
-      <button class="fs-summary-btn fs-summary-btn-secondary" id="fsSummaryExit">Zakończ</button>
+      <button class="fs-summary-btn fs-summary-btn-primary" id="fsSummaryAgain" tabindex="-1">Jeszcze raz</button>
+      <button class="fs-summary-btn fs-summary-btn-secondary" id="fsSummaryExit" tabindex="-1">Zakończ</button>
     </div>
   </div>
-  <button class="fs-react-btn" id="fsReactBtn">Reaguj (Space)</button>
+  <div class="fs-buttons-row">
+    <button class="fs-react-btn" id="fsReactBtn" tabindex="-1">Reaguj (Space)</button>
+    <button class="fs-stop-btn" id="fsStopBtn" tabindex="-1">
+      <svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+      Stop
+    </button>
+  </div>
 `;
 document.body.appendChild(fullscreenOverlay);
+
+// ======== FULLSCREEN PREVIEW MODE (for setting events) ========
+const previewOverlay = document.createElement('div');
+previewOverlay.id = 'previewOverlay';
+previewOverlay.innerHTML = `
+  <div class="preview-video-container" id="previewVideoContainer"></div>
+  <div class="preview-controls">
+    <button class="preview-btn preview-btn-primary" id="previewSetEventBtn">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+      Ustaw zdarzenie (E)
+    </button>
+    <button class="preview-btn preview-btn-secondary" id="previewCloseBtn">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      Zamknij
+    </button>
+  </div>
+  <div class="preview-event-info" id="previewEventInfo"></div>
+`;
+document.body.appendChild(previewOverlay);
 
 const fsStyle = document.createElement('style');
 fsStyle.textContent = `
@@ -2193,6 +2705,7 @@ fsStyle.textContent = `
     overflow: hidden;
     padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
     box-sizing: border-box;
+    outline: none; /* Prevent focus outline */
   }
   #fullscreenOverlay.active {
     display: flex !important;
@@ -2429,6 +2942,61 @@ fsStyle.textContent = `
   .fs-react-btn:active {
     background: linear-gradient(90deg, #0090c5, #009dd5);
   }
+  .fs-buttons-row {
+    display: flex;
+    gap: 12px;
+    width: calc(100% - 24px);
+    max-width: 600px;
+    margin: 12px auto;
+    margin-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+    flex-shrink: 0;
+  }
+  .fs-buttons-row .fs-react-btn {
+    flex: 1;
+    margin: 0;
+    width: auto;
+  }
+  .fs-stop-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: linear-gradient(90deg, #b00020, #d32f2f);
+    color: white;
+    padding: 24px 28px;
+    border: none;
+    border-radius: 16px;
+    font-size: 20px;
+    font-weight: 700;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    -webkit-user-select: none;
+    user-select: none;
+    box-shadow: 0 8px 24px rgba(176, 0, 32, 0.3);
+    flex-shrink: 0;
+  }
+  .fs-stop-btn svg {
+    width: 24px;
+    height: 24px;
+    fill: currentColor;
+  }
+  .fs-stop-btn:active {
+    background: linear-gradient(90deg, #8e001a, #b71c1c);
+  }
+  @media (max-width: 700px) {
+    .fs-buttons-row {
+      width: calc(100% - 20px);
+      margin: 10px auto;
+      margin-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+      gap: 10px;
+    }
+    .fs-stop-btn {
+      padding: 22px 20px;
+      font-size: 18px;
+      border-radius: 14px;
+    }
+  }
   @media (max-width: 700px) {
     .fs-react-btn {
       padding: 22px 20px;
@@ -2472,8 +3040,208 @@ fsStyle.textContent = `
   #fullscreenOverlay video::-webkit-media-controls-panel {
     display: none !important;
   }
+
+  /* Preview Overlay Styles */
+  #previewOverlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    height: 100dvh;
+    background: #000;
+    z-index: 9998;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+  #previewOverlay.active {
+    display: flex !important;
+  }
+  .preview-video-container {
+    flex: 1;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .preview-video-container video {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+  }
+  .preview-controls {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 12px;
+    z-index: 10;
+  }
+  .preview-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 24px;
+    border: none;
+    border-radius: 50px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  }
+  .preview-btn-primary {
+    background: linear-gradient(135deg, #F4D00C 0%, #D4B00A 100%);
+    color: #1a1a1a;
+  }
+  .preview-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(244,208,12,0.4);
+  }
+  .preview-btn-secondary {
+    background: rgba(255,255,255,0.15);
+    color: white;
+    backdrop-filter: blur(10px);
+  }
+  .preview-btn-secondary:hover {
+    background: rgba(255,255,255,0.25);
+  }
+  .preview-event-info {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.7);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    backdrop-filter: blur(10px);
+    display: none;
+  }
+  .preview-event-info.visible {
+    display: block;
+  }
+  @media (max-width: 600px) {
+    .preview-controls {
+      flex-direction: column;
+      bottom: 20px;
+      width: calc(100% - 40px);
+    }
+    .preview-btn {
+      width: 100%;
+      justify-content: center;
+    }
+  }
 `;
 document.head.appendChild(fsStyle);
+
+// Preview mode elements
+const previewVideoContainer = document.getElementById('previewVideoContainer');
+const previewSetEventBtn = document.getElementById('previewSetEventBtn');
+const previewCloseBtn = document.getElementById('previewCloseBtn');
+const previewEventInfo = document.getElementById('previewEventInfo');
+const fsPreviewBtn = document.getElementById('fsPreviewBtn');
+
+let isPreviewMode = false;
+let previewOriginalParent = null;
+
+function enterPreviewMode() {
+  if (isPreviewMode || !video.src) return;
+  isPreviewMode = true;
+  
+  previewOriginalParent = video.parentElement;
+  
+  // Keep controls in preview mode
+  video.setAttribute('controls', '');
+  
+  // Move video to preview container
+  previewVideoContainer.appendChild(video);
+  
+  // Show preview overlay
+  previewOverlay.classList.add('active');
+  
+  // Hide floating button
+  floatingStartBtn.style.display = 'none';
+  
+  // Update event info display
+  updatePreviewEventInfo();
+  
+  // Prevent body scroll
+  document.body.style.overflow = 'hidden';
+  
+  // Try to enter fullscreen
+  if (document.documentElement.requestFullscreen) {
+    document.documentElement.requestFullscreen().catch(() => {});
+  } else if (document.documentElement.webkitRequestFullscreen) {
+    document.documentElement.webkitRequestFullscreen().catch(() => {});
+  }
+}
+
+function exitPreviewMode() {
+  if (!isPreviewMode) return;
+  isPreviewMode = false;
+  
+  // Exit browser fullscreen if active
+  if (document.fullscreenElement || document.webkitFullscreenElement) {
+    if (document.exitFullscreen) {
+      document.exitFullscreen().catch(() => {});
+    } else if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen().catch(() => {});
+    }
+  }
+  
+  // Hide preview overlay
+  previewOverlay.classList.remove('active');
+  
+  // Move video back
+  if (previewOriginalParent) {
+    previewOriginalParent.appendChild(video);
+  }
+  
+  // Show floating button
+  floatingStartBtn.style.display = '';
+  
+  // Restore body scroll
+  document.body.style.overflow = '';
+}
+
+function updatePreviewEventInfo() {
+  if (currentVideoIndex >= 0 && videoEntries[currentVideoIndex]) {
+    const entry = videoEntries[currentVideoIndex];
+    if (entry.eventTime != null) {
+      previewEventInfo.textContent = `Zdarzenie: ${entry.eventTime.toFixed(3)}s ${entry.eventLabel ? '— ' + entry.eventLabel : ''}`;
+      previewEventInfo.classList.add('visible');
+    } else {
+      previewEventInfo.textContent = 'Brak ustawionego zdarzenia';
+      previewEventInfo.classList.add('visible');
+    }
+  } else {
+    previewEventInfo.classList.remove('visible');
+  }
+}
+
+fsPreviewBtn.addEventListener('click', enterPreviewMode);
+previewCloseBtn.addEventListener('click', exitPreviewMode);
+previewSetEventBtn.addEventListener('click', async () => {
+  await setEventAtCurrent();
+  updatePreviewEventInfo();
+});
+
+// Handle ESC to exit preview mode
+document.addEventListener('keydown', (e) => {
+  if (e.code === 'Escape' && isPreviewMode) {
+    exitPreviewMode();
+  }
+});
 
 const fsVideoContainer = document.getElementById('fsVideoContainer');
 const fsTrialInfo = document.getElementById('fsTrialInfo');
@@ -2489,6 +3257,7 @@ const fsSummarySD = document.getElementById('fsSummarySD');
 const fsSummaryValid = document.getElementById('fsSummaryValid');
 const fsSummaryAgain = document.getElementById('fsSummaryAgain');
 const fsSummaryExit = document.getElementById('fsSummaryExit');
+const fsStopBtn = document.getElementById('fsStopBtn');
 
 let originalVideoParent = null;
 let isFullscreenTestMode = false;
@@ -2522,6 +3291,7 @@ function enterFullscreenTestMode() {
   
   // Remove controls attribute to hide native controls
   video.removeAttribute('controls');
+  video.tabIndex = -1; // Prevent video from receiving focus
   
   // Move video to fullscreen container
   fsVideoContainer.appendChild(video);
@@ -2533,6 +3303,12 @@ function enterFullscreenTestMode() {
   
   // Show fullscreen overlay
   fullscreenOverlay.classList.add('active');
+  
+  // Focus fullscreen overlay for keyboard events
+  setTimeout(() => fullscreenOverlay.focus(), 50);
+  
+  // Hide floating button during fullscreen test
+  floatingStartBtn.style.display = 'none';
   
   // Prevent body scroll and fix iOS bouncing
   document.body.style.overflow = 'hidden';
@@ -2551,6 +3327,10 @@ function enterFullscreenTestMode() {
 function exitFullscreenTestMode() {
   if (!isFullscreenTestMode) return;
   isFullscreenTestMode = false;
+  
+  // Show floating button again and update its state
+  floatingStartBtn.style.display = '';
+  updateFloatingButton();
   
   // Hide result bubble and summary bubble if visible
   hideResultBubble();
@@ -2590,8 +3370,9 @@ function exitFullscreenTestMode() {
     originalVideoParent.appendChild(video);
   }
   
-  // Restore controls attribute
+  // Restore controls attribute and focusability
   video.setAttribute('controls', '');
+  video.removeAttribute('tabindex');
   
   // Restore body styles
   document.body.style.overflow = '';
@@ -2724,21 +3505,80 @@ function showTestSummary() {
 }
 
 // Fullscreen react button handler
+fsStopBtn.addEventListener('pointerdown', (e) => {
+  e.preventDefault();
+  stopTest();
+});
+
 fsReactBtn.addEventListener('pointerdown', (e) => {
   e.preventDefault();
   reactNow();
 });
 
-// Summary button handlers
-fsSummaryAgain.addEventListener('click', () => {
-  hideSummaryBubble();
-  // Reset and start new test with same settings
-  results = [];
-  updateResultsUI();
-  startTest();
+// Handle keyboard events in fullscreen mode (capture phase to catch before other handlers)
+fullscreenOverlay.addEventListener('keydown', (e) => {
+  if (e.code === 'Space') {
+    e.preventDefault();
+    e.stopPropagation();
+    if (ongoingTest && ongoingTest.running) {
+      reactNow();
+    }
+  }
+  if (e.code === 'Escape') {
+    e.preventDefault();
+    stopTest();
+  }
+}, true); // Use capture phase
+
+// Click on video container should refocus overlay for keyboard events
+fsVideoContainer.addEventListener('click', () => {
+  if (isFullscreenTestMode) {
+    fullscreenOverlay.focus();
+  }
 });
 
-fsSummaryExit.addEventListener('click', () => {
+// Summary button handlers
+fsSummaryAgain.addEventListener('pointerdown', (e) => {
+  e.preventDefault();
+  hideSummaryBubble();
+  // Reset and start new test directly (we're already in fullscreen mode)
+  results = [];
+  updateResultsUI();
+  
+  // Get settings from inputs
+  const trials = Math.max(1, parseInt(trialsCountInput.value)||1);
+  let from = parseFloat(randomFromInput.value);
+  let to = parseFloat(randomToInput.value);
+  if (isNaN(from)) from = 1.5;
+  if (isNaN(to)) to = 2.5;
+  if (from < 0) from = 0;
+  if (to < 0) to = 0;
+  if (to < from) { const tmp = from; from = to; to = tmp; }
+  
+  const videoIndices = [];
+  videoEntries.forEach((v,i)=>{
+    if (v.eventTime != null) videoIndices.push(i);
+  });
+  
+  // Start test immediately (no delay needed, already in fullscreen)
+  ongoingTest = {
+    running: true,
+    trialsTotal: trials,
+    currentTrial: 0,
+    offsetMin: from,
+    offsetMax: to,
+    videoIndices
+  };
+  updateFloatingButton();
+  updateFsTrialInfo('Przygotuj się...');
+  
+  // Immediately focus and start - focus will be re-applied after video plays
+  fullscreenOverlay.focus();
+  runNextTrial();
+});
+
+fsSummaryExit.addEventListener('pointerdown', (e) => {
+  e.preventDefault();
   exitFullscreenTestMode();
 });
 
@@ -2842,18 +3682,18 @@ function saveTrainingPlansToStorage(plans) {
     localStorage.setItem(TRAINING_PLANS_KEY, JSON.stringify(plans));
   } catch (e) {
     console.error('Error saving training plans:', e);
-    alert('Nie udało się zapisać treningów. Sprawdź dostępne miejsce w przeglądarce.');
+    showToast('Nie udało się zapisać treningów. Sprawdź dostępne miejsce w przeglądarce.', 'error');
   }
 }
 
 // Save current training
 async function saveCurrentTraining() {
   if (videoEntries.length === 0) {
-    alert('Brak filmów do zapisania. Dodaj co najmniej jeden film.');
+    showToast('Brak filmów do zapisania. Dodaj co najmniej jeden film.', 'warning');
     return;
   }
   
-  const planName = prompt('Podaj nazwę treningu:', `Trening ${new Date().toLocaleDateString('pl-PL')}`);
+  const planName = await showPrompt('Podaj nazwę treningu:', `Trening ${new Date().toLocaleDateString('pl-PL')}`);
   if (!planName) return;
   
   // Show saving indicator
@@ -2883,7 +3723,7 @@ async function saveCurrentTraining() {
           videoData.src = null; // Don't store blob URL
         } catch (err) {
           console.error('Error saving local video:', err);
-          alert(`Błąd podczas zapisywania filmu "${v.name}". Film może być zbyt duży.`);
+          showToast(`Błąd podczas zapisywania filmu "${v.name}". Film może być zbyt duży.`, 'error');
           saveTrainingBtn.disabled = false;
           saveTrainingBtn.textContent = 'Zapisz obecny trening';
           return;
@@ -2909,10 +3749,10 @@ async function saveCurrentTraining() {
     saveTrainingPlansToStorage(plans);
     refreshTrainingPlansList();
     
-    alert(`Trening "${planName}" został zapisany z ${videosToSave.length} filmami.`);
+    showToast(`Trening "${planName}" został zapisany z ${videosToSave.length} filmami.`, 'success');
   } catch (err) {
     console.error('Error saving training:', err);
-    alert('Wystąpił błąd podczas zapisywania treningu.');
+    showToast('Wystąpił błąd podczas zapisywania treningu.', 'error');
   } finally {
     saveTrainingBtn.disabled = false;
     saveTrainingBtn.textContent = 'Zapisz obecny trening';
@@ -2924,7 +3764,7 @@ async function loadTrainingPlan(planId) {
   const plans = getSavedTrainingPlans();
   const plan = plans.find(p => p.id === planId);
   if (!plan) {
-    alert('Nie znaleziono treningu.');
+    showToast('Nie znaleziono treningu.', 'error');
     return;
   }
   
@@ -2932,7 +3772,7 @@ async function loadTrainingPlan(planId) {
   const hasExisting = videoEntries.length > 0;
   let shouldReplace = true;
   if (hasExisting) {
-    shouldReplace = confirm('Czy chcesz zastąpić obecne filmy? (OK = zastąp, Anuluj = dodaj do obecnych)');
+    shouldReplace = await showConfirm('Czy chcesz zastąpić obecne filmy?', 'Zastąp', 'Dodaj do obecnych');
   }
   
   // Show loading indicator
@@ -2966,7 +3806,7 @@ async function loadTrainingPlan(planId) {
             src = URL.createObjectURL(videoData.blob);
           } else {
             console.warn('Video not found in IndexedDB:', v.videoId);
-            alert(`Film "${v.name}" nie został znaleziony w pamięci. Możliwe, że dane zostały usunięte.`);
+            showToast(`Film "${v.name}" nie został znaleziony w pamięci. Możliwe, że dane zostały usunięte.`, 'warning');
             continue;
           }
         } catch (err) {
@@ -2992,10 +3832,10 @@ async function loadTrainingPlan(planId) {
       refreshVideoList();
     }
     
-    alert(`Wczytano trening "${plan.name}" z ${plan.videos.length} filmami.`);
+    showToast(`Wczytano trening "${plan.name}" z ${plan.videos.length} filmami.`, 'success');
   } catch (err) {
     console.error('Error loading training:', err);
-    alert('Wystąpił błąd podczas wczytywania treningu.');
+    showToast('Wystąpił błąd podczas wczytywania treningu.', 'error');
   } finally {
     if (loadBtn) {
       loadBtn.disabled = false;
@@ -3010,7 +3850,8 @@ async function deleteTrainingPlan(planId) {
   const plan = plans.find(p => p.id === planId);
   if (!plan) return;
   
-  if (!confirm(`Czy na pewno chcesz usunąć trening "${plan.name}"?`)) return;
+  const confirmed = await showConfirm(`Czy na pewno chcesz usunąć trening "${plan.name}"?`, 'Usuń', 'Anuluj');
+  if (!confirmed) return;
   
   // Delete associated videos from IndexedDB
   for (const v of plan.videos) {
@@ -3104,19 +3945,19 @@ const exampleTrainingsData = {
         {
           "name": "Test Swiatla 1",
           "src": "./example/Test-Swiatla-1.MOV",
-          "eventTime": 1.665,
+          "eventTime": 1.655,
           "eventLabel": "Pierwsze zolte swiatlo"
         },
         {
           "name": "Test Swiatla 2",
           "src": "./example/Test-Swiatla-2.MOV",
-          "eventTime": 5.183,
+          "eventTime": 5.265,
           "eventLabel": "Pierwsze zolte swiatlo"
         },
         {
           "name": "Test Swiatla 3",
           "src": "./example/Test-Swiatla-3.MOV",
-          "eventTime": 2.464,
+          "eventTime": 2.507,
           "eventLabel": "Pierwsze zolte swiatlo"
         }
       ]
@@ -3151,7 +3992,7 @@ function refreshExampleTrainingsList() {
 
 async function loadExampleTraining(index) {
   if (!exampleTrainingsData || !exampleTrainingsData.exampleTrainings[index]) {
-    alert('Nie znaleziono przykładowego treningu.');
+    showToast('Nie znaleziono przykładowego treningu.', 'error');
     return;
   }
 
@@ -3161,7 +4002,7 @@ async function loadExampleTraining(index) {
   const hasExisting = videoEntries.length > 0;
   let shouldReplace = true;
   if (hasExisting) {
-    shouldReplace = confirm('Czy chcesz zastąpić obecne filmy? (OK = zastąp, Anuluj = dodaj do obecnych)');
+    shouldReplace = await showConfirm('Czy chcesz zastąpić obecne filmy?', 'Zastąp', 'Dodaj do obecnych');
   }
 
   // Show loading indicator
@@ -3202,10 +4043,10 @@ async function loadExampleTraining(index) {
       refreshVideoList();
     }
 
-    alert(`Wczytano przykładowy trening "${training.name}" z ${training.videos.length} filmami.`);
+    showToast(`Wczytano przykładowy trening "${training.name}" z ${training.videos.length} filmami.`, 'success');
   } catch (err) {
     console.error('Error loading example training:', err);
-    alert('Wystąpił błąd podczas wczytywania przykładowego treningu.');
+    showToast('Wystąpił błąd podczas wczytywania przykładowego treningu.', 'error');
   } finally {
     if (loadBtn) {
       loadBtn.disabled = false;
