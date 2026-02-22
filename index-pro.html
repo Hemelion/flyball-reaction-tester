@@ -1553,6 +1553,7 @@ const PRO_CONFIG = {
 // Lista dozwolonych użytkowników (ładowana z config.json)
 let allowedUserHashes = [];
 let proSalt = '';
+let configLoaded = false;
 
 // Ładowanie konfiguracji z zewnętrznego pliku
 async function loadConfig() {
@@ -1563,6 +1564,8 @@ async function loadConfig() {
     allowedUserHashes = config.allowedUserHashes || [];
     // Dekoduj salt z base64
     proSalt = config.salt ? atob(config.salt) : '';
+    configLoaded = true;
+    console.log('Config loaded, salt length:', proSalt.length, 'hashes:', allowedUserHashes.length);
     return true;
   } catch (e) {
     console.error('Błąd ładowania config.json:', e);
@@ -1572,6 +1575,10 @@ async function loadConfig() {
 
 // Funkcja hashująca SHA-256 (async)
 async function sha256(message) {
+  // Upewnij się że config jest załadowany
+  if (!configLoaded) {
+    await loadConfig();
+  }
   const msgBuffer = new TextEncoder().encode(message + proSalt);
   const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
   const hashArray = Array.from(new Uint8Array(hashBuffer));
@@ -1581,7 +1588,11 @@ async function sha256(message) {
 // Weryfikacja czy użytkownik jest na whitelist
 async function isUserAllowed(facebookUserId) {
   const userHash = await sha256(facebookUserId);
-  return allowedUserHashes.includes(userHash);
+  console.log('Checking user:', facebookUserId, '-> hash:', userHash);
+  console.log('Allowed hashes:', allowedUserHashes);
+  const allowed = allowedUserHashes.includes(userHash);
+  console.log('Is allowed:', allowed);
+  return allowed;
 }
 
 // Security check - block local file access and unauthorized domains
